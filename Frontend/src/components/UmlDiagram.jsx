@@ -1,14 +1,65 @@
+import ZoomableViewport from './ZoomableViewport'
+
+const NO_SPACE_BEFORE_TOKENS = new Set([',', '.', ';', ':', ')', ']', '}', '>', '<', '(', '[', '{'])
+const NO_SPACE_AFTER_CHARACTERS = new Set(['<', '(', '[', '{'])
+
+function splitLongToken(token, maxChunkLength = 12) {
+  if (!token || token.length <= maxChunkLength) {
+    return [token]
+  }
+
+  const parts = []
+  let cursor = 0
+
+  while (cursor < token.length) {
+    parts.push(token.slice(cursor, cursor + maxChunkLength))
+    cursor += maxChunkLength
+  }
+
+  return parts
+}
+
+function tokenizeForWrap(text) {
+  return `${text ?? ''}`
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([<>(){}\[\],.:;])/g, ' $1 ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+    .flatMap((token) => (
+      /^[<>(){}\[\],.:;]$/.test(token)
+        ? [token]
+        : splitLongToken(token)
+    ))
+}
+
+function appendToken(line, token) {
+  if (!line) {
+    return token
+  }
+
+  const lastCharacter = line[line.length - 1]
+
+  if (NO_SPACE_BEFORE_TOKENS.has(token) || NO_SPACE_AFTER_CHARACTERS.has(lastCharacter)) {
+    return `${line}${token}`
+  }
+
+  return `${line} ${token}`
+}
+
 function wrapText(text, maxLength = 28) {
   if (!text) {
     return []
   }
 
-  const words = `${text}`.split(/\s+/).filter(Boolean)
+  const words = tokenizeForWrap(text)
   const lines = []
   let currentLine = ''
 
   for (const word of words) {
-    const candidate = currentLine ? `${currentLine} ${word}` : word
+    const candidate = appendToken(currentLine, word)
     if (candidate.length <= maxLength) {
       currentLine = candidate
       continue
@@ -27,8 +78,36 @@ function wrapText(text, maxLength = 28) {
   return lines
 }
 
-function getTone(tone) {
-  if (tone === 'teal') {
+function estimateTextWidth(text, fontSize) {
+  return `${text ?? ''}`.length * fontSize * 0.58
+}
+
+function getFittedFontSize(lines, baseFontSize, minimumFontSize, availableWidth) {
+  if (!lines?.length || availableWidth <= 0) {
+    return baseFontSize
+  }
+
+  const widestLine = Math.max(...lines.map((line) => estimateTextWidth(line, baseFontSize)))
+  if (widestLine <= availableWidth) {
+    return baseFontSize
+  }
+
+  const scaledFontSize = Math.floor(baseFontSize * (availableWidth / widestLine))
+  return Math.max(minimumFontSize, Math.min(baseFontSize, scaledFontSize))
+}
+
+function getTone(box) {
+  const stereotype = box.stereotype?.toLowerCase?.() ?? ''
+
+  if (stereotype.includes('concrete')) {
+    return {
+      fill: 'rgba(231, 198, 167, 0.92)',
+      stroke: '#c25737',
+      text: '#5f2d20',
+    }
+  }
+
+  if (stereotype === 'context') {
     return {
       fill: 'rgba(211, 236, 230, 0.94)',
       stroke: '#246b5e',
@@ -36,7 +115,47 @@ function getTone(tone) {
     }
   }
 
-  if (tone === 'accent') {
+  if (stereotype === 'creator') {
+    return {
+      fill: 'rgba(214, 228, 241, 0.94)',
+      stroke: '#426c8d',
+      text: '#27465f',
+    }
+  }
+
+  if (stereotype === 'subject') {
+    return {
+      fill: 'rgba(219, 239, 228, 0.94)',
+      stroke: '#2e7a56',
+      text: '#1e4f38',
+    }
+  }
+
+  if (stereotype === 'observer') {
+    return {
+      fill: 'rgba(245, 231, 201, 0.94)',
+      stroke: '#a16b22',
+      text: '#624313',
+    }
+  }
+
+  if (stereotype === 'strategy' || stereotype === 'product') {
+    return {
+      fill: 'rgba(255, 244, 220, 0.96)',
+      stroke: '#9a7130',
+      text: '#5c4218',
+    }
+  }
+
+  if (box.tone === 'teal') {
+    return {
+      fill: 'rgba(211, 236, 230, 0.94)',
+      stroke: '#246b5e',
+      text: '#153f38',
+    }
+  }
+
+  if (box.tone === 'accent') {
     return {
       fill: 'rgba(231, 198, 167, 0.92)',
       stroke: '#c25737',
@@ -48,6 +167,85 @@ function getTone(tone) {
     fill: 'rgba(255, 249, 239, 0.98)',
     stroke: '#7a5a3f',
     text: '#3d2d20',
+  }
+}
+
+function parseViewBox(viewBox) {
+  const parts = `${viewBox ?? ''}`.split(/\s+/).map(Number)
+
+  if (parts.length === 4 && parts.every((value) => Number.isFinite(value))) {
+    return {
+      minX: parts[0],
+      minY: parts[1],
+      width: parts[2],
+      height: parts[3],
+    }
+  }
+
+  return {
+    minX: 0,
+    minY: 0,
+    width: 960,
+    height: 600,
+  }
+}
+
+function getWrappedMembers(lines, maxLength = 28) {
+  return (lines ?? []).flatMap((line) => wrapText(line, maxLength))
+}
+
+function getBoxLayout(box) {
+  const titleLines = wrapText(box.title, 22)
+  const fieldLines = getWrappedMembers(box.fields, 24)
+  const methodLines = getWrappedMembers(box.methods, 24)
+  const stereotypeLabel = `<<${box.stereotype}>>`
+  const baseWidth = box.width ?? 210
+  const contentWidth = Math.max(
+    estimateTextWidth(stereotypeLabel, 10),
+    ...titleLines.map((line) => estimateTextWidth(line, 18)),
+    ...fieldLines.map((line) => estimateTextWidth(line, 12)),
+    ...methodLines.map((line) => estimateTextWidth(line, 12)),
+  )
+  const width = Math.min(340, Math.max(baseWidth, Math.ceil(contentWidth + 44)))
+  const stereotypeFontSize = getFittedFontSize([stereotypeLabel], 10, 9, width - 40)
+  const titleFontSize = getFittedFontSize(titleLines, 18, 15, width - 40)
+  const memberFontSize = getFittedFontSize(
+    [...fieldLines, ...methodLines, 'Aucun membre pour cette vue simplifiee'],
+    12,
+    10,
+    width - 36,
+  )
+  const titleStartY = 34
+  const titleLineHeight = titleFontSize + 4
+  const memberLineHeight = memberFontSize + 6
+  const headerHeight = 24 + titleLines.length * titleLineHeight + 16
+  const memberStartY = headerHeight + 22
+  const fieldDividerY = fieldLines.length ? memberStartY + fieldLines.length * memberLineHeight - 8 : null
+  const methodStartY = fieldLines.length ? memberStartY + fieldLines.length * memberLineHeight + 14 : memberStartY
+  const contentBottomY = methodLines.length
+    ? methodStartY + methodLines.length * memberLineHeight
+    : fieldLines.length
+      ? memberStartY + fieldLines.length * memberLineHeight
+      : memberStartY + memberLineHeight
+  const height = Math.max(box.height ?? 118, contentBottomY + 20)
+
+  return {
+    ...box,
+    width,
+    height,
+    titleLines,
+    fieldLines,
+    methodLines,
+    titleStartY,
+    titleLineHeight,
+    memberStartY,
+    memberLineHeight,
+    headerHeight,
+    fieldDividerY,
+    methodStartY,
+    stereotypeFontSize,
+    titleFontSize,
+    memberFontSize,
   }
 }
 
@@ -67,7 +265,65 @@ function getAnchor(box, side) {
   return { x: box.x + box.width, y: box.y + box.height / 2 }
 }
 
-function buildPath(relation, classesById) {
+function getAutoSides(fromBox, toBox) {
+  const fromCenterX = fromBox.x + fromBox.width / 2
+  const fromCenterY = fromBox.y + fromBox.height / 2
+  const toCenterX = toBox.x + toBox.width / 2
+  const toCenterY = toBox.y + toBox.height / 2
+  const dx = toCenterX - fromCenterX
+  const dy = toCenterY - fromCenterY
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return dx >= 0
+      ? { fromSide: 'right', toSide: 'left' }
+      : { fromSide: 'left', toSide: 'right' }
+  }
+
+  return dy >= 0
+    ? { fromSide: 'bottom', toSide: 'top' }
+    : { fromSide: 'top', toSide: 'bottom' }
+}
+
+function offsetStraightLine(start, end, offset) {
+  if (offset === 0) {
+    return [start, end]
+  }
+
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const length = Math.hypot(dx, dy) || 1
+  const normalX = -dy / length
+  const normalY = dx / length
+
+  return [
+    { x: start.x + normalX * offset, y: start.y + normalY * offset },
+    { x: end.x + normalX * offset, y: end.y + normalY * offset },
+  ]
+}
+
+function buildRelationMeta(relations) {
+  const totalsByKey = relations.reduce((accumulator, relation) => {
+    const key = `${relation.from}->${relation.to}`
+    accumulator[key] = (accumulator[key] ?? 0) + 1
+    return accumulator
+  }, {})
+
+  const seenByKey = {}
+
+  return relations.map((relation) => {
+    const key = `${relation.from}->${relation.to}`
+    const index = seenByKey[key] ?? 0
+    seenByKey[key] = index + 1
+
+    return {
+      key,
+      index,
+      total: totalsByKey[key],
+    }
+  })
+}
+
+function buildRelationPoints(relation, classesById, relationMeta) {
   const fromBox = classesById[relation.from]
   const toBox = classesById[relation.to]
 
@@ -75,16 +331,259 @@ function buildPath(relation, classesById) {
     return null
   }
 
-  const start = getAnchor(fromBox, relation.fromSide ?? 'right')
-  const end = getAnchor(toBox, relation.toSide ?? 'left')
-  const points = [start, ...(relation.points ?? []), end]
+  const sides = getAutoSides(fromBox, toBox)
+  const start = getAnchor(fromBox, sides.fromSide)
+  const end = getAnchor(toBox, sides.toSide)
+  const offset = relationMeta.total > 1
+    ? (relationMeta.index - (relationMeta.total - 1) / 2) * 22
+    : 0
 
+  return offsetStraightLine(start, end, offset)
+}
+
+function buildPath(points) {
   return points
     .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
     .join(' ')
 }
 
-export default function UmlDiagram({ diagram, patternName }) {
+function getPolylinePointAt(points, ratio = 0.5) {
+  if (!points || points.length === 0) {
+    return { x: 0, y: 0 }
+  }
+
+  let totalLength = 0
+  const segments = []
+
+  for (let index = 1; index < points.length; index += 1) {
+    const start = points[index - 1]
+    const end = points[index]
+    const length = Math.hypot(end.x - start.x, end.y - start.y)
+
+    segments.push({ start, end, length })
+    totalLength += length
+  }
+
+  if (totalLength === 0) {
+    return points[0]
+  }
+
+  const targetLength = totalLength * ratio
+  let walkedLength = 0
+
+  for (const segment of segments) {
+    if (walkedLength + segment.length >= targetLength) {
+      const localRatio = (targetLength - walkedLength) / segment.length
+
+      return {
+        x: segment.start.x + (segment.end.x - segment.start.x) * localRatio,
+        y: segment.start.y + (segment.end.y - segment.start.y) * localRatio,
+      }
+    }
+
+    walkedLength += segment.length
+  }
+
+  return points[points.length - 1]
+}
+
+function withPosition(box, x, y) {
+  return {
+    ...box,
+    x,
+    y,
+  }
+}
+
+function getRowWidth(boxes, gap) {
+  return boxes.reduce((total, box, index) => total + box.width + (index > 0 ? gap : 0), 0)
+}
+
+function getRowHeight(boxes) {
+  return Math.max(...boxes.map((box) => box.height))
+}
+
+function buildFactoryLayout(boxesById) {
+  const factory = boxesById.factory
+  const vehicle = boxesById.vehicle
+  const car = boxesById.car
+  const bike = boxesById.bike
+
+  if (!factory || !vehicle || !car || !bike) {
+    return null
+  }
+
+  const marginX = 88
+  const marginY = 74
+  const columnGap = 156
+  const rowGap = 148
+  const topRow = [factory, vehicle]
+  const bottomRow = [car, bike]
+  const topRowWidth = getRowWidth(topRow, columnGap)
+  const bottomRowWidth = getRowWidth(bottomRow, columnGap)
+  const contentWidth = Math.max(topRowWidth, bottomRowWidth)
+  const width = marginX * 2 + contentWidth
+  const topStartX = marginX + (contentWidth - topRowWidth) / 2
+  const bottomStartX = marginX + (contentWidth - bottomRowWidth) / 2
+  const topY = marginY
+  const bottomY = topY + getRowHeight(topRow) + rowGap
+
+  return {
+    viewBox: `0 0 ${width} ${bottomY + getRowHeight(bottomRow) + marginY}`,
+    boxes: [
+      withPosition(factory, topStartX, topY),
+      withPosition(vehicle, topStartX + factory.width + columnGap, topY),
+      withPosition(car, bottomStartX, bottomY),
+      withPosition(bike, bottomStartX + car.width + columnGap, bottomY),
+    ],
+  }
+}
+
+function buildStrategyLayout(boxesById) {
+  const context = boxesById.context
+  const strategy = boxesById.strategy
+  const card = boxesById.card
+  const paypal = boxesById.paypal
+  const crypto = boxesById.crypto
+
+  if (!context || !strategy || !card || !paypal || !crypto) {
+    return null
+  }
+
+  const marginX = 92
+  const marginY = 74
+  const columnGap = 142
+  const rowGap = 138
+  const bottomRow = [card, paypal, crypto]
+  const bottomRowWidth = getRowWidth(bottomRow, columnGap)
+  const rightAreaWidth = Math.max(bottomRowWidth, strategy.width)
+  const width = marginX * 2 + context.width + columnGap + rightAreaWidth
+  const rightAreaX = marginX + context.width + columnGap
+  const topStartX = rightAreaX + (rightAreaWidth - strategy.width) / 2
+  const bottomStartX = rightAreaX + (rightAreaWidth - bottomRowWidth) / 2
+  const topY = marginY
+  const contextY = topY + (strategy.height - context.height) / 2
+  const bottomY = topY + strategy.height + rowGap
+  const height = Math.max(
+    bottomY + getRowHeight(bottomRow) + marginY,
+    contextY + context.height + marginY,
+  )
+
+  return {
+    viewBox: `0 0 ${width} ${height}`,
+    boxes: [
+      withPosition(strategy, topStartX, topY),
+      withPosition(context, marginX, contextY),
+      withPosition(card, bottomStartX, bottomY),
+      withPosition(paypal, bottomStartX + card.width + columnGap, bottomY),
+      withPosition(crypto, bottomStartX + card.width + columnGap + paypal.width + columnGap, bottomY),
+    ],
+  }
+}
+
+function buildObserverLayout(boxesById) {
+  const subject = boxesById.subject
+  const observer = boxesById.observer
+  const subscriber = boxesById.subscriber
+
+  if (!subject || !observer || !subscriber) {
+    return null
+  }
+
+  const marginX = 88
+  const marginY = 74
+  const columnGap = 162
+  const rowGap = 144
+  const topRowWidth = subject.width + columnGap + observer.width
+  const width = marginX * 2 + topRowWidth
+  const topY = marginY
+  const bottomY = topY + Math.max(subject.height, observer.height) + rowGap
+  const observerX = marginX + subject.width + columnGap
+  const subscriberX = observerX + (observer.width - subscriber.width) / 2
+
+  return {
+    viewBox: `0 0 ${width} ${bottomY + subscriber.height + marginY}`,
+    boxes: [
+      withPosition(subject, marginX, topY),
+      withPosition(observer, observerX, topY),
+      withPosition(subscriber, subscriberX, bottomY),
+    ],
+  }
+}
+
+function buildFallbackLayout(boxes) {
+  const marginX = 88
+  const marginY = 74
+  const columnGap = 102
+  const rowGap = 94
+  const sortedBoxes = [...boxes].sort((left, right) => (
+    left.y === right.y
+      ? left.x - right.x
+      : left.y - right.y
+  ))
+  const rows = []
+
+  sortedBoxes.forEach((box) => {
+    const lastRow = rows[rows.length - 1]
+
+    if (!lastRow || Math.abs(lastRow.referenceY - box.y) > 120) {
+      rows.push({ referenceY: box.y, boxes: [box] })
+      return
+    }
+
+    lastRow.boxes.push(box)
+  })
+
+  const rowWidths = rows.map((row) => getRowWidth(row.boxes, columnGap))
+  const width = marginX * 2 + Math.max(...rowWidths)
+  let cursorY = marginY
+  const positionedBoxes = []
+
+  rows.forEach((row, rowIndex) => {
+    const rowWidth = rowWidths[rowIndex]
+    const rowStartX = marginX + (width - marginX * 2 - rowWidth) / 2
+    let cursorX = rowStartX
+    const rowHeight = getRowHeight(row.boxes)
+
+    row.boxes.forEach((box) => {
+      positionedBoxes.push(withPosition(box, cursorX, cursorY + (rowHeight - box.height) / 2))
+      cursorX += box.width + columnGap
+    })
+
+    cursorY += rowHeight + rowGap
+  })
+
+  return {
+    viewBox: `0 0 ${width} ${cursorY - rowGap + marginY}`,
+    boxes: positionedBoxes,
+  }
+}
+
+function buildPatternLayout(patternCode, boxes) {
+  const boxesById = Object.fromEntries(boxes.map((box) => [box.id, box]))
+
+  if (patternCode === 'factory') {
+    return buildFactoryLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  if (patternCode === 'strategy') {
+    return buildStrategyLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  if (patternCode === 'observer') {
+    return buildObserverLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  return buildFallbackLayout(boxes)
+}
+
+export default function UmlDiagram({
+  diagram,
+  patternCode,
+  patternName,
+  isExpanded = false,
+  onOpenModal,
+}) {
   if (!diagram) {
     return (
       <div className="rounded-[26px] border border-dashed border-black/15 bg-white/70 px-5 py-12 text-sm leading-7 text-stone-600">
@@ -94,21 +593,46 @@ export default function UmlDiagram({ diagram, patternName }) {
   }
 
   const defsId = `uml-${patternName?.toLowerCase?.() ?? 'pattern'}`
-  const classesById = Object.fromEntries(diagram.classes.map((box) => [box.id, box]))
+  const boxLayouts = diagram.classes.map((box) => getBoxLayout(box))
+  const arrangedLayout = buildPatternLayout(patternCode, boxLayouts)
+  const classesById = Object.fromEntries(arrangedLayout.boxes.map((box) => [box.id, box]))
+  const baseViewBox = parseViewBox(diagram.viewBox)
+  const computedViewBox = arrangedLayout.viewBox ?? `${baseViewBox.minX} ${baseViewBox.minY} ${baseViewBox.width} ${baseViewBox.height}`
+  const relationMetaList = buildRelationMeta(diagram.relations)
+  const panelClassName = isExpanded
+    ? 'rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.99),rgba(247,240,226,0.94))] p-6 shadow-[0_30px_90px_rgba(24,20,14,0.16)] lg:p-8'
+    : 'rounded-[30px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.98),rgba(247,240,226,0.92))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]'
+  const svgClassName = isExpanded
+    ? 'h-auto min-h-[460px] w-full'
+    : 'h-auto w-full'
+  const TitleTag = isExpanded ? 'h2' : 'h3'
 
   return (
-    <div className="rounded-[30px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.98),rgba(247,240,226,0.92))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+    <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">UML</p>
-          <h3 className="mt-2 text-2xl text-stone-950">Diagramme du pattern</h3>
+          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
+            Diagramme du pattern
+          </TitleTag>
         </div>
-        <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-          {patternName}
-        </span>
+        {onOpenModal ? (
+          <button
+            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+            type="button"
+            onClick={onOpenModal}
+          >
+            {patternName}
+          </button>
+        ) : (
+          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
+            {patternName}
+          </span>
+        )}
       </div>
 
-      <svg className="mt-4 h-auto w-full" viewBox={diagram.viewBox} role="img">
+      <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
+      <svg className={svgClassName} viewBox={computedViewBox} role="img">
         <defs>
           <marker
             id={`${defsId}-arrow`}
@@ -133,14 +657,20 @@ export default function UmlDiagram({ diagram, patternName }) {
         </defs>
 
         {diagram.relations.map((relation, index) => {
-          const path = buildPath(relation, classesById)
-          if (!path) {
+          const points = buildRelationPoints(relation, classesById, relationMetaList[index])
+          if (!points) {
             return null
           }
 
+          const path = buildPath(points)
+          const labelPosition = getPolylinePointAt(points, 0.5)
+          const label = relation.label.toUpperCase()
+          const labelWidth = Math.max(88, Math.ceil(estimateTextWidth(label, 11) + 28))
+
           return (
-            <g key={`${relation.from}-${relation.to}-${index}`}>
+            <g key={`${relation.from}-${relation.to}-${index}`} className="uml-relation">
               <path
+                className="uml-relation-line"
                 d={path}
                 fill="none"
                 stroke="#7a5a3f"
@@ -149,34 +679,36 @@ export default function UmlDiagram({ diagram, patternName }) {
                 markerEnd={`url(#${defsId}-${relation.marker === 'triangle' ? 'triangle' : 'arrow'})`}
               />
               <rect
-                x={relation.labelX - 44}
-                y={relation.labelY - 12}
-                width="88"
+                className="uml-relation-label-bg"
+                x={labelPosition.x - labelWidth / 2}
+                y={labelPosition.y - 12}
+                width={labelWidth}
                 height="24"
                 rx="12"
                 fill="rgba(255,250,242,0.96)"
                 stroke="rgba(36,31,24,0.08)"
               />
               <text
-                x={relation.labelX}
-                y={relation.labelY + 4}
+                className="uml-relation-label-text"
+                x={labelPosition.x}
+                y={labelPosition.y + 4}
                 textAnchor="middle"
                 fontSize="11"
                 fontWeight="700"
                 letterSpacing="0.14em"
                 fill="#6a5544"
               >
-                {relation.label.toUpperCase()}
+                {label}
               </text>
             </g>
           )
         })}
 
-        {diagram.classes.map((box) => {
-          const tone = getTone(box.tone)
-          const contentLines = [...(box.fields ?? []), ...(box.methods ?? [])]
-          const headerHeight = 44
-          const fieldsHeight = (box.fields?.length ?? 0) * 18
+        {arrangedLayout.boxes.map((box) => {
+          const tone = getTone(box)
+          const hasFields = box.fieldLines.length > 0
+          const hasMethods = box.methodLines.length > 0
+          const hasContent = hasFields || hasMethods
 
           return (
             <g key={box.id} transform={`translate(${box.x} ${box.y})`}>
@@ -189,13 +721,13 @@ export default function UmlDiagram({ diagram, patternName }) {
                 strokeWidth="2.4"
                 className="scene-node-shadow"
               />
-              <line x1="0" y1={headerHeight} x2={box.width} y2={headerHeight} stroke={tone.stroke} strokeOpacity="0.45" />
-              {box.fields?.length ? (
+              <line x1="0" y1={box.headerHeight} x2={box.width} y2={box.headerHeight} stroke={tone.stroke} strokeOpacity="0.45" />
+              {hasFields ? (
                 <line
                   x1="0"
-                  y1={headerHeight + fieldsHeight + 14}
+                  y1={box.fieldDividerY}
                   x2={box.width}
-                  y2={headerHeight + fieldsHeight + 14}
+                  y2={box.fieldDividerY}
                   stroke={tone.stroke}
                   strokeOpacity="0.35"
                 />
@@ -205,7 +737,7 @@ export default function UmlDiagram({ diagram, patternName }) {
                 x={box.width / 2}
                 y="16"
                 textAnchor="middle"
-                fontSize="10"
+                fontSize={box.stereotypeFontSize}
                 fontWeight="700"
                 letterSpacing="0.2em"
                 fill={tone.text}
@@ -213,13 +745,13 @@ export default function UmlDiagram({ diagram, patternName }) {
               >
                 {`<<${box.stereotype}>>`}
               </text>
-              {wrapText(box.title, 20).map((line, index) => (
+              {box.titleLines.map((line, index) => (
                 <text
                   key={`${box.id}-title-${index}`}
                   x={box.width / 2}
-                  y={34 + index * 16}
+                  y={box.titleStartY + index * box.titleLineHeight}
                   textAnchor="middle"
-                  fontSize="18"
+                  fontSize={box.titleFontSize}
                   fontWeight="700"
                   fill={tone.text}
                 >
@@ -227,12 +759,12 @@ export default function UmlDiagram({ diagram, patternName }) {
                 </text>
               ))}
 
-              {(box.fields ?? []).map((line, index) => (
+              {box.fieldLines.map((line, index) => (
                 <text
                   key={`${box.id}-field-${index}`}
                   x="18"
-                  y={68 + index * 18}
-                  fontSize="12"
+                  y={box.memberStartY + index * box.memberLineHeight}
+                  fontSize={box.memberFontSize}
                   fontWeight="500"
                   fill={tone.text}
                 >
@@ -240,12 +772,12 @@ export default function UmlDiagram({ diagram, patternName }) {
                 </text>
               ))}
 
-              {(box.methods ?? []).map((line, index) => (
+              {box.methodLines.map((line, index) => (
                 <text
                   key={`${box.id}-method-${index}`}
                   x="18"
-                  y={box.fields?.length ? 96 + (box.fields.length - 1) * 18 + index * 18 : 68 + index * 18}
-                  fontSize="12"
+                  y={box.methodStartY + index * box.memberLineHeight}
+                  fontSize={box.memberFontSize}
                   fontWeight="500"
                   fill={tone.text}
                 >
@@ -253,11 +785,11 @@ export default function UmlDiagram({ diagram, patternName }) {
                 </text>
               ))}
 
-              {contentLines.length === 0 ? (
+              {!hasContent ? (
                 <text
                   x="18"
-                  y="74"
-                  fontSize="12"
+                  y={box.memberStartY}
+                  fontSize={box.memberFontSize}
                   fontWeight="500"
                   fill={tone.text}
                   opacity="0.72"
@@ -269,6 +801,7 @@ export default function UmlDiagram({ diagram, patternName }) {
           )
         })}
       </svg>
+      </ZoomableViewport>
     </div>
   )
 }
