@@ -102,6 +102,40 @@ select {
   filter: drop-shadow(0 18px 26px rgba(48, 39, 24, 0.12));
 }
 
+.uml-relation .uml-relation-line,
+.uml-relation .uml-relation-label-bg,
+.uml-relation .uml-relation-label-text {
+  transition:
+    stroke 180ms ease,
+    stroke-width 180ms ease,
+    fill 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease,
+    letter-spacing 180ms ease;
+}
+
+.uml-relation .uml-relation-label-bg {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.uml-relation:hover .uml-relation-line {
+  stroke: #246b5e;
+  stroke-width: 3;
+  filter: drop-shadow(0 8px 14px rgba(36, 107, 94, 0.16));
+}
+
+.uml-relation:hover .uml-relation-label-bg {
+  fill: rgba(211, 236, 230, 0.98);
+  stroke: rgba(36, 107, 94, 0.18);
+  transform: scale(1.04);
+}
+
+.uml-relation:hover .uml-relation-label-text {
+  fill: #153f38;
+  letter-spacing: 0.18em;
+}
+
 @keyframes scene-flow {
   from {
     stroke-dashoffset: 0;

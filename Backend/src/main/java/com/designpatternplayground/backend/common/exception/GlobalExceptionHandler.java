@@ -27,6 +27,30 @@ public class GlobalExceptionHandler {
 		);
 	}
 
+	@ExceptionHandler(UsernameAlreadyExistsException.class)
+	public ResponseEntity<ApiError> handleUsernameAlreadyExists(
+		UsernameAlreadyExistsException exception,
+		HttpServletRequest request
+	) {
+		return buildError(
+			HttpStatus.CONFLICT,
+			exception.getMessage(),
+			request.getRequestURI()
+		);
+	}
+
+	@ExceptionHandler(AuthenticationFailedException.class)
+	public ResponseEntity<ApiError> handleAuthenticationFailed(
+		AuthenticationFailedException exception,
+		HttpServletRequest request
+	) {
+		return buildError(
+			HttpStatus.UNAUTHORIZED,
+			exception.getMessage(),
+			request.getRequestURI()
+		);
+	}
+
 	@ExceptionHandler({
 		InvalidPatternConfigurationException.class,
 		MethodArgumentNotValidException.class,
