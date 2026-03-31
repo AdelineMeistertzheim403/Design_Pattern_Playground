@@ -1,0 +1,58 @@
+name: design-pattern-playground-prod
+
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+      target: prod
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/design-pattern-playground;AUTO_SERVER=TRUE
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD:
+      SPRING_H2_CONSOLE_ENABLED: "false"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - backend_data:/data
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK:-traefik-public}"
+      - "traefik.http.routers.design-pattern-playground-backend.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.design-pattern-playground-backend.rule=Host(`${APP_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.design-pattern-playground-backend.priority=100"
+      - "traefik.http.routers.design-pattern-playground-backend.tls=true"
+      - "traefik.http.routers.design-pattern-playground-backend.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
+      - "traefik.http.services.design-pattern-playground-backend.loadbalancer.server.port=8080"
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK:-traefik-public}"
+      - "traefik.http.routers.design-pattern-playground-frontend.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.design-pattern-playground-frontend.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.design-pattern-playground-frontend.priority=1"
+      - "traefik.http.routers.design-pattern-playground-frontend.tls=true"
+      - "traefik.http.routers.design-pattern-playground-frontend.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
+      - "traefik.http.services.design-pattern-playground-frontend.loadbalancer.server.port=80"
+
+volumes:
+  backend_data:
+
+networks:
+  traefik-public:
+    external: true
+    name: ${TRAEFIK_PUBLIC_NETWORK:-traefik-public}

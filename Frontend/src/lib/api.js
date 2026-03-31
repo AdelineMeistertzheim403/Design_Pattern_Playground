@@ -1,4 +1,8 @@
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim()
+
+export const API_URL = configuredApiUrl
+  ? configuredApiUrl.replace(/\/$/, '')
+  : ''
 
 async function request(path) {
   const response = await fetch(`${API_URL}${path}`)

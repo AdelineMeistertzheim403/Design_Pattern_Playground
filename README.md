@@ -33,7 +33,46 @@ npm install
 npm run dev
 ```
 
-Le frontend Vite demarre sur `http://localhost:5173` et vise par defaut `http://localhost:8080`.
+Le frontend Vite demarre sur `http://localhost:5173` et proxifie `/api` vers `http://localhost:8080` par defaut.
+
+## Docker Dev
+
+Le compose de dev expose les ports et monte le code source pour travailler localement.
+
+```bash
+docker compose -f compose.dev.yml up --build
+```
+
+Acces utiles :
+
+- Frontend : `http://localhost:5173`
+- Backend : `http://localhost:8080`
+- H2 console : `http://localhost:8080/h2-console`
+
+## Docker Prod
+
+Le compose de prod n expose pas de ports. Il publie les services via Traefik avec un routage sur le meme host :
+
+- frontend sur `/`
+- backend sur `/api`
+
+Preparation :
+
+```bash
+cp .env.prod.example .env
+```
+
+Puis :
+
+```bash
+docker compose --env-file .env -f compose.prod.yml up -d --build
+```
+
+Prerequis prod :
+
+- un reseau Traefik externe existant, par defaut `traefik-public`
+- une valeur `APP_HOST` definie dans `.env`
+- si vous voulez appeler une API sur une autre origine, renseigner `VITE_API_URL` avant le build du frontend
 
 ## Verifications utiles
 
