@@ -1,0 +1,33 @@
+name: design-pattern-playground-registry
+
+services:
+  registry:
+    image: registry:2
+    restart: unless-stopped
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Design Pattern Playground Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    volumes:
+      - registry_data:/var/lib/registry
+      - ./ops/registry/auth:/auth:ro
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK:-traefik-public}"
+      - "traefik.http.routers.design-pattern-playground-registry.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.design-pattern-playground-registry.rule=Host(`${REGISTRY_HOST}`)"
+      - "traefik.http.routers.design-pattern-playground-registry.tls=true"
+      - "traefik.http.routers.design-pattern-playground-registry.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
+      - "traefik.http.services.design-pattern-playground-registry.loadbalancer.server.port=5000"
+
+volumes:
+  registry_data:
+
+networks:
+  traefik-public:
+    external: true
+    name: ${TRAEFIK_PUBLIC_NETWORK:-traefik-public}

@@ -6,6 +6,7 @@ export const API_URL = configuredApiUrl
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(options.headers ?? {}),
@@ -13,11 +14,15 @@ async function request(path, options = {}) {
     ...options,
   })
 
+  const contentType = response.headers.get('content-type') ?? ''
+  const isJson = contentType.includes('application/json')
+  const payload = isJson ? await response.json() : null
+
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`)
+    throw new Error(payload?.message ?? `Request failed with status ${response.status}`)
   }
 
-  return response.json()
+  return payload
 }
 
 export function getPatterns() {
@@ -36,5 +41,35 @@ export function executePattern(payload) {
   return request('/api/patterns/execute', {
     method: 'POST',
     body: JSON.stringify(payload),
+  })
+}
+
+export function registerUser(payload) {
+  return request('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function loginUser(payload) {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function refreshUserSession() {
+  return request('/api/auth/refresh', {
+    method: 'POST',
+  })
+}
+
+export function getCurrentUser() {
+  return request('/api/auth/me')
+}
+
+export function logoutUser() {
+  return request('/api/auth/logout', {
+    method: 'POST',
   })
 }

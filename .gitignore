@@ -1,0 +1,6 @@
+.env
+Backend/target/
+Frontend/node_modules/
+Frontend/dist/
+ops/registry/auth/*
+!ops/registry/auth/.gitkeep

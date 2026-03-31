@@ -1,21 +1,38 @@
 name: design-pattern-playground-prod
 
 services:
-  backend:
-    build:
-      context: ./Backend
-      dockerfile: Dockerfile
-      target: prod
+  postgres:
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/design-pattern-playground;AUTO_SERVER=TRUE
-      SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD:
+      POSTGRES_DB: ${POSTGRES_DB:-design_pattern_playground}
+      POSTGRES_USER: ${POSTGRES_USER:-design_pattern_playground}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-design_pattern_playground} -d ${POSTGRES_DB:-design_pattern_playground}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    image: ${REGISTRY_HOST}/${REGISTRY_NAMESPACE:-design-pattern-playground}/backend:${APP_IMAGE_TAG:-main}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-design_pattern_playground}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-design_pattern_playground}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
       SPRING_H2_CONSOLE_ENABLED: "false"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    volumes:
-      - backend_data:/data
+      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-true}
+      APP_COOKIE_SAME_SITE: ${APP_COOKIE_SAME_SITE:-Lax}
+      APP_COOKIE_DOMAIN: ${APP_COOKIE_DOMAIN:-}
     networks:
+      - default
       - traefik-public
     labels:
       - "traefik.enable=true"
@@ -28,12 +45,7 @@ services:
       - "traefik.http.services.design-pattern-playground-backend.loadbalancer.server.port=8080"
 
   frontend:
-    build:
-      context: ./Frontend
-      dockerfile: Dockerfile
-      target: prod
-      args:
-        VITE_API_URL: ${VITE_API_URL:-}
+    image: ${REGISTRY_HOST}/${REGISTRY_NAMESPACE:-design-pattern-playground}/frontend:${APP_IMAGE_TAG:-main}
     restart: unless-stopped
     depends_on:
       - backend
@@ -50,7 +62,7 @@ services:
       - "traefik.http.services.design-pattern-playground-frontend.loadbalancer.server.port=80"
 
 volumes:
-  backend_data:
+  postgres_data:
 
 networks:
   traefik-public:
