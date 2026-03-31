@@ -1,81 +1,155 @@
 import { startTransition, useDeferredValue, useEffect, useState } from 'react'
-import { fallbackPatterns, getFallbackPatternDetail, getFallbackPreview } from './data/fallbackPatterns'
-import { API_URL, getPatternDetail, getPatternPreview, getPatterns } from './lib/api'
+import ExecutionScene from './components/ExecutionScene'
+import UmlDiagram from './components/UmlDiagram'
+import { executeFallbackPattern, fallbackPatterns, getFallbackSchema } from './data/fallbackPatterns'
+import { getPatternLearningContent } from './data/patternLearningContent'
+import { getPatternUmlDiagram } from './data/patternUmlDiagrams'
+import { API_URL, executePattern, getPatternSchema, getPatterns } from './lib/api'
 
-const previewModes = [
-  { value: 'text', label: 'Vue narrative' },
-  { value: 'checklist', label: 'Checklist' },
-]
-
-const architectureCards = [
-  {
-    title: 'Backend Spring Boot',
-    body: 'API REST, persistence JPA/H2, seeding de donnees et strategie de rendu pour exposer plusieurs previews d un meme pattern.',
-  },
-  {
-    title: 'Passerelle Full Stack',
-    body: 'Le frontend lit le catalogue depuis le backend et degrade proprement sur des donnees locales tant que l API n est pas lancee.',
-  },
-  {
-    title: 'Frontend React + Tailwind',
-    body: 'Interface de lecture, filtres, selection d un pattern et changement de mode de lecture sans changer la structure globale.',
-  },
-]
-
-const extensionSteps = [
-  'Ajouter un pattern par dossier cote backend avec une implementation reelle et des tests dedies.',
-  'Connecter le detail React a du code source ou des snippets au lieu d une simple fiche descriptive.',
-  'Transformer la preview en atelier interactif avec choix de strategy, observer ou decorator dans l interface.',
-]
+const typeLabels = {
+  CREATIONAL: 'Creation',
+  STRUCTURAL: 'Structure',
+  BEHAVIORAL: 'Comportement',
+}
 
 const statusMap = {
   loading: {
     label: 'Connexion en cours',
     tone: 'bg-amber-100 text-amber-900 ring-amber-300',
-    message: 'Le frontend tente de joindre le backend local.',
+    message: "Le frontend tente d utiliser l API dynamique du backend.",
   },
   connected: {
-    label: 'Backend connecte',
+    label: 'Moteur backend actif',
     tone: 'bg-emerald-100 text-emerald-900 ring-emerald-300',
-    message: 'Les donnees proviennent de l API Spring Boot.',
+    message: "Schemas, metadata et executions proviennent du registre Spring Boot.",
   },
   fallback: {
     label: 'Mode local',
     tone: 'bg-stone-200 text-stone-800 ring-stone-300',
-    message: 'Le catalogue fallback reste disponible tant que l API n est pas demarree.',
+    message: "Le front degrade sur des demos locales tant que l API n est pas joignable.",
   },
+}
+
+const highlightCards = [
+  {
+    title: 'Scene SVG',
+    body: 'Chaque pattern peut etre joue visuellement avec une scene runtime qui montre les objets actifs et leurs interactions.',
+  },
+  {
+    title: 'UML Relie Au Runtime',
+    body: 'Le diagramme UML explique la structure, pendant que la scene SVG montre ce qui se passe a l execution.',
+  },
+  {
+    title: 'Mode Pedagogique',
+    body: 'Le projet parle autant aux etudiants qu aux developpeurs avec des explications, des etapes et des cas d usage concrets.',
+  },
+]
+
+function buildInitialParameters(schema) {
+  return Object.fromEntries(
+    (schema?.fields ?? []).map((field) => {
+      if (field.defaultValue !== null && field.defaultValue !== undefined) {
+        if (field.type === 'BOOLEAN') {
+          return [field.name, field.defaultValue === 'true']
+        }
+
+        if (field.type === 'LIST') {
+          return [field.name, field.defaultValue.split(',').map((value) => value.trim()).filter(Boolean)]
+        }
+
+        return [field.name, field.defaultValue]
+      }
+
+      if (field.type === 'BOOLEAN') {
+        return [field.name, false]
+      }
+
+      if (field.type === 'LIST') {
+        return [field.name, []]
+      }
+
+      return [field.name, '']
+    }),
+  )
+}
+
+function normalizeParameters(schema, formValues) {
+  return Object.fromEntries(
+    (schema?.fields ?? []).map((field) => {
+      const rawValue = formValues[field.name]
+
+      if (field.type === 'NUMBER') {
+        return [field.name, rawValue === '' ? null : Number(rawValue)]
+      }
+
+      if (field.type === 'BOOLEAN') {
+        return [field.name, Boolean(rawValue)]
+      }
+
+      if (field.type === 'LIST') {
+        if (Array.isArray(rawValue)) {
+          return [field.name, rawValue]
+        }
+
+        return [
+          field.name,
+          `${rawValue ?? ''}`
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean),
+        ]
+      }
+
+      return [field.name, rawValue]
+    }),
+  )
+}
+
+function formatOutputValue(value) {
+  return typeof value === 'object' && value !== null
+    ? JSON.stringify(value, null, 2)
+    : `${value}`
+}
+
+function buildPreviewExecution(code, schema, formValues) {
+  try {
+    return executeFallbackPattern(code, normalizeParameters(schema, formValues))
+  } catch {
+    return null
+  }
 }
 
 function App() {
   const [patterns, setPatterns] = useState(fallbackPatterns)
-  const [selectedSlug, setSelectedSlug] = useState(fallbackPatterns[0].slug)
-  const [selectedPattern, setSelectedPattern] = useState(
-    getFallbackPatternDetail(fallbackPatterns[0].slug),
+  const [selectedCode, setSelectedCode] = useState(fallbackPatterns[0].code)
+  const [schema, setSchema] = useState(getFallbackSchema(fallbackPatterns[0].code))
+  const [formValues, setFormValues] = useState(
+    buildInitialParameters(getFallbackSchema(fallbackPatterns[0].code)),
   )
-  const [previewMode, setPreviewMode] = useState('text')
-  const [previewLines, setPreviewLines] = useState(
-    getFallbackPreview(fallbackPatterns[0].slug, 'text'),
-  )
+  const [execution, setExecution] = useState(null)
+  const [executionError, setExecutionError] = useState('')
+  const [lastExecutedPayload, setLastExecutedPayload] = useState(null)
   const [backendStatus, setBackendStatus] = useState('loading')
+  const [isExecuting, setIsExecuting] = useState(false)
   const [search, setSearch] = useState('')
   const deferredSearch = useDeferredValue(search)
 
   useEffect(() => {
     let ignore = false
 
-    const loadCatalog = async () => {
+    const loadPatterns = async () => {
       try {
-        const catalog = await getPatterns()
-        if (ignore || catalog.length === 0) {
+        const apiPatterns = await getPatterns()
+        if (ignore || apiPatterns.length === 0) {
           return
         }
 
-        setPatterns(catalog)
+        setPatterns(apiPatterns)
         setBackendStatus('connected')
-        setSelectedSlug((currentSlug) =>
-          catalog.some((pattern) => pattern.slug === currentSlug)
-            ? currentSlug
-            : catalog[0].slug,
+        setSelectedCode((currentCode) =>
+          apiPatterns.some((pattern) => pattern.code === currentCode)
+            ? currentCode
+            : apiPatterns[0].code,
         )
       } catch {
         if (!ignore) {
@@ -85,52 +159,47 @@ function App() {
       }
     }
 
-    loadCatalog()
+    loadPatterns()
 
     return () => {
       ignore = true
     }
   }, [])
 
-  useEffect(() => {
-    const visibleSlugs = patterns
-      .filter((pattern) => {
-        const haystack = `${pattern.name} ${pattern.category} ${pattern.intent}`.toLowerCase()
-        return haystack.includes(deferredSearch.trim().toLowerCase())
-      })
-      .map((pattern) => pattern.slug)
+  const visiblePatterns = patterns.filter((pattern) => {
+    const haystack = `${pattern.name} ${pattern.type} ${pattern.description} ${pattern.useCase}`.toLowerCase()
+    return haystack.includes(deferredSearch.trim().toLowerCase())
+  })
 
-    if (visibleSlugs.length > 0 && !visibleSlugs.includes(selectedSlug)) {
-      setSelectedSlug(visibleSlugs[0])
+  useEffect(() => {
+    if (visiblePatterns.length > 0 && !visiblePatterns.some((pattern) => pattern.code === selectedCode)) {
+      setSelectedCode(visiblePatterns[0].code)
     }
-  }, [deferredSearch, patterns, selectedSlug])
+  }, [selectedCode, visiblePatterns])
 
   useEffect(() => {
     let ignore = false
 
-    const fallbackDetail = getFallbackPatternDetail(selectedSlug)
-    const fallbackPreview = getFallbackPreview(selectedSlug, previewMode)
+    const fallbackSchema = getFallbackSchema(selectedCode)
+    setSchema(fallbackSchema)
+    setFormValues(buildInitialParameters(fallbackSchema))
+    setExecution(null)
+    setExecutionError('')
+    setLastExecutedPayload(null)
 
-    setSelectedPattern(fallbackDetail)
-    setPreviewLines(fallbackPreview)
-
-    const loadDetail = async () => {
+    const loadSchema = async () => {
       if (backendStatus !== 'connected') {
         return
       }
 
       try {
-        const [detail, preview] = await Promise.all([
-          getPatternDetail(selectedSlug),
-          getPatternPreview(selectedSlug, previewMode),
-        ])
-
+        const apiSchema = await getPatternSchema(selectedCode)
         if (ignore) {
           return
         }
 
-        setSelectedPattern(detail)
-        setPreviewLines(preview.lines)
+        setSchema(apiSchema)
+        setFormValues(buildInitialParameters(apiSchema))
       } catch {
         if (!ignore) {
           setBackendStatus('fallback')
@@ -138,83 +207,124 @@ function App() {
       }
     }
 
-    loadDetail()
+    loadSchema()
 
     return () => {
       ignore = true
     }
-  }, [backendStatus, previewMode, selectedSlug])
+  }, [backendStatus, selectedCode])
 
-  const visiblePatterns = patterns.filter((pattern) => {
-    const haystack = `${pattern.name} ${pattern.category} ${pattern.intent}`.toLowerCase()
-    return haystack.includes(deferredSearch.trim().toLowerCase())
-  })
-
+  const selectedPattern = patterns.find((pattern) => pattern.code === selectedCode) ?? fallbackPatterns[0]
+  const learningContent = getPatternLearningContent(selectedCode)
+  const umlDiagram = getPatternUmlDiagram(selectedCode)
   const status = statusMap[backendStatus] ?? statusMap.fallback
+  const apiTarget = `${API_URL}/api/patterns`
+  const draftPayload = {
+    patternCode: selectedCode,
+    parameters: normalizeParameters(schema, formValues),
+  }
+  const previewExecution = buildPreviewExecution(selectedCode, schema, formValues)
+  const hasDraftChanges = Boolean(
+    lastExecutedPayload
+    && JSON.stringify(lastExecutedPayload) !== JSON.stringify(draftPayload),
+  )
+  const visualExecution = execution && !hasDraftChanges ? execution : (previewExecution ?? execution)
+  const visualSourceLabel = execution && !hasDraftChanges ? 'Derniere execution' : 'Apercu live'
+
+  async function handleExecute(event) {
+    event.preventDefault()
+    setIsExecuting(true)
+    setExecutionError('')
+
+    const payload = draftPayload
+
+    try {
+      const result = backendStatus === 'connected'
+        ? await executePattern(payload)
+        : executeFallbackPattern(selectedCode, payload.parameters)
+
+      setExecution(result)
+      setLastExecutedPayload(payload)
+    } catch (error) {
+      if (backendStatus === 'connected') {
+        setBackendStatus('fallback')
+
+        try {
+          setExecution(executeFallbackPattern(selectedCode, payload.parameters))
+          setLastExecutedPayload(payload)
+        } catch {
+          setExecution(null)
+          setLastExecutedPayload(null)
+          setExecutionError(error.message ?? "L execution a echoue.")
+        }
+      } else {
+        setExecution(null)
+        setLastExecutedPayload(null)
+        setExecutionError(error.message ?? "L execution a echoue.")
+      }
+    } finally {
+      setIsExecuting(false)
+    }
+  }
+
+  function updateFieldValue(field, nextValue) {
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [field.name]: nextValue,
+    }))
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
       <section className="reveal relative overflow-hidden rounded-[32px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_30px_80px_rgba(47,37,22,0.14)] sm:px-10 sm:py-12">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(36,107,94,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(194,87,55,0.2),transparent_35%)]" />
-        <div className="relative grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-stone-700">
-              Design Pattern Playground
+              Pattern Simulator MVP
             </div>
             <div className="space-y-4">
               <p className="max-w-xl text-sm uppercase tracking-[0.22em] text-stone-600">
-                Spring Boot JPA, H2, React 19, Tailwind et une base de catalogue pret a etendre
+                Playground visuel, schemas dynamiques, UML et demos runtime
               </p>
               <h1 className="max-w-3xl text-4xl leading-none text-stone-950 sm:text-6xl">
-                Un terrain de jeu pour montrer les patterns cote backend et frontend.
+                Un laboratoire de design patterns pour comprendre, voir et manipuler chaque mecanique.
               </h1>
               <p className="max-w-2xl text-base leading-7 text-stone-700 sm:text-lg">
-                Le backend expose un catalogue de patterns et une preview strategique. Le frontend consomme
-                cette API, reste lisible hors ligne et sert de point de depart pour vos prochaines demos.
+                Choisis un pattern, joue avec ses parametres, observe son comportement en SVG puis compare
+                la scene runtime avec son UML. Le meme ecran doit aider a apprendre, reviser et expliquer.
               </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a
-                className="inline-flex items-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                href="#catalogue"
-              >
-                Explorer le catalogue
-              </a>
-              <a
-                className="inline-flex items-center rounded-full border border-black/10 bg-white/70 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-black/20 hover:bg-white"
-                href="#roadmap"
-              >
-                Etendre le projet
-              </a>
             </div>
           </div>
 
           <div className="grid gap-3 self-end">
             <div className="rounded-[24px] border border-black/10 bg-white/80 p-5 backdrop-blur-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">API cible</p>
-              <p className="mt-3 font-mono text-sm text-stone-800">{API_URL}/api/patterns</p>
+              <p className="mt-3 font-mono text-sm text-stone-800">{apiTarget}</p>
             </div>
             <div className="rounded-[24px] border border-black/10 bg-white/80 p-5 backdrop-blur-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Patterns seedes</p>
-              <p className="mt-3 text-4xl font-semibold text-stone-950">{fallbackPatterns.length}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Patterns actifs</p>
+              <p className="mt-3 text-4xl font-semibold text-stone-950">{patterns.length}</p>
             </div>
             <div className="rounded-[24px] border border-black/10 bg-white/80 p-5 backdrop-blur-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Preview modes</p>
-              <p className="mt-3 text-4xl font-semibold text-stone-950">{previewModes.length}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Etat backend</p>
+              <div className={`mt-3 inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
+                {status.label}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        {architectureCards.map((card, index) => (
+        {highlightCards.map((card, index) => (
           <article
             key={card.title}
             className="reveal rounded-[28px] border border-black/10 bg-white/70 p-6 shadow-[0_16px_40px_rgba(47,37,22,0.08)] backdrop-blur-sm"
             style={{ animationDelay: `${120 * (index + 1)}ms` }}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              Bloc {index + 1}
+              Pillar {index + 1}
             </p>
             <h2 className="mt-4 text-2xl text-stone-950">{card.title}</h2>
             <p className="mt-3 text-sm leading-7 text-stone-700">{card.body}</p>
@@ -222,15 +332,12 @@ function App() {
         ))}
       </section>
 
-      <section
-        id="catalogue"
-        className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]"
-      >
-        <div className="reveal rounded-[32px] border border-black/10 bg-[var(--panel-strong)] p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
+      <section className="grid gap-6 lg:grid-cols-[0.72fr_0.98fr_1.1fr]">
+        <aside className="reveal rounded-[32px] border border-black/10 bg-[var(--panel-strong)] p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Catalogue</p>
-              <h2 className="mt-3 text-3xl text-stone-950">Patterns disponibles</h2>
+              <h2 className="mt-3 text-3xl text-stone-950">Patterns</h2>
             </div>
             <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
               {status.label}
@@ -243,7 +350,7 @@ function App() {
             <span className="sr-only">Filtrer les patterns</span>
             <input
               className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-black/20"
-              placeholder="Filtrer par nom, categorie ou intention"
+              placeholder="Filtrer par nom, type ou cas d usage"
               type="search"
               value={search}
               onChange={(event) => {
@@ -256,40 +363,36 @@ function App() {
           <div className="mt-5 grid gap-3">
             {visiblePatterns.length > 0 ? (
               visiblePatterns.map((pattern) => {
-                const isActive = pattern.slug === selectedSlug
+                const isActive = pattern.code === selectedCode
 
                 return (
                   <button
-                    key={pattern.slug}
-                    className={`text-left rounded-[24px] border px-4 py-4 transition ${
+                    key={pattern.code}
+                    className={`rounded-[24px] border px-4 py-4 text-left transition ${
                       isActive
                         ? 'border-stone-950 bg-stone-950 text-white shadow-[0_20px_35px_rgba(28,25,23,0.18)]'
                         : 'border-black/10 bg-white/85 text-stone-900 hover:-translate-y-0.5 hover:border-black/20'
                     }`}
                     type="button"
-                    onClick={() => setSelectedSlug(pattern.slug)}
+                    onClick={() => setSelectedCode(pattern.code)}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p
-                          className={`text-xs font-semibold uppercase tracking-[0.24em] ${
-                            isActive ? 'text-white/70' : 'text-stone-500'
-                          }`}
-                        >
-                          {pattern.category}
+                        <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${
+                          isActive ? 'text-white/70' : 'text-stone-500'
+                        }`}>
+                          {typeLabels[pattern.type] ?? pattern.type}
                         </p>
                         <h3 className="mt-3 text-xl">{pattern.name}</h3>
                       </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${
-                          isActive ? 'bg-white/12 text-white' : 'bg-[var(--accent-soft)] text-stone-900'
-                        }`}
-                      >
-                        Demo
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${
+                        isActive ? 'bg-white/12 text-white' : 'bg-[var(--accent-soft)] text-stone-900'
+                      }`}>
+                        {pattern.complexityLevel}
                       </span>
                     </div>
                     <p className={`mt-4 text-sm leading-6 ${isActive ? 'text-white/82' : 'text-stone-700'}`}>
-                      {pattern.intent}
+                      {pattern.description}
                     </p>
                   </button>
                 )
@@ -300,98 +403,255 @@ function App() {
               </div>
             )}
           </div>
-        </div>
+        </aside>
 
-        <div className="reveal rounded-[32px] border border-black/10 bg-white/80 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
-          <div className="flex flex-col gap-4 border-b border-black/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Fiche active</p>
-              <h2 className="mt-3 text-3xl text-stone-950">{selectedPattern.name}</h2>
-              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">
-                {selectedPattern.category}
-              </p>
-            </div>
+        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
+          <div className="border-b border-black/10 pb-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Configuration</p>
+            <h2 className="mt-3 text-3xl text-stone-950">{selectedPattern.name}</h2>
+            <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">
+              {typeLabels[selectedPattern.type] ?? selectedPattern.type} · {selectedPattern.complexityLevel}
+            </p>
+            <p className="mt-4 text-sm leading-7 text-stone-700">{selectedPattern.description}</p>
+            <p className="mt-3 rounded-[22px] bg-[var(--accent-soft)]/70 px-4 py-4 text-sm leading-7 text-stone-700">
+              Cas d usage : {selectedPattern.useCase}
+            </p>
+            <p className="mt-3 rounded-[22px] bg-[var(--teal-soft)]/85 px-4 py-4 text-sm leading-7 text-stone-700">
+              Lecture pedagogique : {learningContent.strapline}
+            </p>
+          </div>
 
-            <div className="flex flex-wrap gap-2">
-              {previewModes.map((mode) => {
-                const isSelected = mode.value === previewMode
-                return (
+          <form className="mt-6 grid gap-4" onSubmit={handleExecute}>
+            {(schema?.fields ?? []).map((field) => (
+              <label key={field.name} className="grid gap-2">
+                <span className="text-sm font-semibold text-stone-800">
+                  {field.label}
+                  {field.required ? ' *' : ''}
+                </span>
+
+                {field.type === 'SELECT' ? (
+                  <select
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+                    value={formValues[field.name] ?? ''}
+                    onChange={(event) => updateFieldValue(field, event.target.value)}
+                  >
+                    {(field.allowedValues ?? []).map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                ) : field.type === 'BOOLEAN' ? (
                   <button
-                    key={mode.value}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      isSelected
-                        ? 'bg-stone-950 text-white'
-                        : 'border border-black/10 bg-white text-stone-700 hover:border-black/20'
+                    className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                      formValues[field.name]
+                        ? 'border-stone-950 bg-stone-950 text-white'
+                        : 'border-black/10 bg-white text-stone-700'
                     }`}
                     type="button"
-                    onClick={() => setPreviewMode(mode.value)}
+                    onClick={() => updateFieldValue(field, !formValues[field.name])}
                   >
-                    {mode.label}
+                    <span>{formValues[field.name] ? 'Actif' : 'Inactif'}</span>
+                    <span>{field.name}</span>
                   </button>
-                )
-              })}
-            </div>
-          </div>
+                ) : field.type === 'LIST' ? (
+                  <textarea
+                    className="min-h-28 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+                    value={Array.isArray(formValues[field.name]) ? formValues[field.name].join(', ') : formValues[field.name] ?? ''}
+                    onChange={(event) => updateFieldValue(field, event.target.value)}
+                  />
+                ) : (
+                  <input
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+                    type={field.type === 'NUMBER' ? 'number' : 'text'}
+                    value={formValues[field.name] ?? ''}
+                    onChange={(event) => updateFieldValue(field, event.target.value)}
+                  />
+                )}
+              </label>
+            ))}
 
-          <div className="mt-6 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-            <article className="rounded-[28px] border border-black/10 bg-[var(--panel)] p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Intent</p>
-              <p className="mt-4 text-sm leading-7 text-stone-700">{selectedPattern.intent}</p>
+            <button
+              className="mt-2 inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isExecuting}
+              type="submit"
+            >
+              {isExecuting ? 'Execution en cours...' : 'Lancer la demo'}
+            </button>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-[24px] bg-white/80 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Backend</p>
-                  <p className="mt-3 text-sm leading-7 text-stone-700">{selectedPattern.backendFocus}</p>
-                </div>
-                <div className="rounded-[24px] bg-white/80 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Frontend</p>
-                  <p className="mt-3 text-sm leading-7 text-stone-700">{selectedPattern.frontendFocus}</p>
-                </div>
+            {executionError ? (
+              <div className="rounded-[22px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {executionError}
               </div>
-            </article>
+            ) : null}
+          </form>
+        </section>
 
-            <article className="rounded-[28px] border border-black/10 bg-stone-950 p-5 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">Preview</p>
-              <ul className="mt-4 space-y-3">
-                {previewLines.map((line) => (
-                  <li key={line} className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm leading-7 text-white/85">
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            </article>
+        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
+          <div className="border-b border-black/10 pb-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Execution</p>
+            <h2 className="mt-3 text-3xl text-stone-950">Resultat</h2>
+            <p className="mt-4 text-sm leading-7 text-stone-700">
+              Lance la demo pour voir un resume, les logs pedagogiques et le graphe simplifie du pattern.
+            </p>
           </div>
 
-          <article className="mt-4 rounded-[28px] border border-black/10 bg-[var(--accent-soft)]/70 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Note de lecture</p>
-            <p className="mt-4 text-sm leading-7 text-stone-700">{selectedPattern.notes}</p>
-          </article>
-        </div>
+          {execution ? (
+            <div className="mt-6 grid gap-4">
+              {hasDraftChanges ? (
+                <div className="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-900">
+                  Le formulaire a change depuis la derniere execution. La scene SVG affiche un apercu live, mais
+                  les logs et l output ci-dessous correspondent encore a la derniere execution.
+                </div>
+              ) : null}
+
+              <article className="rounded-[26px] border border-black/10 bg-[var(--panel)] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Summary</p>
+                <p className="mt-4 text-sm leading-7 text-stone-700">{execution.summary}</p>
+              </article>
+
+              <article className="rounded-[26px] border border-black/10 bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Output</p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {Object.entries(execution.output ?? {}).map(([key, value]) => (
+                    <div key={key} className="rounded-2xl bg-stone-950 px-4 py-4 text-white">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">{key}</p>
+                      <pre className="mt-2 whitespace-pre-wrap text-xs leading-6 text-white/85">
+                        {formatOutputValue(value)}
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-[26px] border border-black/10 bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Logs</p>
+                <ul className="mt-4 space-y-3">
+                  {(execution.logs ?? []).map((line, index) => (
+                    <li key={`${line}-${index}`} className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3 text-sm leading-7 text-stone-700">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className="rounded-[26px] border border-black/10 bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Visualization</p>
+                <div className="mt-4 grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {(execution.visualization?.nodes ?? []).map((node) => (
+                      <div
+                        key={node.id}
+                        className={`rounded-2xl border px-4 py-4 ${
+                          node.data?.selected || node.data?.active
+                            ? 'border-stone-950 bg-stone-950 text-white'
+                            : 'border-black/10 bg-[var(--panel)] text-stone-800'
+                        }`}
+                      >
+                        <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${
+                          node.data?.selected || node.data?.active ? 'text-white/60' : 'text-stone-500'
+                        }`}>
+                          {node.type}
+                        </p>
+                        <h3 className="mt-2 text-lg">{node.label}</h3>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-3">
+                    {(execution.visualization?.edges ?? []).map((edge, index) => (
+                      <div key={`${edge.from}-${edge.to}-${index}`} className="rounded-2xl border border-dashed border-black/15 bg-white px-4 py-3 text-sm text-stone-700">
+                        {edge.from} → {edge.to} · {edge.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
+              Aucun resultat pour le moment. Choisis une configuration puis lance la demonstration.
+            </div>
+          )}
+        </section>
       </section>
 
-      <section
-        id="roadmap"
-        className="reveal rounded-[32px] border border-black/10 bg-[var(--panel)] px-6 py-7 shadow-[0_18px_45px_rgba(47,37,22,0.08)]"
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Roadmap</p>
-            <h2 className="mt-3 text-3xl text-stone-950">Comment faire vivre ce playground</h2>
-          </div>
-          <p className="max-w-xl text-sm leading-7 text-stone-700">
-            Chaque pattern peut devenir un mini module backend plus une scene frontend qui illustre le meme
-            besoin vu sous deux angles complementaires.
-          </p>
-        </div>
+      <section className="grid gap-6 xl:grid-cols-[1.18fr_0.82fr]">
+        <section className="reveal">
+          <ExecutionScene
+            execution={visualExecution}
+            patternCode={selectedCode}
+            sourceLabel={visualSourceLabel}
+          />
+        </section>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {extensionSteps.map((step, index) => (
-            <article key={step} className="rounded-[26px] border border-black/10 bg-white/85 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Etape 0{index + 1}</p>
-              <p className="mt-4 text-sm leading-7 text-stone-700">{step}</p>
+        <section className="reveal">
+          <UmlDiagram
+            diagram={umlDiagram}
+            patternName={selectedPattern.name}
+          />
+        </section>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
+        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Pedagogie</p>
+          <h2 className="mt-3 text-3xl text-stone-950">Comment lire ce pattern</h2>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Intuition</p>
+              <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.intuition}</p>
             </article>
-          ))}
-        </div>
+
+            <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Guide De Lecture</p>
+              <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.readingGuide}</p>
+            </article>
+
+            <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle Etudiant</p>
+              <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.studentAngle}</p>
+            </article>
+
+            <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle Developpeur</p>
+              <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.developerAngle}</p>
+            </article>
+          </div>
+
+          <div className="mt-4 rounded-[24px] border border-black/10 bg-[var(--accent-soft)]/55 px-5 py-5 text-sm leading-7 text-stone-700">
+            Exploration ludique : {learningContent.playfulPrompt}
+          </div>
+        </section>
+
+        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Sequence</p>
+          <h2 className="mt-3 text-3xl text-stone-950">Pas a pas</h2>
+
+          <ol className="mt-6 grid gap-3">
+            {learningContent.steps.map((step, index) => (
+              <li key={`${selectedCode}-step-${index}`} className="flex gap-4 rounded-[24px] border border-black/10 bg-[var(--panel)] px-5 py-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-950 text-sm font-semibold text-white">
+                  {index + 1}
+                </span>
+                <p className="pt-1 text-sm leading-7 text-stone-700">{step}</p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Mini Lexique</p>
+            <div className="mt-4 grid gap-3">
+              {learningContent.glossary.map((item) => (
+                <article key={`${selectedCode}-${item.term}`} className="rounded-[24px] border border-black/10 bg-white px-5 py-4">
+                  <p className="text-sm font-semibold text-stone-900">{item.term}</p>
+                  <p className="mt-2 text-sm leading-7 text-stone-700">{item.definition}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   )

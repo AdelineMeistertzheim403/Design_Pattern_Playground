@@ -1,172 +1,256 @@
 export const fallbackPatterns = [
   {
-    slug: 'factory-method',
+    code: 'factory',
     name: 'Factory Method',
-    category: 'Creation',
-    intent: "Delegue la creation d objets a une fabrique pour limiter le couplage dans l application.",
+    type: 'CREATIONAL',
+    description: "Centralise la creation d objets derriere une fabrique specialisee.",
+    useCase: "Choisir dynamiquement le bon type de vehicule sans dupliquer des constructeurs.",
+    complexityLevel: 'BEGINNER',
   },
   {
-    slug: 'adapter',
-    name: 'Adapter',
-    category: 'Structure',
-    intent: "Transforme une interface existante pour qu elle puisse etre consommee sans fuite du legacy.",
-  },
-  {
-    slug: 'decorator',
-    name: 'Decorator',
-    category: 'Structure',
-    intent: "Ajoute des responsabilites de facon dynamique sans exploser la hierarchie des classes.",
-  },
-  {
-    slug: 'observer',
+    code: 'observer',
     name: 'Observer',
-    category: 'Comportement',
-    intent: "Diffuse les changements d etat vers plusieurs abonnes tout en gardant les participants decouples.",
+    type: 'BEHAVIORAL',
+    description: "Relie un sujet a plusieurs abonnes qui recoivent automatiquement chaque notification.",
+    useCase: "Propager un evenement de publication a plusieurs consommateurs sans les coupler entre eux.",
+    complexityLevel: 'INTERMEDIATE',
   },
   {
-    slug: 'strategy',
+    code: 'strategy',
     name: 'Strategy',
-    category: 'Comportement',
-    intent: "Selectionne dynamiquement un comportement parmi plusieurs algorithmes equivalents.",
+    type: 'BEHAVIORAL',
+    description: "Permet de changer un algorithme a l execution sans modifier le contexte.",
+    useCase: "Basculer entre plusieurs modes de paiement dans un meme workflow.",
+    complexityLevel: 'INTERMEDIATE',
   },
 ]
 
-const fallbackPatternDetails = {
-  'factory-method': {
-    slug: 'factory-method',
-    name: 'Factory Method',
-    category: 'Creation',
-    intent: "Delegue la creation d un objet a une fabrique specialisee pour eviter les constructions dispersees.",
-    backendFocus:
-      "Une factory peut choisir la bonne implementation de service ou de demo a exposer dans l API Spring.",
-    frontendFocus:
-      "React peut mapper un type de pattern vers le composant adequat pour afficher un atelier ou une fiche detaillee.",
-    notes:
-      "Montre bien ou placer les points d extension quand le catalogue grossit et qu un simple if else devient fragile.",
-  },
-  adapter: {
-    slug: 'adapter',
-    name: 'Adapter',
-    category: 'Structure',
-    intent: "Transforme une interface existante en interface attendue par le client.",
-    backendFocus:
-      "Tres utile pour encapsuler une source externe ou du legacy derriere un contrat stable expose par l application.",
-    frontendFocus:
-      "Permet de normaliser des payloads heterogenes avant d alimenter un composant React unique.",
-    notes:
-      "Le bon reflexe est de laisser l adaptation a la frontiere du systeme pour garder le coeur lisible.",
-  },
-  decorator: {
-    slug: 'decorator',
-    name: 'Decorator',
-    category: 'Structure',
-    intent: "Compose des responsabilites additionnelles autour d un objet sans creer de sous classes specialisees.",
-    backendFocus:
-      "Peut servir a rajouter cache, tracing, metrics ou logs autour d un service existant sans toucher au coeur metier.",
-    frontendFocus:
-      "Un composant de base peut etre enrichi avec badges, overlays ou instrumentation de tracking de facon composee.",
-    notes:
-      "A montrer quand plusieurs comportements optionnels doivent s empiler avec un cout faible en maintenance.",
-  },
-  observer: {
-    slug: 'observer',
-    name: 'Observer',
-    category: 'Comportement',
-    intent: "Diffuse un changement d etat a plusieurs abonnes sans lien direct entre l emetteur et les recepteurs.",
-    backendFocus:
-      "Se traduit bien avec des evenements de domaine, des listeners Spring ou une propagation vers une file de messages.",
-    frontendFocus:
-      "Correspond naturellement aux stores, subscriptions, websockets ou hooks qui notifient plusieurs zones de l interface.",
-    notes:
-      "L enjeu n est pas juste la notification mais aussi la maitrise de la propagation et des effets secondaires.",
-  },
-  strategy: {
-    slug: 'strategy',
-    name: 'Strategy',
-    category: 'Comportement',
-    intent: "Choisit l algorithme le plus adapte selon le contexte sans faire fuiter la logique de selection au client.",
-    backendFocus:
-      "Le backend fournit deja deux strategies de preview pour une meme fiche: text et checklist.",
-    frontendFocus:
-      "Le front peut basculer de mode de lecture sans casser la navigation ni recrire tout le composant de detail.",
-    notes:
-      "C est le meilleur point de depart pour une demo car l impact du pattern est visible des la premiere interaction.",
-  },
-}
-
-const fallbackPreviews = {
-  'factory-method': {
-    text: [
-      "Intent: centraliser la creation pour eviter des constructions directes partout dans le code.",
-      "Backend: choisir la bonne implementation a exposer selon le type de demo demande.",
-      "Frontend: router un pattern vers le bon composant React sans conditionnels disperses.",
-    ],
-    checklist: [
-      'Identifier les objets qui changent plus vite que leur usage.',
-      'Creer une fabrique unique pour produire la bonne implementation.',
-      'Injecter cette fabrique la ou le client a besoin d un contrat stable.',
-      'Comparer ensuite le code avant et apres centralisation.',
-    ],
-  },
-  adapter: {
-    text: [
-      "Intent: convertir une interface source en contrat exploitable par le client final.",
-      "Backend: encapsuler une API externe ou un legacy service dans un composant stable.",
-      "Frontend: homogeniser les donnees avant rendu pour garder les composants simples.",
-    ],
-    checklist: [
-      'Fixer l interface cible attendue par le client.',
-      'Lire le contrat reel de la source existante.',
-      'Faire la traduction dans une couche dediee.',
-      'Tester explicitement les transformations et les cas limites.',
-    ],
-  },
-  decorator: {
-    text: [
-      "Intent: enrichir un objet par composition plutot que par heritages specialises.",
-      "Backend: empiler cache, metrics ou logs autour d un service central.",
-      "Frontend: entourer un composant principal de badges, wrappers et telemetry.",
-    ],
-    checklist: [
-      'Identifier le composant de base a conserver simple.',
-      'Extraire chaque responsabilite optionnelle dans un decorator.',
-      'Composer seulement ce qui est necessaire pour la demo courante.',
-      'Montrer le cout de maintenance evite face a une arborescence de classes.',
-    ],
-  },
-  observer: {
-    text: [
-      "Intent: publier des changements a plusieurs abonnes sans couplage fort.",
-      "Backend: propager un evenement metier vers des listeners ou integrations secondaires.",
-      "Frontend: notifier plusieurs panneaux React d un changement commun d etat.",
-    ],
-    checklist: [
-      'Definir qui emet et qui observe.',
-      'Stabiliser le contrat d evenement ou de notification.',
-      'Tracer les effets secondaires pour eviter les cascades difficiles a lire.',
-      'Comparer avec un appel direct pour montrer le gain de decouplage.',
+const fallbackSchemas = {
+  factory: {
+    fields: [
+      {
+        name: 'vehicleType',
+        label: 'Type de vehicule',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['CAR', 'BIKE'],
+        defaultValue: 'CAR',
+      },
     ],
   },
   strategy: {
-    text: [
-      "Intent: fournir plusieurs variantes d un meme comportement et laisser le contexte choisir.",
-      "Backend: changer de formatter sans toucher au service de catalogue.",
-      "Frontend: basculer entre vue narrative et checklist tout en gardant la meme fiche detail.",
+    fields: [
+      {
+        name: 'amount',
+        label: 'Montant',
+        type: 'NUMBER',
+        required: true,
+        allowedValues: null,
+        defaultValue: '100',
+      },
+      {
+        name: 'strategy',
+        label: 'Strategie',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['CARD', 'PAYPAL', 'CRYPTO'],
+        defaultValue: 'CARD',
+      },
     ],
-    checklist: [
-      'Lister les variantes de comportement a presenter.',
-      'Donner un contrat commun a toutes les strategies.',
-      'Resoudre la bonne implementation via un point unique de selection.',
-      'Rendre l impact visible en changeant seulement le mode de preview.',
+  },
+  observer: {
+    fields: [
+      {
+        name: 'subjectName',
+        label: 'Nom du sujet',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'ReleasePublisher',
+      },
+      {
+        name: 'observers',
+        label: 'Observers',
+        type: 'LIST',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Mobile App, Back Office, Audit Log',
+      },
+      {
+        name: 'message',
+        label: 'Notification',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Nouvelle version 1.0 publiee',
+      },
     ],
   },
 }
 
-export function getFallbackPatternDetail(slug) {
-  return fallbackPatternDetails[slug] ?? fallbackPatternDetails.strategy
+const fallbackExecutors = {
+  factory: (parameters) => {
+    const vehicleType = `${parameters.vehicleType ?? 'CAR'}`.toUpperCase()
+    const vehicle = vehicleType === 'BIKE'
+      ? {
+          type: 'BIKE',
+          label: 'Moto',
+          description: "Vehicule agile cree pour des scenarios de livraison ou de mobilite rapide.",
+        }
+      : {
+          type: 'CAR',
+          label: 'Voiture',
+          description: "Vehicule routier cree pour des scenarios urbains ou longue distance.",
+        }
+
+    return {
+      patternCode: 'factory',
+      summary: "Factory Method centralise la creation du produit derriere une interface stable.",
+      logs: [
+        'Creation du point d entree factory.',
+        `Demande de creation pour le type ${vehicle.type}.`,
+        `Instantiation du produit concret ${vehicle.label}.`,
+        'Retour du produit sans exposer le constructeur au client.',
+      ],
+      output: {
+        vehicleType: vehicle.type,
+        vehicleLabel: vehicle.label,
+        description: vehicle.description,
+      },
+      visualization: {
+        nodes: [
+          { id: 'client', label: 'Client', type: 'client', data: {} },
+          { id: 'factory', label: 'VehicleFactory', type: 'factory', data: {} },
+          { id: 'product', label: vehicle.label, type: 'product', data: { type: vehicle.type } },
+        ],
+        edges: [
+          { from: 'client', to: 'factory', label: 'request' },
+          { from: 'factory', to: 'product', label: 'create' },
+        ],
+      },
+    }
+  },
+  observer: (parameters) => {
+    const subjectName = `${parameters.subjectName ?? ''}`.trim()
+    const message = `${parameters.message ?? ''}`.trim()
+    const observers = (Array.isArray(parameters.observers) ? parameters.observers : `${parameters.observers ?? ''}`.split(','))
+      .map((value) => `${value}`.trim())
+      .filter(Boolean)
+      .filter((value, index, array) => array.indexOf(value) === index)
+
+    if (!subjectName) {
+      throw new Error('subjectName est obligatoire.')
+    }
+
+    if (!message) {
+      throw new Error('message est obligatoire.')
+    }
+
+    if (observers.length === 0) {
+      throw new Error('Au moins un observer est obligatoire.')
+    }
+
+    const deliveries = observers.map((observer) => ({
+      observer,
+      detail: `${observer} recoit la notification de ${subjectName} : ${message}`,
+    }))
+
+    return {
+      patternCode: 'observer',
+      summary: "Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient.",
+      logs: [
+        `Creation du sujet : ${subjectName}.`,
+        ...observers.map((observer) => `Abonnement de ${observer}.`),
+        `Emission de l evenement : ${message}.`,
+        `Le sujet notifie ${deliveries.length} observer(s).`,
+        ...deliveries.map((delivery) => delivery.detail),
+      ],
+      output: {
+        subjectName,
+        observerCount: deliveries.length,
+        message,
+        observers,
+        deliveries,
+      },
+      visualization: {
+        nodes: [
+          { id: 'subject', label: subjectName, type: 'subject', data: { active: true } },
+          { id: 'event', label: 'Evenement', type: 'event', data: { message } },
+          ...deliveries.map((delivery, index) => ({
+            id: `observer-${index}`,
+            label: delivery.observer,
+            type: 'observer',
+            data: { selected: true, detail: delivery.detail },
+          })),
+        ],
+        edges: [
+          { from: 'subject', to: 'event', label: 'publish' },
+          ...deliveries.map((_, index) => ({
+            from: 'event',
+            to: `observer-${index}`,
+            label: 'notify',
+          })),
+        ],
+      },
+    }
+  },
+  strategy: (parameters) => {
+    const selectedStrategy = `${parameters.strategy ?? 'CARD'}`.toUpperCase()
+    const amount = Number(parameters.amount ?? 100)
+
+    const strategyLabels = {
+      CARD: 'Carte',
+      PAYPAL: 'Paypal',
+      CRYPTO: 'Crypto',
+    }
+
+    const label = strategyLabels[selectedStrategy] ?? strategyLabels.CARD
+    const message = `Paiement de ${amount} EUR traite avec ${label}.`
+
+    return {
+      patternCode: 'strategy',
+      summary: "Strategy laisse le contexte deleguer l execution a l algorithme choisi.",
+      logs: [
+        'Creation du contexte de paiement.',
+        `Selection de la strategie : ${label}.`,
+        'Execution du workflow de paiement avec un algorithme interchangeable.',
+        `Resultat : ${message}`,
+      ],
+      output: {
+        amount,
+        selectedStrategy,
+        selectedLabel: label,
+        message,
+      },
+      visualization: {
+        nodes: [
+          { id: 'context', label: 'PaymentContext', type: 'context', data: { active: true } },
+          { id: 'card', label: 'Carte', type: 'strategy', data: { selected: selectedStrategy === 'CARD' } },
+          { id: 'paypal', label: 'Paypal', type: 'strategy', data: { selected: selectedStrategy === 'PAYPAL' } },
+          { id: 'crypto', label: 'Crypto', type: 'strategy', data: { selected: selectedStrategy === 'CRYPTO' } },
+          { id: 'result', label: 'Resultat', type: 'output', data: { message } },
+        ],
+        edges: [
+          { from: 'context', to: 'card', label: 'disponible' },
+          { from: 'context', to: 'paypal', label: 'disponible' },
+          { from: 'context', to: 'crypto', label: 'disponible' },
+          { from: selectedStrategy.toLowerCase(), to: 'result', label: 'execute' },
+        ],
+      },
+    }
+  },
 }
 
-export function getFallbackPreview(slug, format) {
-  const patternPreviews = fallbackPreviews[slug] ?? fallbackPreviews.strategy
-  return patternPreviews[format] ?? patternPreviews.text
+export function getFallbackSchema(code) {
+  return fallbackSchemas[code] ?? fallbackSchemas.strategy
+}
+
+export function executeFallbackPattern(code, parameters) {
+  const executor = fallbackExecutors[code]
+
+  if (!executor) {
+    throw new Error(`No local executor available for ${code}`)
+  }
+
+  return executor(parameters)
 }

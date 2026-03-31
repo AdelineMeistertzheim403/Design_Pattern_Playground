@@ -1,11 +1,11 @@
 # Design Pattern Playground
 
-Ce depot contient deux projets initialises pour presenter des design patterns cote backend et frontend.
+Ce depot contient un backend Spring Boot et un frontend React pour simuler et visualiser des design patterns de maniere interactive.
 
 ## Structure
 
-- `Backend/` : API Java Spring Boot 4, JPA, H2, seed de donnees et endpoints REST pour un catalogue de patterns.
-- `Frontend/` : application React 19 + Vite + Tailwind qui lit ce catalogue et affiche des fiches de demonstration.
+- `Backend/` : API Spring Boot 4 avec un registre de patterns, des schemas dynamiques et un moteur d execution.
+- `Frontend/` : application React 19 + Vite + Tailwind qui consomme l API et degrade en mode local si le backend est indisponible.
 
 ## Prerequis
 
@@ -22,8 +22,9 @@ cd Backend
 
 Points utiles :
 
-- API : `http://localhost:8080/api/patterns`
-- H2 console : `http://localhost:8080/h2-console`
+- API catalogue : `http://localhost:8080/api/patterns`
+- Schema d un pattern : `http://localhost:8080/api/patterns/strategy/schema`
+- Execution d une demo : `POST http://localhost:8080/api/patterns/execute`
 
 ## Demarrer le frontend
 
@@ -47,7 +48,6 @@ Acces utiles :
 
 - Frontend : `http://localhost:5173`
 - Backend : `http://localhost:8080`
-- H2 console : `http://localhost:8080/h2-console`
 
 ## Docker Prod
 
@@ -90,8 +90,51 @@ cd Frontend
 npm run build
 ```
 
-## Pistes d extension
+## MVP implemente
 
-- Ajouter un package backend par pattern avec une implementation executable.
-- Ajouter une page ou un onglet frontend par pattern pour comparer plusieurs implementations.
-- Brancher des snippets, diagrammes ou tests interactifs sur la fiche de detail.
+- `strategy` : choix dynamique d une strategie de paiement avec logs et visualisation simple.
+- `factory` : creation dynamique d un vehicule via une fabrique avec schema genere par le backend.
+- `observer` : propagation d un evenement a plusieurs abonnes avec logs de souscription et notifications.
+- UI frontend composee de :
+  - catalogue de patterns
+  - formulaire dynamique base sur `/schema`
+  - resultat, logs et graphe simple
+  - scene SVG pedagogique par pattern
+  - diagramme UML associe a chaque pattern
+  - mode fallback local si l API est coupee
+
+## Endpoints principaux
+
+- `GET /api/patterns`
+- `GET /api/patterns/{code}`
+- `GET /api/patterns/{code}/schema`
+- `POST /api/patterns/execute`
+
+Exemple `strategy` :
+
+```json
+{
+  "patternCode": "strategy",
+  "parameters": {
+    "amount": 150,
+    "strategy": "PAYPAL"
+  }
+}
+```
+
+Exemple `factory` :
+
+```json
+{
+  "patternCode": "factory",
+  "parameters": {
+    "vehicleType": "CAR"
+  }
+}
+```
+
+## Suite logique
+
+- Ajouter `observer`, `singleton` puis `builder`.
+- Remplacer la visualisation cartes/liens par un rendu SVG ou canvas.
+- Ajouter un mode apprentissage et un mode developpeur avec code Java genere.
