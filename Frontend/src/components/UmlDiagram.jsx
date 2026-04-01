@@ -139,6 +139,62 @@ function getTone(box) {
     }
   }
 
+  if (stereotype === 'factory') {
+    return {
+      fill: 'rgba(214, 228, 241, 0.94)',
+      stroke: '#426c8d',
+      text: '#27465f',
+    }
+  }
+
+  if (stereotype === 'client') {
+    return {
+      fill: 'rgba(211, 236, 230, 0.94)',
+      stroke: '#246b5e',
+      text: '#153f38',
+    }
+  }
+
+  if (stereotype === 'extrinsic state') {
+    return {
+      fill: 'rgba(245, 227, 210, 0.96)',
+      stroke: '#c25737',
+      text: '#5f2d20',
+    }
+  }
+
+  if (stereotype === 'flyweight') {
+    return {
+      fill: 'rgba(255, 244, 220, 0.96)',
+      stroke: '#9a7130',
+      text: '#5c4218',
+    }
+  }
+
+  if (stereotype === 'singleton') {
+    return {
+      fill: 'rgba(36, 31, 24, 0.96)',
+      stroke: '#241f18',
+      text: '#fff8ee',
+    }
+  }
+
+  if (stereotype === 'state') {
+    return {
+      fill: 'rgba(255, 244, 220, 0.96)',
+      stroke: '#9a7130',
+      text: '#5c4218',
+    }
+  }
+
+  if (stereotype === 'global state') {
+    return {
+      fill: 'rgba(245, 227, 210, 0.96)',
+      stroke: '#c25737',
+      text: '#5f2d20',
+    }
+  }
+
   if (stereotype === 'strategy' || stereotype === 'product') {
     return {
       fill: 'rgba(255, 244, 220, 0.96)',
@@ -511,6 +567,128 @@ function buildObserverLayout(boxesById) {
   }
 }
 
+function buildFlyweightLayout(boxesById) {
+  const client = boxesById.client
+  const extrinsic = boxesById.extrinsic
+  const factory = boxesById.factory
+  const flyweight = boxesById.flyweight
+  const concrete = boxesById.concrete
+
+  if (!client || !extrinsic || !factory || !flyweight || !concrete) {
+    return null
+  }
+
+  const marginX = 92
+  const marginY = 74
+  const columnGap = 154
+  const rowGap = 134
+  const leftColumnWidth = Math.max(client.width, extrinsic.width)
+  const rightColumnWidth = Math.max(flyweight.width, concrete.width)
+  const leftColumnHeight = client.height + rowGap + extrinsic.height
+  const rightColumnHeight = flyweight.height + rowGap + concrete.height
+  const sideColumnsHeight = Math.max(leftColumnHeight, rightColumnHeight)
+  const width = marginX * 2 + leftColumnWidth + columnGap + factory.width + columnGap + rightColumnWidth
+  const centerX = marginX + leftColumnWidth + columnGap
+  const leftX = marginX
+  const rightX = centerX + factory.width + columnGap
+  const topY = marginY
+  const leftBottomY = topY + client.height + rowGap
+  const rightBottomY = topY + flyweight.height + rowGap
+  const factoryY = marginY + (sideColumnsHeight - factory.height) / 2
+  const height = marginY * 2 + sideColumnsHeight
+
+  return {
+    viewBox: `0 0 ${width} ${height}`,
+    boxes: [
+      withPosition(client, leftX + (leftColumnWidth - client.width) / 2, topY),
+      withPosition(extrinsic, leftX + (leftColumnWidth - extrinsic.width) / 2, leftBottomY),
+      withPosition(factory, centerX, factoryY),
+      withPosition(flyweight, rightX + (rightColumnWidth - flyweight.width) / 2, topY),
+      withPosition(concrete, rightX + (rightColumnWidth - concrete.width) / 2, rightBottomY),
+    ],
+  }
+}
+
+function buildSingletonLayout(boxesById) {
+  const client = boxesById.client
+  const singleton = boxesById.singleton
+  const clients = boxesById.clients
+  const state = boxesById.state
+
+  if (!client || !singleton || !clients || !state) {
+    return null
+  }
+
+  const marginX = 92
+  const marginY = 78
+  const columnGap = 150
+  const rowGap = 140
+  const width = marginX * 2 + client.width + columnGap + singleton.width + columnGap + clients.width
+  const singletonX = marginX + client.width + columnGap
+  const leftY = marginY + 64
+  const rightY = marginY + 64
+  const singletonY = marginY
+  const stateX = singletonX
+  const stateY = singletonY + singleton.height + rowGap
+
+  return {
+    viewBox: `0 0 ${width} ${stateY + state.height + marginY}`,
+    boxes: [
+      withPosition(client, marginX, leftY),
+      withPosition(singleton, singletonX, singletonY),
+      withPosition(clients, singletonX + singleton.width + columnGap, rightY),
+      withPosition(state, stateX, stateY),
+    ],
+  }
+}
+
+function buildStateLayout(boxesById) {
+  const context = boxesById.context
+  const state = boxesById.state
+  const idle = boxesById.idle
+  const running = boxesById.running
+  const jumping = boxesById.jumping
+  const attacking = boxesById.attacking
+
+  if (!context || !state || !idle || !running || !jumping || !attacking) {
+    return null
+  }
+
+  const marginX = 92
+  const marginY = 76
+  const columnGap = 150
+  const stateRowGap = 124
+  const gridColumnGap = 92
+  const gridRowGap = 108
+  const rowOne = [idle, running]
+  const rowTwo = [jumping, attacking]
+  const rowOneWidth = getRowWidth(rowOne, gridColumnGap)
+  const rowTwoWidth = getRowWidth(rowTwo, gridColumnGap)
+  const rightAreaWidth = Math.max(state.width, rowOneWidth, rowTwoWidth)
+  const width = marginX * 2 + context.width + columnGap + rightAreaWidth
+  const rightStartX = marginX + context.width + columnGap
+  const stateX = rightStartX + (rightAreaWidth - state.width) / 2
+  const stateY = marginY
+  const rowOneStartX = rightStartX + (rightAreaWidth - rowOneWidth) / 2
+  const rowOneY = stateY + state.height + stateRowGap
+  const rowTwoStartX = rightStartX + (rightAreaWidth - rowTwoWidth) / 2
+  const rowTwoY = rowOneY + Math.max(idle.height, running.height) + gridRowGap
+  const rightAreaHeight = rowTwoY + Math.max(jumping.height, attacking.height) - stateY
+  const contextY = stateY + (rightAreaHeight - context.height) / 2
+
+  return {
+    viewBox: `0 0 ${width} ${rowTwoY + Math.max(jumping.height, attacking.height) + marginY}`,
+    boxes: [
+      withPosition(context, marginX, contextY),
+      withPosition(state, stateX, stateY),
+      withPosition(idle, rowOneStartX, rowOneY),
+      withPosition(running, rowOneStartX + idle.width + gridColumnGap, rowOneY),
+      withPosition(jumping, rowTwoStartX, rowTwoY),
+      withPosition(attacking, rowTwoStartX + jumping.width + gridColumnGap, rowTwoY),
+    ],
+  }
+}
+
 function buildFallbackLayout(boxes) {
   const marginX = 88
   const marginY = 74
@@ -572,6 +750,18 @@ function buildPatternLayout(patternCode, boxes) {
 
   if (patternCode === 'observer') {
     return buildObserverLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  if (patternCode === 'flyweight') {
+    return buildFlyweightLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  if (patternCode === 'singleton') {
+    return buildSingletonLayout(boxesById) ?? buildFallbackLayout(boxes)
+  }
+
+  if (patternCode === 'state') {
+    return buildStateLayout(boxesById) ?? buildFallbackLayout(boxes)
   }
 
   return buildFallbackLayout(boxes)
