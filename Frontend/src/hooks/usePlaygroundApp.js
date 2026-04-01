@@ -15,7 +15,6 @@ import {
 import { statusMap } from '../app/playgroundConstants'
 import {
   buildInitialParameters,
-  buildPatternPath,
   buildPreviewExecution,
   clearPersistedSession,
   loadPersistedUser,
@@ -126,7 +125,7 @@ export default function usePlaygroundApp() {
     }
   }, [backendStatus])
 
-  const selectedPattern = route.name === 'pattern'
+  const selectedPattern = route.name === 'pattern' || route.name === 'quiz'
     ? (
       patterns.find((pattern) => pattern.code === route.code)
       ?? fallbackPatterns.find((pattern) => pattern.code === route.code)
@@ -358,6 +357,5 @@ export default function usePlaygroundApp() {
     setAuthMode,
     setAuthError,
     activePatternCode,
-    buildPatternPath,
   }
 }
