@@ -950,7 +950,6 @@ function renderFlyweightScene({
               : 'Chaque objet conserve son propre etat intrinsique'}
           </text>
           <text x={statsX + statsWidth - 24} y={poolY + 90} textAnchor="end" fontSize="11" fontWeight="700" letterSpacing="0.12em" fill="#8a7663">
-            defilement vertical
           </text>
 
           <path
