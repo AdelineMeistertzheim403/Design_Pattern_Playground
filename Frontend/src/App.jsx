@@ -43,6 +43,25 @@ const statusMap = {
   },
 }
 
+const patternFieldUi = {
+  flyweight: {
+    objectCount: {
+      min: 100,
+      max: 10000,
+      step: 100,
+      unitLabel: 'objets',
+      hint: "Monte jusqu a 10 000 pour observer l impact du pattern sur la taille de la foule.",
+    },
+    sharedVariantCount: {
+      min: 1,
+      max: 12,
+      step: 1,
+      unitLabel: 'variantes',
+      hint: "Ces variantes representent les etats intrinsiques que le moteur peut partager.",
+    },
+  },
+}
+
 function buildPatternPath(code) {
   return `/patterns/${code}`
 }
@@ -131,6 +150,18 @@ function formatOutputValue(value) {
     : `${value}`
 }
 
+function getNumericFieldUi(patternCode, fieldName) {
+  return patternFieldUi[patternCode]?.[fieldName] ?? null
+}
+
+function getBooleanStateLabel(patternCode, fieldName, value) {
+  if (patternCode === 'flyweight' && fieldName === 'useFlyweight') {
+    return value ? 'Avec Flyweight' : 'Sans Flyweight'
+  }
+
+  return value ? 'Actif' : 'Inactif'
+}
+
 function buildPreviewExecution(code, schema, formValues) {
   try {
     return executeFallbackPattern(code, normalizeParameters(schema, formValues))
@@ -172,11 +203,15 @@ function SiteHeader({
     <header className="sticky top-0 z-40 border-b border-black/8 bg-[rgba(243,234,217,0.82)] backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <button
-          className="text-left"
+          className="flex items-center gap-4 text-left"
           type="button"
           onClick={onNavigateHome}
         >
-          <h1 className="mt-1 text-2xl text-stone-950">Design Pattern Playground</h1>
+          <img
+            alt="Logo Design Pattern Playground"
+            className="w-70 rounded-[1.75rem] object-contain"
+            src="/logo.png"
+          />
         </button>
 
         <div className="flex flex-wrap items-center justify-end gap-3">
@@ -363,6 +398,46 @@ function HomePage({
   )
 }
 
+function CollapsiblePanel({
+  eyebrow,
+  title,
+  description,
+  defaultExpanded = true,
+  children,
+  className = '',
+  bodyClassName = '',
+}) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+
+  return (
+    <section
+      className={`reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm ${className}`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-black/10 pb-5">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">{eyebrow}</p>
+          <h2 className="mt-3 text-3xl text-stone-950">{title}</h2>
+          {description ? (
+            <p className="mt-4 text-sm leading-7 text-stone-700">{description}</p>
+          ) : null}
+        </div>
+
+        <button
+          aria-expanded={isExpanded}
+          className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-[var(--panel)] px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
+          type="button"
+          onClick={() => setIsExpanded((current) => !current)}
+        >
+          <span>{isExpanded ? 'Replier' : 'Deplier'}</span>
+          <span className="text-base leading-none">{isExpanded ? '−' : '+'}</span>
+        </button>
+      </div>
+
+      {isExpanded ? <div className={`mt-6 ${bodyClassName}`}>{children}</div> : null}
+    </section>
+  )
+}
+
 function PatternPage({
   selectedPattern,
   patterns,
@@ -475,18 +550,17 @@ function PatternPage({
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
-          <div className="border-b border-black/10 pb-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Configuration</p>
-            <h2 className="mt-3 text-3xl text-stone-950">Parametrer la demo</h2>
-            <p className="mt-4 text-sm leading-7 text-stone-700">
-              Le formulaire est genere a partir du schema expose par le backend. La page du pattern reste donc stable meme quand la demo evolue.
-            </p>
-          </div>
+      <CollapsiblePanel
+        bodyClassName="grid gap-4"
+        description="Le formulaire est genere a partir du schema expose par le backend. La page du pattern reste donc stable meme quand la demo evolue."
+        eyebrow="Configuration"
+        title="Parametrer la demo"
+      >
+        <form className="grid gap-4 xl:grid-cols-2" onSubmit={onSubmit}>
+          {(schema?.fields ?? []).map((field) => {
+            const numericUi = getNumericFieldUi(selectedPattern.code, field.name)
 
-          <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
-            {(schema?.fields ?? []).map((field) => (
+            return (
               <label key={field.name} className="grid gap-2">
                 <span className="text-sm font-semibold text-stone-800">
                   {field.label}
@@ -515,9 +589,36 @@ function PatternPage({
                     type="button"
                     onClick={() => onFieldValueChange(field, !formValues[field.name])}
                   >
-                    <span>{formValues[field.name] ? 'Actif' : 'Inactif'}</span>
+                    <span>{getBooleanStateLabel(selectedPattern.code, field.name, Boolean(formValues[field.name]))}</span>
                     <span>{field.name}</span>
                   </button>
+                ) : field.type === 'NUMBER' && numericUi ? (
+                  <div className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700">
+                        {Number(formValues[field.name] ?? numericUi.min).toLocaleString('fr-FR')} {numericUi.unitLabel}
+                      </span>
+                      <input
+                        className="w-28 rounded-2xl border border-black/10 bg-white px-3 py-2 text-right text-sm text-stone-900 outline-none focus:border-black/20"
+                        max={numericUi.max}
+                        min={numericUi.min}
+                        step={numericUi.step}
+                        type="number"
+                        value={formValues[field.name] ?? ''}
+                        onChange={(event) => onFieldValueChange(field, event.target.value)}
+                      />
+                    </div>
+                    <input
+                      className="flyweight-range"
+                      max={numericUi.max}
+                      min={numericUi.min}
+                      step={numericUi.step}
+                      type="range"
+                      value={Number(formValues[field.name] ?? numericUi.min)}
+                      onChange={(event) => onFieldValueChange(field, event.target.value)}
+                    />
+                    <p className="text-sm leading-7 text-stone-600">{numericUi.hint}</p>
+                  </div>
                 ) : field.type === 'LIST' ? (
                   <textarea
                     className="min-h-28 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
@@ -533,8 +634,10 @@ function PatternPage({
                   />
                 )}
               </label>
-            ))}
+            )
+          })}
 
+          <div className="xl:col-span-2">
             <button
               className="mt-2 inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isExecuting}
@@ -544,95 +647,98 @@ function PatternPage({
             </button>
 
             {executionError ? (
-              <div className="rounded-[22px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mt-4 rounded-[22px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {executionError}
               </div>
             ) : null}
-          </form>
-        </section>
-
-        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
-          <div className="border-b border-black/10 pb-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Resultat</p>
-            <h2 className="mt-3 text-3xl text-stone-950">Retour d execution</h2>
-            <p className="mt-4 text-sm leading-7 text-stone-700">
-              Tu retrouves ici le resume, l output et les logs pedagogiques renvoyes par la demo executee.
-            </p>
           </div>
-
-          {execution ? (
-            <div className="mt-6 grid gap-4">
-              {hasDraftChanges ? (
-                <div className="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-900">
-                  Le formulaire a change depuis la derniere execution. La scene SVG affiche un apercu live, mais
-                  les logs et l output ci-dessous correspondent encore a la derniere execution.
-                </div>
-              ) : null}
-
-              <article className="rounded-[26px] border border-black/10 bg-[var(--panel)] p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Summary</p>
-                <p className="mt-4 text-sm leading-7 text-stone-700">{execution.summary}</p>
-              </article>
-
-              <article className="rounded-[26px] border border-black/10 bg-white p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Output</p>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  {Object.entries(execution.output ?? {}).map(([key, value]) => (
-                    <div key={key} className="rounded-2xl bg-stone-950 px-4 py-4 text-white">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">{key}</p>
-                      <pre className="mt-2 whitespace-pre-wrap text-xs leading-6 text-white/85">
-                        {formatOutputValue(value)}
-                      </pre>
-                    </div>
-                  ))}
-                </div>
-              </article>
-
-              <article className="rounded-[26px] border border-black/10 bg-white p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Logs</p>
-                <ul className="mt-4 space-y-3">
-                  {(execution.logs ?? []).map((line, index) => (
-                    <li key={`${line}-${index}`} className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3 text-sm leading-7 text-stone-700">
-                      {line}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </div>
-          ) : (
-            <div className="mt-6 rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
-              Aucun resultat pour le moment. Tu peux deja observer la scene SVG en apercu live, puis lancer la demonstration pour figer un resultat complet.
-            </div>
-          )}
-        </section>
-      </section>
+        </form>
+      </CollapsiblePanel>
 
       <section className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
-        <section className="reveal">
+        <CollapsiblePanel
+          bodyClassName="p-0"
+          description="La scene donne une lecture runtime du pattern. Tu peux l ouvrir en grand pour inspecter les objets, les relations et les etats."
+          eyebrow="Scene SVG"
+          title="Visualisation interactive"
+        >
           <ExecutionScene
             execution={visualExecution}
             onOpenModal={onOpenSceneModal}
             patternCode={selectedPattern.code}
             sourceLabel={visualSourceLabel}
           />
-        </section>
+        </CollapsiblePanel>
 
-        <section className="reveal">
+        <CollapsiblePanel
+          bodyClassName="p-0"
+          description="Le diagramme UML fige la structure du pattern. Il complete la scene runtime avec la vue conception."
+          eyebrow="Diagramme UML"
+          title="Structure du pattern"
+        >
           <UmlDiagram
             diagram={umlDiagram}
             patternCode={selectedPattern.code}
             onOpenModal={onOpenUmlModal}
             patternName={selectedPattern.name}
           />
-        </section>
+        </CollapsiblePanel>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
-        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Pedagogie</p>
-          <h2 className="mt-3 text-3xl text-stone-950">Comment lire cette page</h2>
+      <CollapsiblePanel
+        description="Tu retrouves ici le resume, l output et les logs pedagogiques renvoyes par la demo executee."
+        eyebrow="Resultat"
+        title="Retour d execution"
+      >
+        {execution ? (
+          <div className="grid gap-4">
+            {hasDraftChanges ? (
+              <div className="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-900">
+                Le formulaire a change depuis la derniere execution. La scene SVG affiche un apercu live, mais
+                les logs et l output ci-dessous correspondent encore a la derniere execution.
+              </div>
+            ) : null}
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <article className="rounded-[26px] border border-black/10 bg-[var(--panel)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Summary</p>
+              <p className="mt-4 text-sm leading-7 text-stone-700">{execution.summary}</p>
+            </article>
+
+            <article className="rounded-[26px] border border-black/10 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Output</p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {Object.entries(execution.output ?? {}).map(([key, value]) => (
+                  <div key={key} className="rounded-2xl bg-stone-950 px-4 py-4 text-white">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">{key}</p>
+                    <pre className="mt-2 whitespace-pre-wrap text-xs leading-6 text-white/85">
+                      {formatOutputValue(value)}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="rounded-[26px] border border-black/10 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Logs</p>
+              <ul className="mt-4 grid gap-3">
+                {(execution.logs ?? []).map((line, index) => (
+                  <li key={`${line}-${index}`} className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3 text-sm leading-7 text-stone-700">
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        ) : (
+          <div className="rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
+            Aucun resultat pour le moment. Tu peux deja observer la scene SVG en apercu live, puis lancer la demonstration pour figer un resultat complet.
+          </div>
+        )}
+      </CollapsiblePanel>
+
+      <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
+        <CollapsiblePanel eyebrow="Pedagogie" title="Comment lire cette page">
+          <div className="grid gap-4 md:grid-cols-2">
             <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Guide De Lecture</p>
               <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.readingGuide}</p>
@@ -653,13 +759,10 @@ function PatternPage({
               <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.playfulPrompt}</p>
             </article>
           </div>
-        </section>
+        </CollapsiblePanel>
 
-        <section className="reveal rounded-[32px] border border-black/10 bg-white/80 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Pas A Pas</p>
-          <h2 className="mt-3 text-3xl text-stone-950">Sequence de comprehension</h2>
-
-          <ol className="mt-6 grid gap-3">
+        <CollapsiblePanel eyebrow="Pas A Pas" title="Sequence de comprehension">
+          <ol className="grid gap-3">
             {learningContent.steps.map((step, index) => (
               <li key={`${selectedPattern.code}-step-${index}`} className="flex gap-4 rounded-[24px] border border-black/10 bg-[var(--panel)] px-5 py-4">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-950 text-sm font-semibold text-white">
@@ -681,7 +784,7 @@ function PatternPage({
               ))}
             </div>
           </div>
-        </section>
+        </CollapsiblePanel>
       </section>
     </div>
   )

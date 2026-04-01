@@ -29,6 +29,93 @@ const defaultLearningContent = {
 }
 
 export const patternLearningContent = {
+  singleton: {
+    strapline: 'Plusieurs clients pointent vers une seule instance, donc la configuration reste coherente partout.',
+    intuition:
+      "Singleton sert a centraliser un etat ou un service global quand plusieurs parties de l application doivent partager exactement la meme reference.",
+    readingGuide:
+      "Regarde d abord combien d instances reelles sont presentes dans la scene. Puis observe si la modification de configuration se propage a tous les clients ou reste enfermee dans une copie locale.",
+    studentAngle:
+      "Le point pedagogique n est pas seulement l unicite, mais la coherence des donnees quand plusieurs consommateurs consultent le meme service.",
+    developerAngle:
+      "C est pratique pour une configuration globale ou un logger, mais il faut rester prudent car cela introduit aussi un etat global difficile a tester.",
+    playfulPrompt:
+      "Bascule entre avec et sans Singleton et verifie ce qui arrive quand le premier client modifie une valeur centrale.",
+    steps: [
+      'Plusieurs clients demandent un service de configuration.',
+      'Le premier client applique une mise a jour.',
+      'Les autres clients lisent ensuite la configuration visible.',
+      'Comparer la coherence du systeme avec une instance unique puis avec des copies independantes.',
+    ],
+    glossary: [
+      {
+        term: 'Instance unique',
+        definition: "Objet unique partage par tout le systeme pour centraliser un etat ou une responsabilite.",
+      },
+      {
+        term: 'Etat global',
+        definition: "Donnee visible depuis plusieurs endroits de l application et dont la coherence doit etre maitrisee.",
+      },
+    ],
+  },
+  state: {
+    strapline: 'Le contexte change de comportement en changeant simplement d etat courant.',
+    intuition:
+      "State remplace un gros bloc de conditions par plusieurs objets d etat. Chaque etat connait les transitions qu il autorise et le contexte delegue la reaction courante.",
+    readingGuide:
+      "Observe d abord l etat actif dans la scene, puis suis la timeline des actions. Les transitions acceptees deplacent le personnage, les actions ignorees montrent les limites de chaque etat.",
+    studentAngle:
+      "Le point cle est de voir qu on ne raisonne plus en if imbriques, mais en comportements locaux a chaque etat.",
+    developerAngle:
+      "Ce pattern devient tres utile quand un workflow, une UI ou un personnage possede beaucoup de transitions et commence a accumuler des conditions difficiles a maintenir.",
+    playfulPrompt:
+      "Change l etat initial puis joue avec une sequence d actions atypique pour voir quelles transitions sont refusees.",
+    steps: [
+      'Le contexte demarre avec un etat initial.',
+      'Chaque action est deleguee a l etat courant.',
+      'L etat decide soit une transition, soit un refus.',
+      'Le contexte adopte ensuite le nouvel etat et expose ses prochaines actions possibles.',
+    ],
+    glossary: [
+      {
+        term: 'Etat concret',
+        definition: "Classe qui encapsule les transitions autorisees et le comportement associe a un etat precis.",
+      },
+      {
+        term: 'Transition',
+        definition: "Passage explicite d un etat vers un autre apres une action ou un evenement.",
+      },
+    ],
+  },
+  flyweight: {
+    strapline: 'Des milliers d objets restent affichables parce qu ils partagent les memes donnees lourdes.',
+    intuition:
+      "Flyweight separe ce qui peut etre partage de ce qui doit rester specifique a chaque objet. L etat intrinsique est mutualise, l etat extrinseque reste porte par chaque element a l ecran.",
+    readingGuide:
+      "Observe d abord la foule d objets dans la scene, puis compare le nombre d objets affiches au nombre d instances reelles. Dans l UML, repere la factory de flyweights, l objet partage et l etat extrinseque qui reste cote client.",
+    studentAngle:
+      "Le declic pedagogique est simple : beaucoup d objets visibles ne veut pas dire beaucoup d objets lourds en memoire.",
+    developerAngle:
+      "Le pattern devient pertinent quand plusieurs milliers d elements repetent les memes textures, meshes, glyphes ou regles de rendu et que la duplication commence a couter cher.",
+    playfulPrompt:
+      "Monte brutalement le nombre d objets, coupe puis reactive Flyweight et regarde comment les instances reelles et la memoire simulee se compriment.",
+    steps: [
+      'Identifier les donnees communes qui peuvent etre partagees.',
+      'Distinguer les variations portees par chaque objet a l execution.',
+      'Comparer la memoire sans pattern et avec Flyweight.',
+      'Relier cette optimisation a un cas reel de rendu massif ou de catalogue repetitif.',
+    ],
+    glossary: [
+      {
+        term: 'Etat intrinsique',
+        definition: "Partie partageable de l objet, typiquement la texture, la forme ou une configuration stable.",
+      },
+      {
+        term: 'Etat extrinseque',
+        definition: "Partie variable fournie par le client, comme la position, la taille, la rotation ou le contexte courant.",
+      },
+    ],
+  },
   factory: {
     strapline: 'Le client demande un produit, la fabrique choisit la bonne classe concrete.',
     intuition:
