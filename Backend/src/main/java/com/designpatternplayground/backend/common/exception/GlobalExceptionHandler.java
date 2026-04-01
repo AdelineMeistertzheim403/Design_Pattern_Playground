@@ -27,6 +27,18 @@ public class GlobalExceptionHandler {
 		);
 	}
 
+	@ExceptionHandler(QuizNotFoundException.class)
+	public ResponseEntity<ApiError> handleQuizNotFound(
+		QuizNotFoundException exception,
+		HttpServletRequest request
+	) {
+		return buildError(
+			HttpStatus.NOT_FOUND,
+			exception.getMessage(),
+			request.getRequestURI()
+		);
+	}
+
 	@ExceptionHandler(UsernameAlreadyExistsException.class)
 	public ResponseEntity<ApiError> handleUsernameAlreadyExists(
 		UsernameAlreadyExistsException exception,

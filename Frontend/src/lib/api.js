@@ -37,6 +37,25 @@ export function getPatternSchema(code) {
   return request(`/api/patterns/${code}/schema`)
 }
 
+export function getPatternQuiz(code) {
+  return request(`/api/patterns/${code}/quiz`)
+}
+
+export function getPatternQuizProgress(code) {
+  return request(`/api/patterns/${code}/quiz/progress`)
+}
+
+export function submitPatternQuiz(code, payload) {
+  return request(`/api/patterns/${code}/quiz/submissions`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getQuizDashboard() {
+  return request('/api/quiz/dashboard')
+}
+
 export function executePattern(payload) {
   return request('/api/patterns/execute', {
     method: 'POST',

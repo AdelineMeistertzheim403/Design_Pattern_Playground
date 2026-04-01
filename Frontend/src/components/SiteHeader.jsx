@@ -1,7 +1,9 @@
 export default function SiteHeader({
   currentUser,
+  routeName,
   status,
   onNavigateHome,
+  onNavigateProgress,
   onOpenAuth,
   onLogout,
 }) {
@@ -24,6 +26,18 @@ export default function SiteHeader({
           <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
             {status.label}
           </div>
+
+          <button
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              routeName === 'progress'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
+            }`}
+            type="button"
+            onClick={onNavigateProgress}
+          >
+            Ma progression
+          </button>
 
           {currentUser ? (
             <>

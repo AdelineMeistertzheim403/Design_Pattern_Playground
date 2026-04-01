@@ -5,11 +5,31 @@ export function buildPatternPath(code) {
   return `/patterns/${code}`
 }
 
+export function buildPatternQuizPath(code) {
+  return `/patterns/${code}/quiz`
+}
+
+export function buildProgressPath() {
+  return '/progression'
+}
+
 export function parseRoute(pathname) {
   const normalized = pathname.replace(/\/+$/, '') || '/'
 
   if (normalized === '/') {
     return { name: 'home' }
+  }
+
+  if (normalized === '/progression') {
+    return { name: 'progress' }
+  }
+
+  const quizMatch = normalized.match(/^\/patterns\/([a-z0-9-]+)\/quiz$/)
+  if (quizMatch) {
+    return {
+      name: 'quiz',
+      code: quizMatch[1],
+    }
   }
 
   const patternMatch = normalized.match(/^\/patterns\/([a-z0-9-]+)$/)

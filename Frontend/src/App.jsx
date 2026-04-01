@@ -7,7 +7,9 @@ import usePlaygroundApp from './hooks/usePlaygroundApp'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 import PatternPage from './pages/PatternPage'
-import { buildPatternPath } from './app/playgroundUtils'
+import PatternQuizPage from './pages/PatternQuizPage'
+import QuizDashboardPage from './pages/QuizDashboardPage'
+import { buildPatternPath, buildPatternQuizPath, buildProgressPath } from './app/playgroundUtils'
 
 function PatternModals({
   route,
@@ -101,8 +103,10 @@ export default function App() {
     <>
       <SiteHeader
         currentUser={currentUser}
+        routeName={route.name}
         status={status}
         onNavigateHome={() => navigate('/')}
+        onNavigateProgress={() => navigate(buildProgressPath())}
         onOpenAuth={openAuth}
         onLogout={handleLogout}
       />
@@ -139,8 +143,35 @@ export default function App() {
           onFieldValueChange={updateFieldValue}
           onNavigateHome={() => navigate('/')}
           onNavigatePattern={(code) => navigate(buildPatternPath(code))}
+          onNavigateQuiz={() => {
+            if (currentUser) {
+              navigate(buildPatternQuizPath(selectedPattern.code))
+              return
+            }
+
+            openAuth('login')
+          }}
           onOpenAuth={openAuth}
           onSubmit={handleExecute}
+        />
+      ) : route.name === 'quiz' && selectedPattern ? (
+        <PatternQuizPage
+          backendStatus={backendStatus}
+          currentUser={currentUser}
+          selectedPattern={selectedPattern}
+          status={status}
+          onNavigateHome={() => navigate('/')}
+          onNavigatePattern={() => navigate(buildPatternPath(selectedPattern.code))}
+          onOpenAuth={openAuth}
+        />
+      ) : route.name === 'progress' ? (
+        <QuizDashboardPage
+          backendStatus={backendStatus}
+          currentUser={currentUser}
+          onNavigateHome={() => navigate('/')}
+          onOpenAuth={openAuth}
+          onOpenPattern={(code) => navigate(buildPatternPath(code))}
+          onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
         />
       ) : (
         <NotFoundPage onNavigateHome={() => navigate('/')} />

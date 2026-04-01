@@ -161,6 +161,7 @@ export default function PatternPage({
   status,
   onNavigateHome,
   onNavigatePattern,
+  onNavigateQuiz,
   onOpenAuth,
   onFieldValueChange,
   onSubmit,
@@ -186,6 +187,16 @@ export default function PatternPage({
               <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
                 {status.label}
               </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+                type="button"
+                onClick={onNavigateQuiz}
+              >
+                {currentUser ? 'Ouvrir le quiz' : 'Connecte-toi pour debloquer le quiz'}
+              </button>
             </div>
 
             <div>
