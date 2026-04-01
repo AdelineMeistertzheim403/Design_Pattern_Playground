@@ -46,6 +46,59 @@ const toneMap = {
     stroke: '#c25737',
     text: '#5f2d20',
   },
+  cluster: {
+    fill: 'rgba(214, 228, 241, 0.94)',
+    stroke: '#426c8d',
+    text: '#27465f',
+  },
+  pool: {
+    fill: 'rgba(211, 236, 230, 0.94)',
+    stroke: '#246b5e',
+    text: '#153f38',
+  },
+  flyweight: {
+    fill: 'rgba(255, 244, 220, 0.98)',
+    stroke: '#9a7130',
+    text: '#5c4218',
+  },
+  memory: {
+    fill: 'rgba(194, 87, 55, 0.12)',
+    stroke: '#c25737',
+    text: '#5f2d20',
+  },
+  singleton: {
+    fill: '#241f18',
+    stroke: '#241f18',
+    text: '#fffaf2',
+  },
+  instance: {
+    fill: 'rgba(214, 228, 241, 0.94)',
+    stroke: '#426c8d',
+    text: '#27465f',
+  },
+  state: {
+    fill: 'rgba(255, 244, 220, 0.98)',
+    stroke: '#9a7130',
+    text: '#5c4218',
+  },
+}
+
+const FLYWEIGHT_SWATCHES = [
+  { fill: '#246b5e', stroke: '#153f38' },
+  { fill: '#c25737', stroke: '#5f2d20' },
+  { fill: '#d48a2d', stroke: '#7d5018' },
+  { fill: '#426c8d', stroke: '#27465f' },
+  { fill: '#8f5e9f', stroke: '#52305c' },
+  { fill: '#3b8d5f', stroke: '#24563a' },
+  { fill: '#bc5077', stroke: '#6a2640' },
+  { fill: '#8d6a46', stroke: '#4e3925' },
+]
+
+const STATE_LABELS = {
+  IDLE: 'Idle',
+  RUNNING: 'Running',
+  JUMPING: 'Jumping',
+  ATTACKING: 'Attacking',
 }
 
 const NO_SPACE_BEFORE_TOKENS = new Set([',', '.', ';', ':', ')', ']', '}', '>', '<', '(', '[', '{'])
@@ -469,6 +522,1286 @@ function getEdgeLabelPosition(source, target) {
   }
 }
 
+function safeNumber(value, fallbackValue = 0) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallbackValue
+}
+
+function extractStateModel(execution) {
+  const output = execution?.output
+
+  if (!output || !Array.isArray(output.timeline)) {
+    return null
+  }
+
+  const timeline = output.timeline.map((step, index) => ({
+    index: safeNumber(step.index, index + 1),
+    actionCode: `${step.actionCode ?? ''}`.trim().toUpperCase(),
+    actionLabel: `${step.actionLabel ?? step.actionCode ?? 'Action'}`,
+    fromState: `${step.fromState ?? 'IDLE'}`.trim().toUpperCase(),
+    toState: `${step.toState ?? step.fromState ?? 'IDLE'}`.trim().toUpperCase(),
+    accepted: Boolean(step.accepted),
+    detail: `${step.detail ?? ''}`.trim(),
+  }))
+
+  const initialState = `${output.initialState ?? timeline[0]?.fromState ?? 'IDLE'}`.trim().toUpperCase()
+  const finalState = `${output.finalState ?? timeline[timeline.length - 1]?.toState ?? initialState}`.trim().toUpperCase()
+  const visitedStates = Array.isArray(output.visitedStates)
+    ? output.visitedStates.map((value) => `${value}`.trim().toUpperCase()).filter(Boolean)
+    : [...new Set([initialState, ...timeline.flatMap((step) => [step.fromState, step.toState])])]
+
+  return {
+    characterName: `${output.characterName ?? 'Arena Bot'}`,
+    initialState,
+    finalState,
+    currentStateLabel: `${output.currentStateLabel ?? STATE_LABELS[finalState] ?? finalState}`,
+    actionCount: safeNumber(output.actionCount, timeline.length),
+    acceptedTransitions: safeNumber(output.acceptedTransitions, timeline.filter((step) => step.accepted).length),
+    ignoredActions: safeNumber(output.ignoredActions, timeline.filter((step) => !step.accepted).length),
+    availableActions: Array.isArray(output.availableActions)
+      ? output.availableActions.map((value) => `${value}`.trim().toUpperCase()).filter(Boolean)
+      : [],
+    visitedStates,
+    timeline,
+  }
+}
+
+function extractSingletonModel(execution) {
+  const output = execution?.output
+
+  if (!output || output.instanceCount === undefined || !Array.isArray(output.clientViews)) {
+    return null
+  }
+
+  const clientViews = output.clientViews.map((view, index) => ({
+    id: `client-view-${index}`,
+    client: `${view.client ?? `Client ${index + 1}`}`,
+    instanceId: `${view.instanceId ?? `instance-${index + 1}`}`,
+    visibleValue: `${view.visibleValue ?? 'non defini'}`,
+    shared: Boolean(view.shared),
+  }))
+
+  return {
+    mode: `${output.mode ?? 'WITH_SINGLETON'}`,
+    modeLabel: `${output.modeLabel ?? 'Avec Singleton'}`,
+    writerClient: `${output.writerClient ?? clientViews[0]?.client ?? 'Client 1'}`,
+    settingKey: `${output.settingKey ?? 'theme'}`,
+    settingValue: `${output.settingValue ?? 'emerald'}`,
+    instanceCount: safeNumber(output.instanceCount, clientViews.length),
+    clientCount: safeNumber(output.clientCount, clientViews.length),
+    coherent: Boolean(output.coherent),
+    coherenceLabel: `${output.coherenceLabel ?? ''}`.trim() || 'Etat en cours',
+    uniqueInstanceIds: Array.isArray(output.uniqueInstanceIds)
+      ? output.uniqueInstanceIds.map((value) => `${value}`)
+      : [...new Set(clientViews.map((view) => view.instanceId))],
+    clientViews,
+  }
+}
+
+function extractFlyweightModel(execution) {
+  const output = execution?.output
+
+  if (!output || output.objectCount === undefined) {
+    return null
+  }
+
+  const objectCount = safeNumber(output.objectCount, 0)
+  const sharedVariantCount = safeNumber(output.sharedVariantCount ?? output.variantCount, 1)
+  const realInstances = safeNumber(output.realInstances, sharedVariantCount)
+  const memoryCurrentKb = safeNumber(output.memoryCurrentKb, 0)
+  const memoryWithoutFlyweightKb = safeNumber(output.memoryWithoutFlyweightKb, memoryCurrentKb)
+  const savedMemoryKb = safeNumber(output.savedMemoryKb, 0)
+  const savingsPercent = safeNumber(output.savingsPercent, 0)
+  const simulatedFrameCostMs = safeNumber(output.simulatedFrameCostMs, 0)
+
+  return {
+    assetLabel: `${output.assetLabel ?? 'Objets'}`,
+    assetType: `${output.assetType ?? 'TREE'}`,
+    modeLabel: `${output.modeLabel ?? 'Avec Flyweight'}`,
+    objectCount,
+    sharedVariantCount: Math.max(1, sharedVariantCount),
+    realInstances,
+    memoryCurrentKb,
+    memoryWithoutFlyweightKb,
+    savedMemoryKb,
+    savingsPercent,
+    simulatedFrameCostMs,
+    performanceLabel: `${output.performanceLabel ?? ''}`.trim() || 'Simulation en cours',
+    useFlyweight: `${output.mode ?? ''}` === 'WITH_FLYWEIGHT' || realInstances < objectCount,
+    variants: Array.isArray(output.variants) ? output.variants : [],
+  }
+}
+
+function buildFlyweightSamples(model, layout) {
+  const {
+    sampleCount,
+    columnCount,
+    rowGap,
+    columnGap,
+    startX,
+    startY,
+  } = layout
+
+  return Array.from({ length: sampleCount }, (_, index) => {
+    const column = index % columnCount
+    const row = Math.floor(index / columnCount)
+    const variantIndex = index % model.sharedVariantCount
+    const swatch = FLYWEIGHT_SWATCHES[variantIndex % FLYWEIGHT_SWATCHES.length]
+    const scale = 0.88 + (variantIndex % 4) * 0.08
+
+    return {
+      id: `sample-${index}`,
+      x: startX + column * columnGap + (row % 2) * 3,
+      y: startY + row * rowGap + (column % 3) * 1.4,
+      variantIndex,
+      swatch,
+      scale,
+    }
+  })
+}
+
+function renderFlyweightGlyph(sample, assetType) {
+  const { swatch, scale } = sample
+
+  if (assetType === 'PARTICLE') {
+    return (
+      <g transform={`translate(${sample.x} ${sample.y}) scale(${scale})`}>
+        <circle cx="0" cy="0" r="7" fill={swatch.fill} fillOpacity="0.9" stroke={swatch.stroke} strokeWidth="1.2" />
+        <circle cx="0" cy="0" r="3" fill="#fff7ec" fillOpacity="0.86" />
+      </g>
+    )
+  }
+
+  if (assetType === 'BULLET') {
+    return (
+      <g transform={`translate(${sample.x} ${sample.y}) rotate(-12) scale(${scale})`}>
+        <rect x="-8" y="-4" width="16" height="8" rx="4" fill={swatch.fill} stroke={swatch.stroke} strokeWidth="1.2" />
+        <path d="M 8 -4 L 14 0 L 8 4 Z" fill={swatch.stroke} />
+      </g>
+    )
+  }
+
+  return (
+    <g transform={`translate(${sample.x} ${sample.y}) scale(${scale})`}>
+      <rect x="-2.4" y="4" width="4.8" height="10" rx="1.4" fill="#6d4a31" />
+      <path d="M 0 -16 L 11 -1 L -11 -1 Z" fill={swatch.fill} stroke={swatch.stroke} strokeWidth="1.15" />
+      <path d="M 0 -9 L 9 3 L -9 3 Z" fill={swatch.fill} fillOpacity="0.88" />
+    </g>
+  )
+}
+
+function renderFlyweightScene({
+  execution,
+  isExpanded,
+  panelClassName,
+  svgClassName,
+  TitleTag,
+  sourceLabel,
+  onOpenModal,
+}) {
+  const model = extractFlyweightModel(execution)
+
+  if (!model) {
+    return (
+      <div className="rounded-[26px] border border-dashed border-black/15 bg-white/70 px-5 py-12 text-sm leading-7 text-stone-600">
+        La scene visuelle apparaitra ici des qu une demo ou un apercu local sera disponible.
+      </div>
+    )
+  }
+
+  const viewBoxWidth = 1120
+  const stageX = 36
+  const stageY = 88
+  const stageWidth = 700
+  const statsX = 770
+  const statsWidth = 314
+  const statsHeight = 228
+  const poolY = 344
+  const poolHeight = isExpanded ? 356 : 324
+  const memoryRatio = model.memoryWithoutFlyweightKb > 0
+    ? Math.min(1, model.memoryCurrentKb / model.memoryWithoutFlyweightKb)
+    : 0
+  const sampleCount = Math.min(model.objectCount, isExpanded ? 420 : 260)
+  const columnCount = isExpanded ? 24 : 18
+  const rowGap = isExpanded ? 24 : 26
+  const columnGap = isExpanded ? 26 : 31
+  const rowCount = Math.max(1, Math.ceil(sampleCount / columnCount))
+  const objectFrameX = stageX + 24
+  const objectFrameY = stageY + 114
+  const objectFrameWidth = stageWidth - 48
+  const sampleStartX = objectFrameX + (isExpanded ? 34 : 30)
+  const sampleStartY = objectFrameY + (isExpanded ? 42 : 38)
+  const sampleGlyphHeight = model.assetType === 'TREE' ? 30 : 18
+  const sampleViewportHeight = Math.max(
+    isExpanded ? 310 : 256,
+    (sampleStartY - objectFrameY) + (rowCount - 1) * rowGap + sampleGlyphHeight + 24,
+  )
+  const objectLabelHeight = 56
+  const objectFrameHeight = sampleViewportHeight + objectLabelHeight
+  const stageHeight = (objectFrameY - stageY) + objectFrameHeight + 26
+  const viewBoxHeight = Math.max(
+    isExpanded ? 780 : 720,
+    stageY + stageHeight + 40,
+    poolY + poolHeight + 48,
+  )
+  const sampleObjects = buildFlyweightSamples(model, {
+    sampleCount,
+    columnCount,
+    rowGap,
+    columnGap,
+    startX: sampleStartX,
+    startY: sampleStartY,
+  })
+  const extraObjects = Math.max(0, model.objectCount - sampleObjects.length)
+  const connectionStartY = objectFrameY + Math.min(sampleViewportHeight * 0.5, sampleViewportHeight - 28)
+  const connectionPath = `M ${stageX + stageWidth} ${connectionStartY} C 790 ${connectionStartY} 782 ${poolY + 88} ${statsX} ${poolY + 88}`
+  const defsId = `flyweight-scene-${isExpanded ? 'expanded' : 'compact'}`
+  const scrollRegionX = statsX + 18
+  const scrollRegionY = poolY + 120
+  const scrollRegionWidth = statsWidth - 36
+  const scrollRegionHeight = poolHeight - 146
+
+  return (
+    <div className={panelClassName}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
+            Memory Battle
+          </TitleTag>
+        </div>
+        {onOpenModal ? (
+          <button
+            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+            type="button"
+            onClick={onOpenModal}
+          >
+            {sourceLabel}
+          </button>
+        ) : (
+          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
+            {sourceLabel}
+          </span>
+        )}
+      </div>
+
+      <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
+        <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
+          <defs>
+            <linearGradient id={`${defsId}-stage`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(214,228,241,0.62)" />
+              <stop offset="100%" stopColor="rgba(255,250,242,0.98)" />
+            </linearGradient>
+            <linearGradient id={`${defsId}-memory-current`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#246b5e" />
+              <stop offset="100%" stopColor="#3e9b84" />
+            </linearGradient>
+            <linearGradient id={`${defsId}-memory-baseline`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#c25737" />
+              <stop offset="100%" stopColor="#df8a6e" />
+            </linearGradient>
+            <clipPath id={`${defsId}-samples-clip`}>
+              <rect
+                x={objectFrameX + 16}
+                y={objectFrameY + 16}
+                width={objectFrameWidth - 32}
+                height={sampleViewportHeight - 10}
+                rx="24"
+              />
+            </clipPath>
+            <marker
+              id={`${defsId}-arrow`}
+              markerWidth="10"
+              markerHeight="10"
+              refX="8"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill={model.useFlyweight ? '#246b5e' : '#c25737'} />
+            </marker>
+          </defs>
+
+          <circle cx="190" cy="124" r="114" fill="rgba(36,107,94,0.08)" />
+          <circle cx="982" cy={viewBoxHeight - 126} r="136" fill="rgba(194,87,55,0.08)" />
+
+          <rect
+            x={stageX}
+            y={stageY}
+            width={stageWidth}
+            height={stageHeight}
+            rx="34"
+            fill={`url(#${defsId}-stage)`}
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={stageX + 26} y={stageY + 32} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5a5147">
+            SCENE SAMPLE
+          </text>
+          <text x={stageX + 26} y={stageY + 64} fontSize="28" fontWeight="700" fill="#241f18">
+            {model.objectCount.toLocaleString('fr-FR')} objets a l ecran
+          </text>
+          <text x={stageX + 26} y={stageY + 92} fontSize="15" fontWeight="500" fill="#5d554b">
+            Echantillon visuel {sampleObjects.length.toLocaleString('fr-FR')} / {model.objectCount.toLocaleString('fr-FR')} · {model.assetLabel}
+          </text>
+
+          <rect
+            x={objectFrameX}
+            y={objectFrameY}
+            width={objectFrameWidth}
+            height={objectFrameHeight}
+            rx="28"
+            fill="rgba(255,255,255,0.58)"
+          />
+          <rect
+            x={stageX + 26}
+            y={objectFrameY + objectFrameHeight - 42}
+            width={216}
+            height="28"
+            rx="14"
+            fill={model.useFlyweight ? 'rgba(36,107,94,0.14)' : 'rgba(194,87,55,0.14)'}
+            stroke={model.useFlyweight ? 'rgba(36,107,94,0.28)' : 'rgba(194,87,55,0.28)'}
+          />
+          <text x={stageX + 42} y={objectFrameY + objectFrameHeight - 23} fontSize="11" fontWeight="700" letterSpacing="0.16em" fill="#5f5548">
+            {model.useFlyweight ? 'ETAT EXTRINSIQUE PAR OBJET' : 'ETAT COMPLET DUPLIQUE'}
+          </text>
+
+          <g clipPath={`url(#${defsId}-samples-clip)`}>
+            {sampleObjects.map((sample) => renderFlyweightGlyph(sample, model.assetType))}
+          </g>
+
+          {extraObjects > 0 ? (
+            <>
+              <rect
+                x={stageX + stageWidth - 226}
+                y={objectFrameY + objectFrameHeight - 42}
+                width="200"
+                height="28"
+                rx="14"
+                fill="rgba(36,31,24,0.08)"
+              />
+              <text
+                x={stageX + stageWidth - 126}
+                y={objectFrameY + objectFrameHeight - 23}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="700"
+                letterSpacing="0.16em"
+                fill="#5f5548"
+              >
+                +{extraObjects.toLocaleString('fr-FR')} objets supplementaires
+              </text>
+            </>
+          ) : null}
+
+          <rect
+            x={statsX}
+            y={stageY}
+            width={statsWidth}
+            height={statsHeight}
+            rx="30"
+            fill="rgba(255,250,242,0.96)"
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={statsX + 24} y={stageY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            ANALYSE LIVE
+          </text>
+          <text x={statsX + 24} y={stageY + 62} fontSize="26" fontWeight="700" fill="#241f18">
+            {model.modeLabel}
+          </text>
+          <text x={statsX + 24} y={stageY + 90} fontSize="14" fill="#5f5548">
+            {model.performanceLabel}
+          </text>
+
+          <text x={statsX + 24} y={stageY + 126} fontSize="11" fontWeight="700" letterSpacing="0.14em" fill="#786e62">
+            MEMOIRE COURANTE
+          </text>
+          <rect x={statsX + 24} y={stageY + 138} width="248" height="16" rx="8" fill="rgba(36,31,24,0.1)" />
+          <rect x={statsX + 24} y={stageY + 138} width={248 * memoryRatio} height="16" rx="8" fill={`url(#${defsId}-memory-current)`} />
+          <text x={statsX + 24} y={stageY + 176} fontSize="13" fontWeight="600" fill="#241f18">
+            {model.memoryCurrentKb.toLocaleString('fr-FR')} KB / {model.memoryWithoutFlyweightKb.toLocaleString('fr-FR')} KB
+          </text>
+          <text x={statsX + 24} y={stageY + 201} fontSize="12" fill="#5f5548">
+            Economie : {model.savedMemoryKb.toLocaleString('fr-FR')} KB · {model.savingsPercent.toLocaleString('fr-FR')}%
+          </text>
+          <text x={statsX + 24} y={stageY + 224} fontSize="12" fill="#5f5548">
+            Cout frame simule : {model.simulatedFrameCostMs.toLocaleString('fr-FR')} ms
+          </text>
+
+          <rect
+            x={statsX}
+            y={poolY}
+            width={statsWidth}
+            height={poolHeight}
+            rx="30"
+            fill="rgba(255,250,242,0.96)"
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={statsX + 24} y={poolY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            {model.useFlyweight ? 'POOL PARTAGE' : 'INSTANCE STORM'}
+          </text>
+          <text x={statsX + 24} y={poolY + 62} fontSize="26" fontWeight="700" fill="#241f18">
+            {model.realInstances.toLocaleString('fr-FR')} instance(s) reelle(s)
+          </text>
+          <text x={statsX + 24} y={poolY + 90} fontSize="14" fill="#5f5548">
+            {model.useFlyweight
+              ? `${model.sharedVariantCount.toLocaleString('fr-FR')} variante(s) alimentent toute la foule`
+              : 'Chaque objet conserve son propre etat intrinsique'}
+          </text>
+          <text x={statsX + statsWidth - 24} y={poolY + 90} textAnchor="end" fontSize="11" fontWeight="700" letterSpacing="0.12em" fill="#8a7663">
+          </text>
+
+          <path
+            d={connectionPath}
+            fill="none"
+            stroke={model.useFlyweight ? '#246b5e' : '#c25737'}
+            strokeWidth="3"
+            strokeDasharray={model.useFlyweight ? '14 9' : '8 7'}
+            markerEnd={`url(#${defsId}-arrow)`}
+            className={model.useFlyweight ? 'scene-flow-line' : ''}
+          />
+          <circle r="5" fill={model.useFlyweight ? '#246b5e' : '#c25737'} opacity="0.95">
+            <animateMotion dur={model.useFlyweight ? '2.2s' : '1.35s'} repeatCount="indefinite" path={connectionPath} />
+          </circle>
+
+          <foreignObject x={scrollRegionX} y={scrollRegionY} width={scrollRegionWidth} height={scrollRegionHeight}>
+            <div className="flyweight-instance-scroll h-full overflow-y-auto pr-1" xmlns="http://www.w3.org/1999/xhtml">
+              <div className="space-y-2.5 pb-2">
+                {model.variants.map((variant, index) => {
+                  const swatch = FLYWEIGHT_SWATCHES[index % FLYWEIGHT_SWATCHES.length]
+
+                  return (
+                    <div
+                      key={`${variant.code}-${index}`}
+                      className="rounded-[18px] border border-black/8 bg-white/90 px-3 py-2 shadow-[0_12px_24px_rgba(48,39,24,0.08)]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border"
+                          style={{ backgroundColor: swatch.fill, borderColor: swatch.stroke }}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[12px] font-semibold text-stone-900">{variant.label}</p>
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-stone-500">
+                            {model.useFlyweight ? 'instance partagee' : 'copies regroupees'}
+                          </p>
+                        </div>
+                        <p className="text-right text-[11px] font-bold text-stone-700">
+                          {safeNumber(variant.objects, 0).toLocaleString('fr-FR')} objets
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </foreignObject>
+        </svg>
+      </ZoomableViewport>
+    </div>
+  )
+}
+
+function renderStateScene({
+  execution,
+  isExpanded,
+  panelClassName,
+  svgClassName,
+  TitleTag,
+  sourceLabel,
+  onOpenModal,
+}) {
+  const model = extractStateModel(execution)
+
+  if (!model) {
+    return (
+      <div className="rounded-[26px] border border-dashed border-black/15 bg-white/70 px-5 py-12 text-sm leading-7 text-stone-600">
+        La scene visuelle apparaitra ici des qu une demo ou un apercu local sera disponible.
+      </div>
+    )
+  }
+
+  const viewBoxWidth = 1120
+  const graphX = 36
+  const graphY = 170
+  const graphWidth = 1048
+  const graphHeight = isExpanded ? 820 : 720
+  const timelineX = graphX
+  const timelineY = graphY + graphHeight + 28
+  const timelineWidth = graphWidth
+  const timelineColumns = isExpanded ? 3 : 2
+  const timelineRows = Math.max(1, Math.ceil(model.timeline.length / timelineColumns))
+  const timelineRowHeight = isExpanded ? 142 : 150
+  const timelineGap = 12
+  const timelineHeight = 124 + timelineRows * timelineRowHeight + Math.max(0, timelineRows - 1) * timelineGap
+  const viewBoxHeight = timelineY + timelineHeight + 40
+  const defsId = `state-scene-${isExpanded ? 'expanded' : 'compact'}`
+  const contextDescriptionLines = wrapText('delegue chaque action a l etat courant', 28)
+  const summaryActionLines = wrapText(
+    `prochaines actions : ${model.availableActions.join(' · ') || 'aucune'}`,
+    30,
+  )
+  const latestStep = model.timeline[model.timeline.length - 1] ?? null
+  const latestAcceptedStep = [...model.timeline].reverse().find((step) => step.accepted) ?? null
+
+  const stateNodes = {
+    IDLE: { x: graphX + 110, y: graphY + 314, width: 230, height: 108 },
+    RUNNING: { x: graphX + 412, y: graphY + 158, width: 238, height: 108 },
+    ATTACKING: { x: graphX + 718, y: graphY + 314, width: 236, height: 108 },
+    JUMPING: { x: graphX + 412, y: graphY + 520, width: 238, height: 108 },
+  }
+
+  const activeStateNode = stateNodes[model.finalState]
+  const contextCard = {
+    x: graphX + 28,
+    y: graphY + 28,
+    width: 276,
+    height: 118,
+  }
+  const summaryCard = { x: graphX + graphWidth - 318, y: graphY + 42, width: 286, height: 132 }
+
+  const transitionDefinitions = [
+    { key: 'idle-run', from: 'IDLE', to: 'RUNNING', action: 'START_RUN', offset: -18, labelShiftY: -46, labelShiftX: -14 },
+    { key: 'run-idle', from: 'RUNNING', to: 'IDLE', action: 'STOP', offset: 18, labelShiftY: 46, labelShiftX: 12 },
+    { key: 'idle-jump', from: 'IDLE', to: 'JUMPING', action: 'JUMP', offset: -14, labelShiftX: -10 },
+    { key: 'run-jump', from: 'RUNNING', to: 'JUMPING', action: 'JUMP', offset: 0 },
+    { key: 'jump-idle', from: 'JUMPING', to: 'IDLE', action: 'LAND', offset: 14, labelShiftY: 26 },
+    { key: 'idle-attack', from: 'IDLE', to: 'ATTACKING', action: 'ATTACK', offset: -22, labelShiftY: -52 },
+    { key: 'run-attack', from: 'RUNNING', to: 'ATTACKING', action: 'ATTACK', offset: 16, labelShiftY: -20, labelShiftX: 18 },
+    { key: 'attack-idle', from: 'ATTACKING', to: 'IDLE', action: 'FINISH_ATTACK', offset: 22, labelShiftY: 52, labelShiftX: 22 },
+  ]
+
+  const transitionUsage = model.timeline.reduce((accumulator, step) => {
+    if (!step.accepted) {
+      return accumulator
+    }
+
+    const key = `${step.fromState}->${step.toState}:${step.actionCode}`
+    accumulator[key] = (accumulator[key] ?? 0) + 1
+    return accumulator
+  }, {})
+  const latestAcceptedTransitionKey = latestAcceptedStep
+    ? `${latestAcceptedStep.fromState}->${latestAcceptedStep.toState}:${latestAcceptedStep.actionCode}`
+    : null
+
+  const getAnchor = (box, side) => {
+    if (side === 'left') {
+      return { x: box.x, y: box.y + box.height / 2 }
+    }
+
+    if (side === 'top') {
+      return { x: box.x + box.width / 2, y: box.y }
+    }
+
+    if (side === 'bottom') {
+      return { x: box.x + box.width / 2, y: box.y + box.height }
+    }
+
+    return { x: box.x + box.width, y: box.y + box.height / 2 }
+  }
+
+  const buildPathBetweenStates = (fromCode, toCode, offset = 0) => {
+    const from = stateNodes[fromCode]
+    const to = stateNodes[toCode]
+    const fromCenterX = from.x + from.width / 2
+    const fromCenterY = from.y + from.height / 2
+    const toCenterX = to.x + to.width / 2
+    const toCenterY = to.y + to.height / 2
+    const dx = toCenterX - fromCenterX
+    const dy = toCenterY - fromCenterY
+    const horizontal = Math.abs(dx) >= Math.abs(dy)
+    const start = horizontal
+      ? getAnchor(from, dx >= 0 ? 'right' : 'left')
+      : getAnchor(from, dy >= 0 ? 'bottom' : 'top')
+    const end = horizontal
+      ? getAnchor(to, dx >= 0 ? 'left' : 'right')
+      : getAnchor(to, dy >= 0 ? 'top' : 'bottom')
+
+    if (horizontal) {
+      const curve = Math.max(72, Math.abs(dx) * 0.36)
+      return `M ${start.x} ${start.y + offset} C ${start.x + Math.sign(dx) * curve} ${start.y + offset} ${end.x - Math.sign(dx) * curve} ${end.y + offset} ${end.x} ${end.y + offset}`
+    }
+
+    const curve = Math.max(72, Math.abs(dy) * 0.36)
+    return `M ${start.x + offset} ${start.y} C ${start.x + offset} ${start.y + Math.sign(dy) * curve} ${end.x + offset} ${end.y - Math.sign(dy) * curve} ${end.x + offset} ${end.y}`
+  }
+
+  const getLabelPosition = (fromCode, toCode, offset = 0, shiftX = 0, shiftY = 0) => {
+    const from = stateNodes[fromCode]
+    const to = stateNodes[toCode]
+    return {
+      x: (from.x + from.width / 2 + to.x + to.width / 2) / 2 + (Math.abs(offset) > 0 ? offset * 1.3 : 0) + shiftX,
+      y: (from.y + from.height / 2 + to.y + to.height / 2) / 2 - 10 + offset * 0.25 + shiftY,
+    }
+  }
+
+  return (
+    <div className={panelClassName}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
+            Character State Simulator
+          </TitleTag>
+        </div>
+        {onOpenModal ? (
+          <button
+            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+            type="button"
+            onClick={onOpenModal}
+          >
+            {sourceLabel}
+          </button>
+        ) : (
+          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
+            {sourceLabel}
+          </span>
+        )}
+      </div>
+
+      <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
+        <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
+          <defs>
+            <linearGradient id={`${defsId}-metrics`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(255,249,239,0.98)" />
+              <stop offset="100%" stopColor="rgba(211,236,230,0.86)" />
+            </linearGradient>
+            <marker
+              id={`${defsId}-arrow`}
+              markerWidth="10"
+              markerHeight="10"
+              refX="8"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#246b5e" />
+            </marker>
+            <marker
+              id={`${defsId}-arrow-muted`}
+              markerWidth="10"
+              markerHeight="10"
+              refX="8"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#b7aa99" />
+            </marker>
+          </defs>
+
+          <rect
+            x="36"
+            y="44"
+            width="1048"
+            height="92"
+            rx="32"
+            fill={`url(#${defsId}-metrics)`}
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x="64" y="80" fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            STATE MACHINE
+          </text>
+          <text x="64" y="112" fontSize="28" fontWeight="700" fill="#241f18">
+            {model.characterName} · {model.currentStateLabel}
+          </text>
+          <text x="392" y="86" fontSize="13" fontWeight="600" fill="#5f5548">
+            Etat initial : {STATE_LABELS[model.initialState] ?? model.initialState}
+          </text>
+          <text x="392" y="112" fontSize="13" fontWeight="600" fill="#5f5548">
+            Etat final : {STATE_LABELS[model.finalState] ?? model.finalState}
+          </text>
+          <text x="1056" y="82" textAnchor="end" fontSize="24" fontWeight="700" fill="#241f18">
+            {model.acceptedTransitions} transition(s)
+          </text>
+          <text x="1056" y="108" textAnchor="end" fontSize="13" fill="#5f5548">
+            {model.ignoredActions} action(s) ignoree(s)
+          </text>
+          {latestStep ? (
+            <text x="1056" y="130" textAnchor="end" fontSize="12" fontWeight="600" fill="#5f5548">
+              Derniere action : {latestStep.actionCode}
+            </text>
+          ) : null}
+
+          <rect
+            x={graphX}
+            y={graphY}
+            width={graphWidth}
+            height={graphHeight}
+            rx="34"
+            fill="rgba(255,250,242,0.94)"
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={graphX + 24} y={graphY + 24} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            GRAPHE DES ETATS
+          </text>
+
+          <rect
+            x={contextCard.x}
+            y={contextCard.y}
+            width={contextCard.width}
+            height={contextCard.height}
+            rx="24"
+            fill="rgba(211,236,230,0.94)"
+            stroke="#246b5e"
+            strokeWidth="2"
+            className="scene-node-shadow"
+          />
+          <text x={contextCard.x + 18} y={contextCard.y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill="#577166">
+            CONTEXT
+          </text>
+          <text x={contextCard.x + 18} y={contextCard.y + 50} fontSize="20" fontWeight="700" fill="#153f38">
+            CharacterContext
+          </text>
+          {contextDescriptionLines.map((line, index) => (
+            <text
+              key={`context-line-${index}`}
+              x={contextCard.x + 18}
+              y={contextCard.y + 76 + index * 16}
+              fontSize="12"
+              fill="#215247"
+            >
+              {line}
+            </text>
+          ))}
+
+          <rect
+            x={summaryCard.x}
+            y={summaryCard.y}
+            width={summaryCard.width}
+            height={summaryCard.height}
+            rx="24"
+            fill="rgba(245,227,210,0.92)"
+            stroke="#c25737"
+            strokeWidth="2"
+            className="scene-node-shadow"
+          />
+          <text x={summaryCard.x + 18} y={summaryCard.y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill="#8b5b49">
+            ETAT ACTIF
+          </text>
+          <text x={summaryCard.x + 18} y={summaryCard.y + 52} fontSize="24" fontWeight="700" fill="#5f2d20">
+            {STATE_LABELS[model.finalState] ?? model.finalState}
+          </text>
+          {summaryActionLines.map((line, index) => (
+            <text
+              key={`summary-line-${index}`}
+              x={summaryCard.x + 18}
+              y={summaryCard.y + 80 + index * 16}
+              fontSize="12"
+              fill="#7a4634"
+            >
+              {line}
+            </text>
+          ))}
+
+          <path
+            d={`M ${contextCard.x + contextCard.width} ${contextCard.y + contextCard.height / 2} L ${
+              contextCard.x + contextCard.width + 74
+            } ${contextCard.y + contextCard.height / 2} L ${
+              contextCard.x + contextCard.width + 74
+            } ${activeStateNode.y + activeStateNode.height / 2} L ${
+              activeStateNode.x <= contextCard.x + contextCard.width
+                ? activeStateNode.x + activeStateNode.width
+                : activeStateNode.x
+            } ${activeStateNode.y + activeStateNode.height / 2}`}
+            fill="none"
+            stroke="#246b5e"
+            strokeWidth="2.8"
+            strokeDasharray="12 8"
+            markerEnd={`url(#${defsId}-arrow)`}
+            className="scene-flow-line"
+          />
+
+          {transitionDefinitions.map((transition) => {
+            const path = buildPathBetweenStates(transition.from, transition.to, transition.offset)
+            const count = transitionUsage[`${transition.from}->${transition.to}:${transition.action}`] ?? 0
+            const isActive = count > 0
+            const isRecent = latestAcceptedTransitionKey === `${transition.from}->${transition.to}:${transition.action}`
+            const labelPosition = getLabelPosition(
+              transition.from,
+              transition.to,
+              transition.offset,
+              transition.labelShiftX ?? 0,
+              transition.labelShiftY ?? 0,
+            )
+            const labelWidth = Math.max(78, Math.ceil(estimateTextWidth(transition.action, 10) + 24))
+
+            return (
+              <g key={transition.key}>
+                <path
+                  d={path}
+                  fill="none"
+                  stroke={isRecent ? '#c25737' : isActive ? '#246b5e' : 'rgba(143,127,107,0.68)'}
+                  strokeWidth={isRecent ? '4.2' : isActive ? '3.4' : '2.2'}
+                  strokeDasharray={isRecent ? '16 8' : isActive ? '14 8' : '0'}
+                  markerEnd={`url(#${defsId}-${isActive || isRecent ? 'arrow' : 'arrow-muted'})`}
+                  className={isRecent ? 'state-recent-path' : isActive ? 'scene-flow-line' : ''}
+                />
+                {isRecent ? (
+                  <circle r="5.5" fill="#c25737" opacity="0.96">
+                    <animateMotion dur="1.55s" repeatCount="indefinite" path={path} />
+                  </circle>
+                ) : null}
+                <rect
+                  x={labelPosition.x - labelWidth / 2}
+                  y={labelPosition.y - 12}
+                  width={labelWidth}
+                  height="22"
+                  rx="11"
+                  fill={isRecent ? 'rgba(245,227,210,0.98)' : isActive ? 'rgba(211,236,230,0.96)' : 'rgba(255,250,242,0.92)'}
+                  stroke={isRecent ? 'rgba(194,87,55,0.2)' : isActive ? 'rgba(36,107,94,0.16)' : 'rgba(36,31,24,0.08)'}
+                />
+                <text
+                  x={labelPosition.x}
+                  y={labelPosition.y + 3}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fontWeight="700"
+                  letterSpacing="0.14em"
+                  fill={isRecent ? '#8b3620' : isActive ? '#153f38' : '#6d6459'}
+                >
+                  {transition.action}
+                </text>
+                {count > 0 ? (
+                  <text
+                    x={labelPosition.x + labelWidth / 2 + 8}
+                    y={labelPosition.y + 3}
+                    fontSize="10"
+                    fontWeight="700"
+                    fill={isRecent ? '#c25737' : '#246b5e'}
+                  >
+                    x{count}
+                  </text>
+                ) : null}
+              </g>
+            )
+          })}
+
+          {Object.entries(stateNodes).map(([code, node]) => {
+            const isActive = model.finalState === code
+            const isVisited = model.visitedStates.includes(code)
+
+            return (
+              <g key={code}>
+                {isActive ? (
+                  <rect
+                    x={node.x - 10}
+                    y={node.y - 10}
+                    width={node.width + 20}
+                    height={node.height + 20}
+                    rx="34"
+                    fill="rgba(194,87,55,0.08)"
+                    stroke="rgba(194,87,55,0.22)"
+                    strokeWidth="2"
+                    className="state-active-halo"
+                  />
+                ) : null}
+                <rect
+                  x={node.x}
+                  y={node.y}
+                  width={node.width}
+                  height={node.height}
+                  rx="28"
+                  fill={isActive ? '#241f18' : isVisited ? 'rgba(255,244,220,0.98)' : 'rgba(255,250,242,0.95)'}
+                  stroke={isActive ? '#241f18' : isVisited ? '#9a7130' : 'rgba(36,31,24,0.12)'}
+                  strokeWidth="2"
+                  className="scene-node-shadow"
+                />
+                <text
+                  x={node.x + 18}
+                  y={node.y + 24}
+                  fontSize="10"
+                  fontWeight="700"
+                  letterSpacing="0.18em"
+                  fill={isActive ? 'rgba(255,248,238,0.7)' : isVisited ? '#7a571f' : '#7f7469'}
+                >
+                  {isActive ? 'ACTIVE STATE' : isVisited ? 'VISITED STATE' : 'STATE'}
+                </text>
+                <text
+                  x={node.x + 18}
+                  y={node.y + 54}
+                  fontSize="22"
+                  fontWeight="700"
+                  fill={isActive ? '#fff8ee' : isVisited ? '#5c4218' : '#241f18'}
+                >
+                  {STATE_LABELS[code]}
+                </text>
+                <text
+                  x={node.x + 18}
+                  y={node.y + 80}
+                  fontSize="12"
+                  fill={isActive ? 'rgba(255,248,238,0.74)' : isVisited ? '#7a571f' : '#5f5548'}
+                >
+                  {code}
+                </text>
+                {isActive ? (
+                  <text
+                    x={node.x + node.width - 18}
+                    y={node.y + 24}
+                    textAnchor="end"
+                    fontSize="10"
+                    fontWeight="700"
+                    letterSpacing="0.18em"
+                    fill="#f1b29e"
+                  >
+                    NOW
+                  </text>
+                ) : null}
+              </g>
+            )
+          })}
+
+          <rect
+            x={timelineX}
+            y={timelineY}
+            width={timelineWidth}
+            height={timelineHeight}
+            rx="34"
+            fill="rgba(255,250,242,0.96)"
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={timelineX + 24} y={timelineY + 32} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            TIMELINE
+          </text>
+          <text x={timelineX + 24} y={timelineY + 62} fontSize="24" fontWeight="700" fill="#241f18">
+            {model.actionCount} action(s)
+          </text>
+          <text x={timelineX + 24} y={timelineY + 88} fontSize="13" fill="#5f5548">
+            les transitions refusees restent visibles pour comprendre les limites de chaque etat
+          </text>
+
+          <foreignObject x={timelineX + 16} y={timelineY + 106} width={timelineWidth - 32} height={timelineHeight - 130}>
+            <div className="h-full" xmlns="http://www.w3.org/1999/xhtml">
+              <div
+                className="grid gap-3 pb-2"
+                style={{ gridTemplateColumns: `repeat(${timelineColumns}, minmax(0, 1fr))` }}
+              >
+                {model.timeline.map((step) => (
+                  <div
+                    key={`${step.index}-${step.actionCode}`}
+                    className={`min-h-[132px] rounded-[18px] border px-3 py-3 shadow-[0_12px_24px_rgba(48,39,24,0.08)] ${
+                      latestStep && step.index === latestStep.index
+                        ? step.accepted
+                          ? 'state-recent-card border-orange-200 bg-orange-50/95'
+                          : 'state-recent-card border-amber-300 bg-amber-50/96'
+                        : step.accepted
+                          ? 'border-emerald-200 bg-emerald-50/90'
+                          : 'border-amber-200 bg-amber-50/92'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
+                        Step {step.index}
+                      </p>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${
+                        latestStep && step.index === latestStep.index
+                          ? step.accepted
+                            ? 'text-orange-800'
+                            : 'text-amber-900'
+                          : step.accepted ? 'text-emerald-800' : 'text-amber-900'
+                      }`}>
+                        {latestStep && step.index === latestStep.index
+                          ? step.accepted ? 'dernier move' : 'dernier essai'
+                          : step.accepted ? 'transition acceptee' : 'action ignoree'}
+                      </p>
+                    </div>
+                    <p className="mt-2 text-[13px] font-semibold text-stone-900">{step.actionCode}</p>
+                    <p className="mt-1 text-[12px] text-stone-700">
+                      {STATE_LABELS[step.fromState] ?? step.fromState} → {STATE_LABELS[step.toState] ?? step.toState}
+                    </p>
+                    <p className="mt-2 text-[12px] leading-5 text-stone-600">{step.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </foreignObject>
+        </svg>
+      </ZoomableViewport>
+    </div>
+  )
+}
+
+function renderSingletonScene({
+  execution,
+  isExpanded,
+  panelClassName,
+  svgClassName,
+  TitleTag,
+  sourceLabel,
+  onOpenModal,
+}) {
+  const model = extractSingletonModel(execution)
+
+  if (!model) {
+    return (
+      <div className="rounded-[26px] border border-dashed border-black/15 bg-white/70 px-5 py-12 text-sm leading-7 text-stone-600">
+        La scene visuelle apparaitra ici des qu une demo ou un apercu local sera disponible.
+      </div>
+    )
+  }
+
+  const viewBoxWidth = 1120
+  const clientCardHeight = 82
+  const clientGap = 22
+  const clientsHeight = model.clientViews.length * clientCardHeight + Math.max(0, model.clientViews.length - 1) * clientGap
+  const viewBoxHeight = Math.max(isExpanded ? 760 : 660, 240 + clientsHeight)
+  const defsId = `singleton-scene-${isExpanded ? 'expanded' : 'compact'}`
+  const clientColumnX = 48
+  const clientColumnY = 156
+  const clientCardWidth = 268
+  const metricsX = 392
+  const metricsY = 52
+  const metricsWidth = 680
+  const metricsHeight = 108
+  const instanceColumnX = 590
+  const singleInstanceWidth = 414
+  const singleInstanceHeight = 196
+  const singleInstanceY = 214
+  const stackedInstanceWidth = 372
+  const stackedInstanceHeight = 92
+  const stackedInstanceGap = 26
+  const useSingleton = model.mode === 'WITH_SINGLETON' || model.instanceCount === 1
+  const uniqueInstanceIds = model.uniqueInstanceIds
+  const instanceViews = uniqueInstanceIds.map((instanceId) => ({
+    instanceId,
+    visibleValue: model.clientViews.find((view) => view.instanceId === instanceId)?.visibleValue ?? 'non defini',
+    clients: model.clientViews.filter((view) => view.instanceId === instanceId).map((view) => view.client),
+  }))
+  const totalInstancesHeight = instanceViews.length * stackedInstanceHeight + Math.max(0, instanceViews.length - 1) * stackedInstanceGap
+  const stackedStartY = Math.max(176, (viewBoxHeight - totalInstancesHeight) / 2)
+
+  const buildPath = (startX, startY, endX, endY) => {
+    const curve = Math.max(82, (endX - startX) * 0.38)
+    return `M ${startX} ${startY} C ${startX + curve} ${startY} ${endX - curve} ${endY} ${endX} ${endY}`
+  }
+
+  const connectionEntries = model.clientViews.map((view, index) => {
+    const clientY = clientColumnY + index * (clientCardHeight + clientGap)
+    const sourceX = clientColumnX + clientCardWidth
+    const sourceY = clientY + clientCardHeight / 2
+
+    if (useSingleton) {
+      return {
+        key: `${view.client}-${view.instanceId}`,
+        path: buildPath(sourceX, sourceY, instanceColumnX, singleInstanceY + singleInstanceHeight / 2),
+        highlight: view.client === model.writerClient,
+      }
+    }
+
+    const instanceIndex = instanceViews.findIndex((instance) => instance.instanceId === view.instanceId)
+    const targetY = stackedStartY + instanceIndex * (stackedInstanceHeight + stackedInstanceGap)
+
+    return {
+      key: `${view.client}-${view.instanceId}`,
+      path: buildPath(sourceX, sourceY, instanceColumnX, targetY + stackedInstanceHeight / 2),
+      highlight: view.client === model.writerClient,
+    }
+  })
+
+  return (
+    <div className={panelClassName}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
+            Shared Instance Dashboard
+          </TitleTag>
+        </div>
+        {onOpenModal ? (
+          <button
+            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+            type="button"
+            onClick={onOpenModal}
+          >
+            {sourceLabel}
+          </button>
+        ) : (
+          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
+            {sourceLabel}
+          </span>
+        )}
+      </div>
+
+      <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
+        <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
+          <defs>
+            <linearGradient id={`${defsId}-metrics`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(255,249,239,0.98)" />
+              <stop offset="100%" stopColor="rgba(211,236,230,0.84)" />
+            </linearGradient>
+            <marker
+              id={`${defsId}-arrow`}
+              markerWidth="10"
+              markerHeight="10"
+              refX="8"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill={useSingleton ? '#246b5e' : '#426c8d'} />
+            </marker>
+          </defs>
+
+          <circle cx="164" cy="108" r="104" fill="rgba(36,107,94,0.08)" />
+          <circle cx="972" cy={viewBoxHeight - 102} r="124" fill="rgba(194,87,55,0.08)" />
+
+          <rect
+            x={metricsX}
+            y={metricsY}
+            width={metricsWidth}
+            height={metricsHeight}
+            rx="34"
+            fill={`url(#${defsId}-metrics)`}
+            stroke="rgba(36,31,24,0.1)"
+            strokeWidth="2"
+          />
+          <text x={metricsX + 28} y={metricsY + 34} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            SINGLETON CHECK
+          </text>
+          <text x={metricsX + 28} y={metricsY + 68} fontSize="30" fontWeight="700" fill="#241f18">
+            {model.modeLabel}
+          </text>
+          <text x={metricsX + 28} y={metricsY + 95} fontSize="14" fill="#5f5548">
+            {model.coherenceLabel}
+          </text>
+          <text x={metricsX + metricsWidth - 28} y={metricsY + 62} textAnchor="end" fontSize="25" fontWeight="700" fill="#241f18">
+            {model.instanceCount} instance(s)
+          </text>
+          <text x={metricsX + metricsWidth - 28} y={metricsY + 92} textAnchor="end" fontSize="14" fill="#5f5548">
+            {model.clientCount} client(s)
+          </text>
+
+          <text x={clientColumnX} y={clientColumnY - 26} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
+            CLIENTS
+          </text>
+          {model.clientViews.map((view, index) => {
+            const y = clientColumnY + index * (clientCardHeight + clientGap)
+            const isWriter = view.client === model.writerClient
+
+            return (
+              <g key={view.id}>
+                <rect
+                  x={clientColumnX}
+                  y={y}
+                  width={clientCardWidth}
+                  height={clientCardHeight}
+                  rx="24"
+                  fill={isWriter ? 'rgba(231,198,167,0.9)' : 'rgba(255,250,242,0.96)'}
+                  stroke={isWriter ? '#c25737' : 'rgba(36,31,24,0.12)'}
+                  strokeWidth="2"
+                  className="scene-node-shadow"
+                />
+                <text x={clientColumnX + 22} y={y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill="#78685c">
+                  {isWriter ? 'WRITER CLIENT' : 'CLIENT'}
+                </text>
+                <text x={clientColumnX + 22} y={y + 48} fontSize="18" fontWeight="700" fill="#241f18">
+                  {view.client}
+                </text>
+                <text x={clientColumnX + 22} y={y + 68} fontSize="12" fill="#5f5548">
+                  voit {model.settingKey} = {view.visibleValue}
+                </text>
+              </g>
+            )
+          })}
+
+          {connectionEntries.map((entry, index) => (
+            <g key={entry.key}>
+              <path
+                d={entry.path}
+                fill="none"
+                stroke={entry.highlight ? '#c25737' : (useSingleton ? '#246b5e' : '#426c8d')}
+                strokeWidth={entry.highlight ? '3.2' : '2.6'}
+                strokeDasharray={entry.highlight ? '12 8' : '0'}
+                markerEnd={`url(#${defsId}-arrow)`}
+                className={entry.highlight ? 'scene-flow-line' : ''}
+              />
+              {entry.highlight ? (
+                <circle r="5" fill="#c25737" opacity="0.95">
+                  <animateMotion dur="1.9s" repeatCount="indefinite" path={entry.path} begin={`${index * 0.12}s`} />
+                </circle>
+              ) : null}
+            </g>
+          ))}
+
+          {useSingleton ? (
+            <g>
+              <rect
+                x={instanceColumnX}
+                y={singleInstanceY}
+                width={singleInstanceWidth}
+                height={singleInstanceHeight}
+                rx="34"
+                fill="#241f18"
+                stroke="#241f18"
+                strokeWidth="2"
+                className="scene-node-shadow"
+              />
+              <text x={instanceColumnX + 28} y={singleInstanceY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="rgba(255,250,242,0.64)">
+                INSTANCE UNIQUE
+              </text>
+              <text x={instanceColumnX + 28} y={singleInstanceY + 72} fontSize="30" fontWeight="700" fill="#fff8ee">
+                GlobalSettingsManager
+              </text>
+              <rect
+                x={instanceColumnX + 28}
+                y={singleInstanceY + 96}
+                width={singleInstanceWidth - 56}
+                height="54"
+                rx="18"
+                fill="rgba(255,250,242,0.1)"
+                stroke="rgba(255,250,242,0.12)"
+              />
+              <text x={instanceColumnX + 48} y={singleInstanceY + 127} fontSize="14" fontWeight="700" fill="#fff8ee">
+                {model.settingKey} = {model.settingValue}
+              </text>
+              <text x={instanceColumnX + 48} y={singleInstanceY + 148} fontSize="12" fill="rgba(255,250,242,0.7)">
+                meme reference renvoyee a tous les clients
+              </text>
+              <text x={instanceColumnX + 28} y={singleInstanceY + 176} fontSize="12" fill="rgba(255,250,242,0.78)">
+                Clients relies : {model.clientViews.map((view) => view.client).join(' · ')}
+              </text>
+            </g>
+          ) : (
+            instanceViews.map((instance, index) => {
+              const y = stackedStartY + index * (stackedInstanceHeight + stackedInstanceGap)
+              const isPrimary = instance.clients.includes(model.writerClient)
+
+              return (
+                <g key={instance.instanceId}>
+                  <rect
+                    x={instanceColumnX}
+                    y={y}
+                    width={stackedInstanceWidth}
+                    height={stackedInstanceHeight}
+                    rx="24"
+                    fill={isPrimary ? 'rgba(231,198,167,0.9)' : 'rgba(214,228,241,0.94)'}
+                    stroke={isPrimary ? '#c25737' : '#426c8d'}
+                    strokeWidth="2"
+                    className="scene-node-shadow"
+                  />
+                  <text x={instanceColumnX + 22} y={y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill="#6c6257">
+                    INSTANCE LOCALE
+                  </text>
+                  <text x={instanceColumnX + 22} y={y + 48} fontSize="19" fontWeight="700" fill="#241f18">
+                    {instance.instanceId}
+                  </text>
+                  <text x={instanceColumnX + 22} y={y + 69} fontSize="12" fill="#5f5548">
+                    {model.settingKey} = {instance.visibleValue}
+                  </text>
+                  <text x={instanceColumnX + stackedInstanceWidth - 22} y={y + 69} textAnchor="end" fontSize="12" fill="#5f5548">
+                    {instance.clients.join(', ')}
+                  </text>
+                </g>
+              )
+            })
+          )}
+        </svg>
+      </ZoomableViewport>
+    </div>
+  )
+}
+
 export default function ExecutionScene({
   execution,
   patternCode,
@@ -496,6 +1829,42 @@ export default function ExecutionScene({
     ? 'h-auto min-h-[420px] w-full'
     : 'h-auto w-full'
   const TitleTag = isExpanded ? 'h2' : 'h3'
+
+  if (patternCode === 'state' && execution?.output) {
+    return renderStateScene({
+      execution,
+      isExpanded,
+      panelClassName,
+      svgClassName,
+      TitleTag,
+      sourceLabel,
+      onOpenModal,
+    })
+  }
+
+  if (patternCode === 'singleton' && execution?.output) {
+    return renderSingletonScene({
+      execution,
+      isExpanded,
+      panelClassName,
+      svgClassName,
+      TitleTag,
+      sourceLabel,
+      onOpenModal,
+    })
+  }
+
+  if (patternCode === 'flyweight' && execution?.output) {
+    return renderFlyweightScene({
+      execution,
+      isExpanded,
+      panelClassName,
+      svgClassName,
+      TitleTag,
+      sourceLabel,
+      onOpenModal,
+    })
+  }
 
   return (
     <div className={panelClassName}>
