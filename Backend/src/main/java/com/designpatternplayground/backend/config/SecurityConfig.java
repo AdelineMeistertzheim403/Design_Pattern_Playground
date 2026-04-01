@@ -2,6 +2,7 @@ package com.designpatternplayground.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,16 +34,19 @@ public class SecurityConfig {
 			.exceptionHandling(exception ->
 				exception.authenticationEntryPoint(authenticationEntryPoint)
 			)
-			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(
-					"/api/auth/register",
-					"/api/auth/login",
-					"/api/auth/refresh",
-					"/api/auth/logout",
-					"/api/patterns/**",
-					"/h2-console/**"
-				).permitAll()
-				.requestMatchers("/api/auth/me").authenticated()
+				.authorizeHttpRequests(authorize -> authorize
+					.requestMatchers(
+						"/api/auth/register",
+						"/api/auth/login",
+						"/api/auth/refresh",
+						"/api/auth/logout",
+						"/h2-console/**"
+					).permitAll()
+					.requestMatchers("/api/quiz/**").authenticated()
+					.requestMatchers(HttpMethod.GET, "/api/patterns/*/quiz").authenticated()
+					.requestMatchers("/api/patterns/*/quiz/**").authenticated()
+					.requestMatchers("/api/auth/me").authenticated()
+					.requestMatchers("/api/patterns/**").permitAll()
 				.anyRequest().permitAll()
 			)
 			.headers(headers ->
