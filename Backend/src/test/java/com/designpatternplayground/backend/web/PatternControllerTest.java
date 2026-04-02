@@ -40,9 +40,10 @@ class PatternControllerTest {
 	void shouldExposeSchemaForStrategy() throws Exception {
 		mockMvc.perform(get("/api/patterns/strategy/schema"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.fields", hasSize(2)))
-			.andExpect(jsonPath("$.fields[0].name").value("amount"))
-			.andExpect(jsonPath("$.fields[1].allowedValues", hasSize(3)));
+			.andExpect(jsonPath("$.fields", hasSize(3)))
+			.andExpect(jsonPath("$.fields[0].name").value("mode"))
+			.andExpect(jsonPath("$.fields[1].name").value("amount"))
+			.andExpect(jsonPath("$.fields[2].allowedValues", hasSize(3)));
 	}
 
 	@Test
@@ -166,6 +167,7 @@ class PatternControllerTest {
 				{
 				  "patternCode": "strategy",
 				  "parameters": {
+				    "mode": "WITH_STRATEGY",
 				    "amount": 150,
 				    "strategy": "PAYPAL"
 				  }
@@ -186,6 +188,7 @@ class PatternControllerTest {
 				{
 				  "patternCode": "observer",
 				  "parameters": {
+				    "mode": "WITH_OBSERVER",
 				    "subjectName": "ReleasePublisher",
 				    "observers": ["Mobile App", "Back Office", "Audit Log"],
 				    "message": "Nouvelle version publiee"
@@ -256,6 +259,7 @@ class PatternControllerTest {
 				{
 				  "patternCode": "state",
 				  "parameters": {
+				    "mode": "WITH_STATE",
 				    "characterName": "Arena Bot",
 				    "initialState": "IDLE",
 				    "actions": ["START_RUN", "JUMP", "LAND", "ATTACK", "FINISH_ATTACK"]
@@ -280,6 +284,7 @@ class PatternControllerTest {
 				{
 				  "patternCode": "decorator",
 				  "parameters": {
+				    "mode": "WITH_DECORATOR",
 				    "characterName": "Ember Knight",
 				    "baseType": "WARRIOR",
 				    "decorators": ["FIRE", "ICE"]

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Component;
@@ -34,6 +35,8 @@ import com.designpatternplayground.backend.pattern.domain.VisualizationNode;
 public class StatePatternDemo implements DesignPatternDemo {
 
 	private static final List<String> STATE_CODES = List.of("IDLE", "RUNNING", "JUMPING", "ATTACKING");
+	private static final String WITH_STATE = "WITH_STATE";
+	private static final String WITHOUT_STATE = "WITHOUT_STATE";
 
 	@Override
 	public String getCode() {
@@ -55,6 +58,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 	@Override
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
+			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_STATE, WITHOUT_STATE), WITH_STATE),
 			new PatternField("characterName", "Nom du personnage", FieldType.TEXT, true, null, "Arena Bot"),
 			new PatternField("initialState", "Etat initial", FieldType.SELECT, true, STATE_CODES, "IDLE"),
 			new PatternField(
@@ -71,24 +75,47 @@ public class StatePatternDemo implements DesignPatternDemo {
 	@Override
 	public PatternExecutionResult execute(PatternExecutionRequest request) {
 		StateConfig config = toConfig(request.parameters());
+		boolean useState = WITH_STATE.equals(config.mode());
 		CharacterState initialState = stateFromCode(config.initialState());
-		CharacterContext context = new CharacterContext(config.characterName(), initialState);
 		List<String> logs = new ArrayList<>();
+		List<StateTransitionStep> timeline;
+		CharacterState finalState;
 
-		logs.add("Creation du contexte pour " + config.characterName() + " avec l etat initial " + initialState.code() + ".");
+		if (useState) {
+			CharacterContext context = new CharacterContext(config.characterName(), initialState);
+			logs.add("Creation du contexte pour " + config.characterName() + " avec l etat initial " + initialState.code() + ".");
 
-		List<StateTransitionStep> timeline = IntStream.range(0, config.actions().size())
-			.mapToObj(index -> {
+			timeline = IntStream.range(0, config.actions().size())
+				.mapToObj(index -> {
+					CharacterAction action = CharacterAction.fromCode(config.actions().get(index));
+					StateTransitionStep step = context.dispatch(action, index + 1);
+					logs.add("Action " + step.index() + " - " + step.actionCode() + " : " + step.detail());
+					return step;
+				})
+				.toList();
+
+			finalState = context.currentState();
+		} else {
+			logs.add("Mode sans State : le contexte garde une logique de transition basee sur des conditions.");
+			logs.add("Creation du controleur conditionnel pour " + config.characterName() + " avec l etat initial " + initialState.code() + ".");
+
+			String currentStateCode = initialState.code();
+			List<StateTransitionStep> mutableTimeline = new ArrayList<>();
+
+			for (int index = 0; index < config.actions().size(); index += 1) {
 				CharacterAction action = CharacterAction.fromCode(config.actions().get(index));
-				StateTransitionStep step = context.dispatch(action, index + 1);
+				StateTransitionStep step = dispatchWithoutStatePattern(currentStateCode, action, config.characterName(), index + 1);
+				currentStateCode = step.toState();
 				logs.add("Action " + step.index() + " - " + step.actionCode() + " : " + step.detail());
-				return step;
-			})
-			.toList();
+				mutableTimeline.add(step);
+			}
+
+			timeline = List.copyOf(mutableTimeline);
+			finalState = stateFromCode(currentStateCode);
+		}
 
 		long acceptedTransitions = timeline.stream().filter(StateTransitionStep::accepted).count();
 		long ignoredActions = timeline.size() - acceptedTransitions;
-		CharacterState finalState = context.currentState();
 		List<String> visitedStates = timeline.stream()
 			.flatMap(step -> java.util.stream.Stream.of(step.fromState(), step.toState()))
 			.collect(java.util.stream.Collectors.collectingAndThen(
@@ -101,6 +128,8 @@ public class StatePatternDemo implements DesignPatternDemo {
 		}
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
+		output.put("mode", useState ? WITH_STATE : WITHOUT_STATE);
+		output.put("modeLabel", useState ? "Avec State" : "Sans State");
 		output.put("characterName", config.characterName());
 		output.put("initialState", initialState.code());
 		output.put("finalState", finalState.code());
@@ -124,20 +153,28 @@ public class StatePatternDemo implements DesignPatternDemo {
 
 		return new PatternExecutionResult(
 			getCode(),
-			"State encapsule les transitions dans chaque etat concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer.",
+			useState
+				? "State encapsule les transitions dans chaque etat concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer."
+				: "Sans State, le contexte conserve les transitions dans une logique conditionnelle centrale plus difficile a maintenir.",
 			logs,
 			output,
-			buildVisualization(finalState, timeline, visitedStates)
+			buildVisualization(useState, finalState, timeline, visitedStates)
 		);
 	}
 
 	private VisualizationGraph buildVisualization(
+		boolean useState,
 		CharacterState finalState,
 		List<StateTransitionStep> timeline,
 		List<String> visitedStates
 	) {
 		List<VisualizationNode> nodes = new ArrayList<>();
-		nodes.add(new VisualizationNode("context", "CharacterContext", "context", Map.of("detail", "etat courant")));
+		nodes.add(new VisualizationNode(
+			"context",
+			useState ? "CharacterContext" : "SwitchController",
+			"context",
+			Map.of("detail", useState ? "etat courant" : "if / else centralise")
+		));
 		nodes.add(new VisualizationNode("idle", "IdleState", "state", Map.of(
 			"active", "IDLE".equals(finalState.code()),
 			"visited", visitedStates.contains("IDLE")
@@ -162,7 +199,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 		));
 
 		List<VisualizationEdge> edges = new ArrayList<>();
-		edges.add(new VisualizationEdge("context", finalState.code().toLowerCase(), "holds"));
+		edges.add(new VisualizationEdge("context", finalState.code().toLowerCase(), useState ? "holds" : "switch"));
 		edges.add(new VisualizationEdge("idle", "running", "START_RUN"));
 		edges.add(new VisualizationEdge("running", "idle", "STOP"));
 		edges.add(new VisualizationEdge("idle", "jumping", "JUMP"));
@@ -181,6 +218,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
 		}
 
+		String mode = requireMode(parameters.get("mode"));
 		String characterName = requirePlainText(parameters.get("characterName"), "characterName");
 		String initialState = requireUppercaseText(parameters.get("initialState"), "initialState");
 		List<String> actions = extractActions(parameters.get("actions"));
@@ -189,7 +227,98 @@ public class StatePatternDemo implements DesignPatternDemo {
 			throw new InvalidPatternConfigurationException("Au moins une action est obligatoire.");
 		}
 
-		return new StateConfig(characterName, initialState, actions);
+		return new StateConfig(mode, characterName, initialState, actions);
+	}
+
+	private String requireMode(Object value) {
+		String mode = requirePlainText(value, "mode").toUpperCase(Locale.ROOT);
+		if (!WITH_STATE.equals(mode) && !WITHOUT_STATE.equals(mode)) {
+			throw new InvalidPatternConfigurationException("mode doit valoir WITH_STATE ou WITHOUT_STATE.");
+		}
+		return mode;
+	}
+
+	private StateTransitionStep dispatchWithoutStatePattern(
+		String currentStateCode,
+		CharacterAction action,
+		String characterName,
+		int index
+	) {
+		String nextState = currentStateCode;
+		boolean accepted = false;
+		String detail;
+
+		switch (currentStateCode) {
+			case "IDLE" -> {
+				switch (action) {
+					case START_RUN -> {
+						nextState = "RUNNING";
+						accepted = true;
+						detail = characterName + " quitte Idle et passe en Running.";
+					}
+					case JUMP -> {
+						nextState = "JUMPING";
+						accepted = true;
+						detail = characterName + " saute depuis Idle et entre en Jumping.";
+					}
+					case ATTACK -> {
+						nextState = "ATTACKING";
+						accepted = true;
+						detail = characterName + " declenche une attaque depuis Idle.";
+					}
+					default -> detail = action.label() + " ne produit rien tant que " + characterName + " est en Idle.";
+				}
+			}
+			case "RUNNING" -> {
+				switch (action) {
+					case STOP -> {
+						nextState = "IDLE";
+						accepted = true;
+						detail = characterName + " s arrete et revient en Idle.";
+					}
+					case JUMP -> {
+						nextState = "JUMPING";
+						accepted = true;
+						detail = characterName + " saute en gardant son elan et passe en Jumping.";
+					}
+					case ATTACK -> {
+						nextState = "ATTACKING";
+						accepted = true;
+						detail = characterName + " interrompt sa course pour attaquer.";
+					}
+					default -> detail = action.label() + " est ignoree tant que " + characterName + " est en Running.";
+				}
+			}
+			case "JUMPING" -> {
+				if (action == CharacterAction.LAND) {
+					nextState = "IDLE";
+					accepted = true;
+					detail = characterName + " atterrit et repasse en Idle.";
+				} else {
+					detail = action.label() + " est impossible pendant que " + characterName + " est en Jumping.";
+				}
+			}
+			case "ATTACKING" -> {
+				if (action == CharacterAction.FINISH_ATTACK) {
+					nextState = "IDLE";
+					accepted = true;
+					detail = characterName + " termine son attaque et revient en Idle.";
+				} else {
+					detail = action.label() + " est ignoree tant que " + characterName + " est en Attacking.";
+				}
+			}
+			default -> throw new InvalidPatternConfigurationException("Etat initial inconnu : " + currentStateCode);
+		}
+
+		return new StateTransitionStep(
+			index,
+			action.code(),
+			action.label(),
+			currentStateCode,
+			nextState,
+			accepted,
+			detail
+		);
 	}
 
 	private CharacterState stateFromCode(String rawState) {

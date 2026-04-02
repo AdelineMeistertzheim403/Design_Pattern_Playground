@@ -570,6 +570,42 @@ function safeNumber(value, fallbackValue = 0) {
   return Number.isFinite(parsed) ? parsed : fallbackValue
 }
 
+function getExecutionModeLabel(execution) {
+  const rawLabel = execution?.output?.modeLabel
+  return typeof rawLabel === 'string' && rawLabel.trim() ? rawLabel.trim() : null
+}
+
+function SceneMetaBadges({
+  execution,
+  onOpenModal,
+  sourceLabel,
+}) {
+  const modeLabel = getExecutionModeLabel(execution)
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {modeLabel ? (
+        <span className="rounded-full border border-black/10 bg-[var(--panel)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-700">
+          {modeLabel}
+        </span>
+      ) : null}
+      {onOpenModal ? (
+        <button
+          className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
+          type="button"
+          onClick={onOpenModal}
+        >
+          {sourceLabel}
+        </button>
+      ) : (
+        <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
+          {sourceLabel}
+        </span>
+      )}
+    </div>
+  )
+}
+
 function extractStateModel(execution) {
   const output = execution?.output
 
@@ -594,6 +630,9 @@ function extractStateModel(execution) {
     : [...new Set([initialState, ...timeline.flatMap((step) => [step.fromState, step.toState])])]
 
   return {
+    mode: `${output.mode ?? 'WITH_STATE'}`,
+    modeLabel: `${output.modeLabel ?? 'Avec State'}`,
+    useState: `${output.mode ?? 'WITH_STATE'}` !== 'WITHOUT_STATE',
     characterName: `${output.characterName ?? 'Arena Bot'}`,
     initialState,
     finalState,
@@ -813,19 +852,7 @@ function renderFlyweightScene({
             Memory Battle
           </TitleTag>
         </div>
-        {onOpenModal ? (
-          <button
-            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-            type="button"
-            onClick={onOpenModal}
-          >
-            {sourceLabel}
-          </button>
-        ) : (
-          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-            {sourceLabel}
-          </span>
-        )}
+        <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
@@ -1066,6 +1093,9 @@ function extractDecoratorModel(execution) {
   }))
 
   return {
+    mode: `${output.mode ?? 'WITH_DECORATOR'}`,
+    modeLabel: `${output.modeLabel ?? 'Avec Decorator'}`,
+    useDecorator: `${output.mode ?? 'WITH_DECORATOR'}` !== 'WITHOUT_DECORATOR',
     characterName: `${output.characterName ?? 'Ember Knight'}`,
     baseLabel: `${output.baseLabel ?? stack[0]?.layerLabel ?? 'BaseCharacter'}`,
     baseType: `${output.baseType ?? 'WARRIOR'}`,
@@ -1145,19 +1175,7 @@ function renderDecoratorScene({
             Stack Builder
           </TitleTag>
         </div>
-        {onOpenModal ? (
-          <button
-            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-            type="button"
-            onClick={onOpenModal}
-          >
-            {sourceLabel}
-          </button>
-        ) : (
-          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-            {sourceLabel}
-          </span>
-        )}
+        <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
@@ -1247,7 +1265,7 @@ function renderDecoratorScene({
           </foreignObject>
 
           <text x={stackX} y="118" fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
-            PILE DE WRAPPERS
+            {model.useDecorator ? 'PILE DE WRAPPERS' : 'CLASSE COMBINEE'}
           </text>
 
           {displayLayers.map((layer, index) => {
@@ -1338,7 +1356,7 @@ function renderDecoratorScene({
             className="scene-node-shadow"
           />
           <text x={finalX + 28} y={finalY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
-            BUILD FINAL
+            {model.useDecorator ? 'BUILD FINAL' : 'BUILD FINAL MONOLITHIQUE'}
           </text>
           <text x={finalX + 28} y={finalY + 64} fontSize="30" fontWeight="700" fill="#241f18">
             {model.characterName}
@@ -1484,7 +1502,12 @@ function renderStateScene({
   const timelineHeight = 124 + timelineRows * timelineRowHeight + Math.max(0, timelineRows - 1) * timelineGap
   const viewBoxHeight = timelineY + timelineHeight + 40
   const defsId = `state-scene-${isExpanded ? 'expanded' : 'compact'}`
-  const contextDescriptionLines = wrapText('delegue chaque action a l etat courant', 28)
+  const contextDescriptionLines = wrapText(
+    model.useState
+      ? 'delegue chaque action a l etat courant'
+      : 'decide chaque transition via des conditions centrales',
+    28,
+  )
   const summaryActionLines = wrapText(
     `prochaines actions : ${model.availableActions.join(' · ') || 'aucune'}`,
     30,
@@ -1592,19 +1615,7 @@ function renderStateScene({
             Character State Simulator
           </TitleTag>
         </div>
-        {onOpenModal ? (
-          <button
-            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-            type="button"
-            onClick={onOpenModal}
-          >
-            {sourceLabel}
-          </button>
-        ) : (
-          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-            {sourceLabel}
-          </span>
-        )}
+        <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
@@ -1647,7 +1658,7 @@ function renderStateScene({
             strokeWidth="2"
           />
           <text x="64" y="80" fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
-            STATE MACHINE
+            {model.useState ? 'STATE MACHINE' : 'CONDITIONAL FLOW'}
           </text>
           <text x="64" y="112" fontSize="28" fontWeight="700" fill="#241f18">
             {model.characterName} · {model.currentStateLabel}
@@ -1699,7 +1710,7 @@ function renderStateScene({
             CONTEXT
           </text>
           <text x={contextCard.x + 18} y={contextCard.y + 50} fontSize="20" fontWeight="700" fill="#153f38">
-            CharacterContext
+            {model.useState ? 'CharacterContext' : 'SwitchController'}
           </text>
           {contextDescriptionLines.map((line, index) => (
             <text
@@ -2056,19 +2067,7 @@ function renderSingletonScene({
             Shared Instance Dashboard
           </TitleTag>
         </div>
-        {onOpenModal ? (
-          <button
-            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-            type="button"
-            onClick={onOpenModal}
-          >
-            {sourceLabel}
-          </button>
-        ) : (
-          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-            {sourceLabel}
-          </span>
-        )}
+        <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
@@ -2334,19 +2333,7 @@ export default function ExecutionScene({
             Demo visuelle
           </TitleTag>
         </div>
-        {onOpenModal ? (
-          <button
-            className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-            type="button"
-            onClick={onOpenModal}
-          >
-            {sourceLabel}
-          </button>
-        ) : (
-          <span className="rounded-full border border-black/10 bg-white/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">
-            {sourceLabel}
-          </span>
-        )}
+        <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>

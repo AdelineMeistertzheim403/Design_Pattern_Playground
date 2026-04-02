@@ -97,6 +97,14 @@ const fallbackSchemas = {
   state: {
     fields: [
       {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_STATE', 'WITHOUT_STATE'],
+        defaultValue: 'WITH_STATE',
+      },
+      {
         name: 'characterName',
         label: 'Nom du personnage',
         type: 'TEXT',
@@ -161,6 +169,14 @@ const fallbackSchemas = {
   decorator: {
     fields: [
       {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_DECORATOR', 'WITHOUT_DECORATOR'],
+        defaultValue: 'WITH_DECORATOR',
+      },
+      {
         name: 'characterName',
         label: 'Nom du personnage',
         type: 'TEXT',
@@ -189,6 +205,14 @@ const fallbackSchemas = {
   factory: {
     fields: [
       {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_FACTORY', 'WITHOUT_FACTORY'],
+        defaultValue: 'WITH_FACTORY',
+      },
+      {
         name: 'vehicleType',
         label: 'Type de vehicule',
         type: 'SELECT',
@@ -200,6 +224,14 @@ const fallbackSchemas = {
   },
   strategy: {
     fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_STRATEGY', 'WITHOUT_STRATEGY'],
+        defaultValue: 'WITH_STRATEGY',
+      },
       {
         name: 'amount',
         label: 'Montant',
@@ -220,6 +252,14 @@ const fallbackSchemas = {
   },
   observer: {
     fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_OBSERVER', 'WITHOUT_OBSERVER'],
+        defaultValue: 'WITH_OBSERVER',
+      },
       {
         name: 'subjectName',
         label: 'Nom du sujet',
@@ -704,6 +744,8 @@ const fallbackExecutors = {
     }
   },
   state: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_STATE'}`.toUpperCase()
+    const useState = mode !== 'WITHOUT_STATE'
     const characterName = `${parameters.characterName ?? ''}`.trim() || 'Arena Bot'
     const initialState = `${parameters.initialState ?? 'IDLE'}`.trim().toUpperCase()
     const actions = normalizeOrderedList(parameters.actions).map((action) => action.toUpperCase())
@@ -717,7 +759,11 @@ const fallbackExecutors = {
     }
 
     let currentState = initialState
-    const logs = [`Creation du contexte pour ${characterName} avec l etat initial ${initialState}.`]
+    const logs = [
+      useState
+        ? `Creation du contexte pour ${characterName} avec l etat initial ${initialState}.`
+        : `Mode sans State : creation d un controleur conditionnel pour ${characterName} avec l etat initial ${initialState}.`,
+    ]
 
     const timeline = actions.map((actionCode, index) => {
       const fromState = currentState
@@ -757,9 +803,13 @@ const fallbackExecutors = {
 
     return {
       patternCode: 'state',
-      summary: "State encapsule les transitions dans chaque etat concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer.",
+      summary: useState
+        ? "State encapsule les transitions dans chaque etat concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer."
+        : "Sans State, la logique de transition reste centralisee dans des conditions, ce qui complique l evolution du contexte.",
       logs,
       output: {
+        mode: useState ? 'WITH_STATE' : 'WITHOUT_STATE',
+        modeLabel: useState ? 'Avec State' : 'Sans State',
         characterName,
         initialState,
         finalState: currentState,
@@ -773,7 +823,12 @@ const fallbackExecutors = {
       },
       visualization: {
         nodes: [
-          { id: 'context', label: 'CharacterContext', type: 'context', data: { detail: 'etat courant' } },
+          {
+            id: 'context',
+            label: useState ? 'CharacterContext' : 'SwitchController',
+            type: 'context',
+            data: { detail: useState ? 'etat courant' : 'if / else centralise' },
+          },
           { id: 'idle', label: 'IdleState', type: 'state', data: { active: currentState === 'IDLE', visited: visitedStates.includes('IDLE') } },
           { id: 'running', label: 'RunningState', type: 'state', data: { active: currentState === 'RUNNING', visited: visitedStates.includes('RUNNING') } },
           { id: 'jumping', label: 'JumpingState', type: 'state', data: { active: currentState === 'JUMPING', visited: visitedStates.includes('JUMPING') } },
@@ -781,7 +836,7 @@ const fallbackExecutors = {
           { id: 'result', label: 'Etat final', type: 'output', data: { message: `${currentState} apres ${timeline.length} action(s)` } },
         ],
         edges: [
-          { from: 'context', to: currentState.toLowerCase(), label: 'holds' },
+          { from: 'context', to: currentState.toLowerCase(), label: useState ? 'holds' : 'switch' },
           { from: 'idle', to: 'running', label: 'START_RUN' },
           { from: 'running', to: 'idle', label: 'STOP' },
           { from: 'idle', to: 'jumping', label: 'JUMP' },
@@ -881,6 +936,8 @@ const fallbackExecutors = {
     }
   },
   decorator: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_DECORATOR'}`.toUpperCase()
+    const useDecorator = mode !== 'WITHOUT_DECORATOR'
     const characterName = `${parameters.characterName ?? ''}`.trim() || 'Ember Knight'
     const baseType = `${parameters.baseType ?? 'WARRIOR'}`.toUpperCase()
     const baseProfile = decoratorBaseProfiles[baseType] ?? decoratorBaseProfiles.WARRIOR
@@ -896,6 +953,7 @@ const fallbackExecutors = {
       `Creation du composant de base ${characterName} sur le profil ${baseProfile.label}.`,
       `Stats de depart : ATK ${baseProfile.stats.attack} / DEF ${baseProfile.stats.defense} / SPD ${baseProfile.stats.speed} / CTRL ${baseProfile.stats.control}.`,
     ]
+    const activeEffects = [`Socle de base ${baseProfile.label}`]
 
     const stack = [
       {
@@ -909,19 +967,41 @@ const fallbackExecutors = {
 
     let runningStats = { ...baseProfile.stats }
 
-    decorators.forEach((code) => {
-      const definition = decoratorDefinitions[code]
-      runningStats = addDecoratorStats(runningStats, definition.stats)
-      logs.push(`Ajout de ${definition.layerLabel} autour du composant courant.`)
-      logs.push(`Effet applique : ${definition.effect}`)
-      stack.push({
-        code: definition.code,
-        layerClass: definition.layerLabel,
-        layerLabel: definition.layerLabel,
-        effect: definition.effect,
-        ...runningStats,
+    if (useDecorator) {
+      decorators.forEach((code) => {
+        const definition = decoratorDefinitions[code]
+        runningStats = addDecoratorStats(runningStats, definition.stats)
+        logs.push(`Ajout de ${definition.layerLabel} autour du composant courant.`)
+        logs.push(`Effet applique : ${definition.effect}`)
+        activeEffects.push(definition.effect)
+        stack.push({
+          code: definition.code,
+          layerClass: definition.layerLabel,
+          layerLabel: definition.layerLabel,
+          effect: definition.effect,
+          ...runningStats,
+        })
       })
-    })
+    } else {
+      logs.push('Mode sans Decorator : les effets sont regroupes dans une classe concrete specialisee.')
+      decorators.forEach((code) => {
+        const definition = decoratorDefinitions[code]
+        runningStats = addDecoratorStats(runningStats, definition.stats)
+        logs.push(`Effet ${definition.layerLabel} integre directement dans une classe monolithique.`)
+        logs.push(`Variation appliquee : ${definition.effect}`)
+        activeEffects.push(definition.effect)
+      })
+
+      if (decorators.length > 0) {
+        stack.push({
+          code: 'MONOLITH',
+          layerClass: `${baseProfile.label.replaceAll(' ', '')}Combo`,
+          layerLabel: 'Monolithic build',
+          effect: 'Toutes les variations sont codees dans une seule classe concrete.',
+          ...runningStats,
+        })
+      }
+    }
 
     const challengeGoal = 'attaque >= 20 et defense >= 10'
     const challengeMet = runningStats.attack >= 20 && runningStats.defense >= 10
@@ -937,11 +1017,15 @@ const fallbackExecutors = {
 
     return {
       patternCode: 'decorator',
-      summary: decorators.length === 0
-        ? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
-        : "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.",
+      summary: useDecorator
+        ? (decorators.length === 0
+          ? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
+          : "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.")
+        : "Sans Decorator, les memes effets sont fusionnes dans une classe concrete specialisee plus rigide et moins composable.",
       logs,
       output: {
+        mode: useDecorator ? 'WITH_DECORATOR' : 'WITHOUT_DECORATOR',
+        modeLabel: useDecorator ? 'Avec Decorator' : 'Sans Decorator',
         characterName,
         baseType: baseProfile.code,
         baseLabel: baseProfile.label,
@@ -951,10 +1035,7 @@ const fallbackExecutors = {
         defense: runningStats.defense,
         speed: runningStats.speed,
         control: runningStats.control,
-        activeEffects: [
-          `Socle de base ${baseProfile.label}`,
-          ...decorators.map((code) => decoratorDefinitions[code].effect),
-        ],
+        activeEffects,
         challengeGoal,
         challengeMet,
         classExplosionExamples: [
@@ -968,6 +1049,8 @@ const fallbackExecutors = {
     }
   },
   factory: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_FACTORY'}`.toUpperCase()
+    const useFactory = mode !== 'WITHOUT_FACTORY'
     const vehicleType = `${parameters.vehicleType ?? 'CAR'}`.toUpperCase()
     const vehicle = vehicleType === 'BIKE'
       ? {
@@ -983,32 +1066,51 @@ const fallbackExecutors = {
 
     return {
       patternCode: 'factory',
-      summary: "Factory Method centralise la creation du produit derriere une interface stable.",
-      logs: [
-        'Creation du point d entree factory.',
-        `Demande de creation pour le type ${vehicle.type}.`,
-        `Instantiation du produit concret ${vehicle.label}.`,
-        'Retour du produit sans exposer le constructeur au client.',
-      ],
+      summary: useFactory
+        ? "Factory Method centralise la creation du produit derriere une interface stable."
+        : "Sans Factory, le client instancie directement le produit concret et reste couple a son constructeur.",
+      logs: useFactory
+        ? [
+          'Creation du point d entree factory.',
+          `Demande de creation pour le type ${vehicle.type}.`,
+          `Instantiation du produit concret ${vehicle.label}.`,
+          'Retour du produit sans exposer le constructeur au client.',
+        ]
+        : [
+          'Mode sans Factory : le client connait le type concret.',
+          `Le client choisit le constructeur pour ${vehicle.type}.`,
+          `Le code appelant execute directement new ${vehicle.label}().`,
+          'Le changement de type oblige a modifier le code client.',
+        ],
       output: {
+        mode: useFactory ? 'WITH_FACTORY' : 'WITHOUT_FACTORY',
+        modeLabel: useFactory ? 'Avec Factory' : 'Sans Factory',
         vehicleType: vehicle.type,
         vehicleLabel: vehicle.label,
         description: vehicle.description,
+        creationStyle: useFactory ? 'Factory centralisee' : 'Instantiation directe',
       },
       visualization: {
         nodes: [
           { id: 'client', label: 'Client', type: 'client', data: {} },
-          { id: 'factory', label: 'VehicleFactory', type: 'factory', data: {} },
+          {
+            id: 'factory',
+            label: useFactory ? 'VehicleFactory' : `new ${vehicle.label}()`,
+            type: useFactory ? 'factory' : 'cluster',
+            data: { detail: useFactory ? 'creation centralisee' : 'constructeur concret expose' },
+          },
           { id: 'product', label: vehicle.label, type: 'product', data: { type: vehicle.type } },
         ],
         edges: [
-          { from: 'client', to: 'factory', label: 'request' },
-          { from: 'factory', to: 'product', label: 'create' },
+          { from: 'client', to: 'factory', label: useFactory ? 'request' : 'new' },
+          { from: 'factory', to: 'product', label: useFactory ? 'create' : 'return' },
         ],
       },
     }
   },
   observer: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_OBSERVER'}`.toUpperCase()
+    const useObserver = mode !== 'WITHOUT_OBSERVER'
     const subjectName = `${parameters.subjectName ?? ''}`.trim()
     const message = `${parameters.message ?? ''}`.trim()
     const observers = normalizeUniqueList(parameters.observers)
@@ -1032,15 +1134,26 @@ const fallbackExecutors = {
 
     return {
       patternCode: 'observer',
-      summary: "Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient.",
-      logs: [
-        `Creation du sujet : ${subjectName}.`,
-        ...observers.map((observer) => `Abonnement de ${observer}.`),
-        `Emission de l evenement : ${message}.`,
-        `Le sujet notifie ${deliveries.length} observer(s).`,
-        ...deliveries.map((delivery) => delivery.detail),
-      ],
+      summary: useObserver
+        ? "Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient."
+        : "Sans Observer, l emetteur appelle directement chaque cible concrete et augmente son couplage.",
+      logs: useObserver
+        ? [
+          `Creation du sujet : ${subjectName}.`,
+          ...observers.map((observer) => `Abonnement de ${observer}.`),
+          `Emission de l evenement : ${message}.`,
+          `Le sujet notifie ${deliveries.length} observer(s).`,
+          ...deliveries.map((delivery) => delivery.detail),
+        ]
+        : [
+          `Mode sans Observer : ${subjectName} connait explicitement toutes les cibles.`,
+          `Emission de l evenement : ${message}.`,
+          `Boucle manuelle sur ${deliveries.length} dependance(s) concretes.`,
+          ...deliveries.map((delivery) => delivery.detail),
+        ],
       output: {
+        mode: useObserver ? 'WITH_OBSERVER' : 'WITHOUT_OBSERVER',
+        modeLabel: useObserver ? 'Avec Observer' : 'Sans Observer',
         subjectName,
         observerCount: deliveries.length,
         message,
@@ -1050,7 +1163,12 @@ const fallbackExecutors = {
       visualization: {
         nodes: [
           { id: 'subject', label: subjectName, type: 'subject', data: { active: true } },
-          { id: 'event', label: 'Evenement', type: 'event', data: { message } },
+          {
+            id: 'event',
+            label: useObserver ? 'Evenement' : 'Manual loop',
+            type: 'event',
+            data: { message: useObserver ? message : 'couplage direct' },
+          },
           ...deliveries.map((delivery, index) => ({
             id: `observer-${index}`,
             label: delivery.observer,
@@ -1059,17 +1177,19 @@ const fallbackExecutors = {
           })),
         ],
         edges: [
-          { from: 'subject', to: 'event', label: 'publish' },
+          { from: 'subject', to: 'event', label: useObserver ? 'publish' : 'iterate' },
           ...deliveries.map((_, index) => ({
             from: 'event',
             to: `observer-${index}`,
-            label: 'notify',
+            label: useObserver ? 'notify' : 'call',
           })),
         ],
       },
     }
   },
   strategy: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_STRATEGY'}`.toUpperCase()
+    const useStrategy = mode !== 'WITHOUT_STRATEGY'
     const selectedStrategy = `${parameters.strategy ?? 'CARD'}`.toUpperCase()
     const amount = Number(parameters.amount ?? 100)
 
@@ -1084,14 +1204,25 @@ const fallbackExecutors = {
 
     return {
       patternCode: 'strategy',
-      summary: "Strategy laisse le contexte deleguer l execution a l algorithme choisi.",
-      logs: [
-        'Creation du contexte de paiement.',
-        `Selection de la strategie : ${label}.`,
-        'Execution du workflow de paiement avec un algorithme interchangeable.',
-        `Resultat : ${message}`,
-      ],
+      summary: useStrategy
+        ? "Strategy laisse le contexte deleguer l execution a l algorithme choisi."
+        : "Sans Strategy, le service garde un bloc if/else pour chaque variante d algorithme.",
+      logs: useStrategy
+        ? [
+          'Creation du contexte de paiement.',
+          `Selection de la strategie : ${label}.`,
+          'Execution du workflow de paiement avec un algorithme interchangeable.',
+          `Resultat : ${message}`,
+        ]
+        : [
+          'Mode sans Strategy : PaymentService garde un bloc if/else.',
+          `Evaluation de la branche ${label}.`,
+          'Le service choisit l algorithme en fonction de la valeur recue.',
+          `Resultat : ${message}`,
+        ],
       output: {
+        mode: useStrategy ? 'WITH_STRATEGY' : 'WITHOUT_STRATEGY',
+        modeLabel: useStrategy ? 'Avec Strategy' : 'Sans Strategy',
         amount,
         selectedStrategy,
         selectedLabel: label,
@@ -1099,17 +1230,37 @@ const fallbackExecutors = {
       },
       visualization: {
         nodes: [
-          { id: 'context', label: 'PaymentContext', type: 'context', data: { active: true } },
-          { id: 'card', label: 'Carte', type: 'strategy', data: { selected: selectedStrategy === 'CARD' } },
-          { id: 'paypal', label: 'Paypal', type: 'strategy', data: { selected: selectedStrategy === 'PAYPAL' } },
-          { id: 'crypto', label: 'Crypto', type: 'strategy', data: { selected: selectedStrategy === 'CRYPTO' } },
+          {
+            id: 'context',
+            label: useStrategy ? 'PaymentContext' : 'PaymentService',
+            type: 'context',
+            data: { active: true },
+          },
+          {
+            id: 'card',
+            label: useStrategy ? 'Carte' : 'if CARD',
+            type: 'strategy',
+            data: { selected: selectedStrategy === 'CARD', detail: useStrategy ? '' : 'branche conditionnelle' },
+          },
+          {
+            id: 'paypal',
+            label: useStrategy ? 'Paypal' : 'if PAYPAL',
+            type: 'strategy',
+            data: { selected: selectedStrategy === 'PAYPAL', detail: useStrategy ? '' : 'branche conditionnelle' },
+          },
+          {
+            id: 'crypto',
+            label: useStrategy ? 'Crypto' : 'if CRYPTO',
+            type: 'strategy',
+            data: { selected: selectedStrategy === 'CRYPTO', detail: useStrategy ? '' : 'branche conditionnelle' },
+          },
           { id: 'result', label: 'Resultat', type: 'output', data: { message } },
         ],
         edges: [
-          { from: 'context', to: 'card', label: 'disponible' },
-          { from: 'context', to: 'paypal', label: 'disponible' },
-          { from: 'context', to: 'crypto', label: 'disponible' },
-          { from: selectedStrategy.toLowerCase(), to: 'result', label: 'execute' },
+          { from: 'context', to: 'card', label: useStrategy ? 'disponible' : 'if/else' },
+          { from: 'context', to: 'paypal', label: useStrategy ? 'disponible' : 'if/else' },
+          { from: 'context', to: 'crypto', label: useStrategy ? 'disponible' : 'if/else' },
+          { from: selectedStrategy.toLowerCase(), to: 'result', label: useStrategy ? 'execute' : 'branch' },
         ],
       },
     }
