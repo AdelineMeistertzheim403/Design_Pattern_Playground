@@ -108,6 +108,7 @@ Prerequis prod :
 - une registry privee disponible via `REGISTRY_HOST`
 - des variables PostgreSQL definies dans `.env`
 - une valeur `ADMINER_HOST_PORT` si tu veux changer le port local VPS utilise par `adminer`
+- une valeur `APP_CORS_ALLOWED_ORIGINS` avec l origine exacte du frontend en prod
 - un `APP_JWT_SECRET` fort dans `.env`
 - si vous voulez appeler une API sur une autre origine, renseigner `VITE_API_URL` lors du build GitHub Actions
 - si le frontend et l API ne sont plus servis sur la meme origine, adaptez `APP_COOKIE_SAME_SITE` et `APP_COOKIE_SECURE`
@@ -164,10 +165,17 @@ POSTGRES_DB=design_pattern_playground
 POSTGRES_USER=design_pattern_playground
 POSTGRES_PASSWORD=change-me
 ADMINER_HOST_PORT=18080
+APP_CORS_ALLOWED_ORIGINS=https://design-pattern-playground.example.com
 APP_JWT_SECRET=change-me-with-a-long-random-secret
 APP_COOKIE_SECURE=true
 APP_COOKIE_SAME_SITE=Lax
 APP_COOKIE_DOMAIN=
+```
+
+`APP_CORS_ALLOWED_ORIGINS` accepte une liste separee par des virgules. Exemple :
+
+```env
+APP_CORS_ALLOWED_ORIGINS=https://design-pattern-playground.example.com,https://www.design-pattern-playground.example.com
 ```
 
 ### Premiere installation de la registry
