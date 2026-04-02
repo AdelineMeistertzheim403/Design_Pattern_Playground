@@ -131,6 +131,7 @@ Aujourd hui, les scenes specialisees existent deja pour :
 - `flyweight`
 - `singleton`
 - `state`
+- `decorator`
 
 Les autres patterns utilisent la scene generique.
 
@@ -417,6 +418,7 @@ Le formulaire est generique, mais certains patterns ont des enrichissements UI p
 Exemples existants :
 
 - sliders numeriques flyweight
+- selection cliquable d une pile de decorators quand `LIST` expose des `allowedValues`
 - labels specifiques pour certains booleens
 
 Si ton pattern a besoin :

@@ -267,9 +267,15 @@ npm run build
 - `strategy` : choix dynamique d une strategie de paiement avec logs et visualisation simple.
 - `factory` : creation dynamique d un vehicule via une fabrique avec schema genere par le backend.
 - `observer` : propagation d un evenement a plusieurs abonnes avec logs de souscription et notifications.
+- `singleton` : comparaison avec / sans instance unique partagee entre plusieurs clients.
+- `state` : machine a etats interactive avec timeline, transitions et scene SVG dediee.
+- `flyweight` : simulation memoire avec mutualisation d instances et comparaison live.
+- `decorator` : empilement de power-ups sur un composant de base avec stats cumulees et pile de wrappers.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
+- quiz proteges par authentification avec progression persistee, score pondere et badges
+- page dediee de progression utilisateur accessible depuis la navbar
 - authentification utilisateur avec inscription et connexion
 - session geree par cookies `HttpOnly` avec access token court et refresh token rotatif
 - persistance des comptes et sessions de refresh dans PostgreSQL
@@ -312,6 +318,6 @@ Exemple `factory` :
 
 ## Suite logique
 
-- Ajouter `observer`, `singleton` puis `builder`.
-- Remplacer la visualisation cartes/liens par un rendu SVG ou canvas.
+- Ajouter `builder`, `command` et d autres patterns tres visuels comme `adapter` ou `command`.
+- Continuer a enrichir les scenes SVG et les quiz par pattern.
 - Ajouter un mode apprentissage et un mode developpeur avec code Java genere.
