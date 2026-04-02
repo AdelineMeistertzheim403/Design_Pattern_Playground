@@ -116,6 +116,35 @@ export const patternLearningContent = {
       },
     ],
   },
+  decorator: {
+    strapline: 'Chaque power-up enveloppe le composant precedent et enrichit le build sans toucher a la classe d origine.',
+    intuition:
+      "Decorator evite de creer une classe par combinaison possible. A la place, on compose dynamiquement des wrappers qui ajoutent chacun une responsabilite claire.",
+    readingGuide:
+      "Lis d abord la pile de wrappers du bas vers le haut, puis regarde le build final a droite. L UML montre la structure Component / Decorator, la scene montre l empilement runtime.",
+    studentAngle:
+      "Le declic pedagogique est de voir qu on n a pas besoin d une classe PersonnageFeuBouclierVitesse pour obtenir ce resultat.",
+    developerAngle:
+      "Ce pattern devient interessant quand tu veux enrichir un composant par options cumulables, sans exploser les branches d heritage ni dupliquer la logique.",
+    playfulPrompt:
+      "Ajoute, retire ou reordonne mentalement les power-ups et observe comment les stats evoluent couche apres couche.",
+    steps: [
+      'Identifier le composant de base et ses stats initiales.',
+      'Ajouter un premier decorator qui wrap le composant.',
+      'Empiler plusieurs decorators pour cumuler les effets.',
+      'Comparer le build final avec ce qu il aurait fallu coder sans pattern.',
+    ],
+    glossary: [
+      {
+        term: 'Component',
+        definition: "Contrat commun partage par l objet de base et par tous les decorators.",
+      },
+      {
+        term: 'Wrapping',
+        definition: "Fait d envelopper un objet dans un autre pour enrichir son comportement a l execution.",
+      },
+    ],
+  },
   factory: {
     strapline: 'Le client demande un produit, la fabrique choisit la bonne classe concrete.',
     intuition:

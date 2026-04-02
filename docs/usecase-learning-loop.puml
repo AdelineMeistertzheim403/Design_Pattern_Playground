@@ -1,0 +1,50 @@
+@startuml usecase_learning_loop
+left to right direction
+title Design Pattern Playground - Learning loop use case
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Etudiant / Developpeur" as Learner
+
+rectangle "Boucle pedagogique complete" {
+  usecase "Decouvrir un pattern" as UC_DISCOVER
+  usecase "Comprendre sa structure\nUML" as UC_UML
+  usecase "Observer son comportement\nruntime" as UC_RUNTIME
+  usecase "Manipuler les parametres" as UC_PLAY
+  usecase "Comparer theorie et pratique" as UC_COMPARE
+  usecase "Verifier sa comprehension\navec un quiz" as UC_QUIZ
+  usecase "Recevoir un feedback\nimmediat" as UC_FEEDBACK
+  usecase "Valider la maitrise" as UC_VALIDATE
+  usecase "Mesurer sa progression" as UC_MEASURE
+}
+
+Learner --> UC_DISCOVER
+Learner --> UC_PLAY
+Learner --> UC_QUIZ
+Learner --> UC_MEASURE
+
+UC_DISCOVER .> UC_UML : <<include>>
+UC_DISCOVER .> UC_RUNTIME : <<include>>
+UC_PLAY .> UC_COMPARE : <<include>>
+UC_QUIZ .> UC_FEEDBACK : <<include>>
+UC_QUIZ .> UC_VALIDATE : <<extend>>
+UC_VALIDATE .> UC_MEASURE : <<include>>
+
+note right of UC_DISCOVER
+Lecture rapide, cas d usage,
+explication simple, diagramme UML.
+end note
+
+note right of UC_PLAY
+Le coeur du projet :
+apprendre en manipulant la demo.
+end note
+
+note bottom of UC_VALIDATE
+Validation pedagogique :
+score, badge, progression persistante.
+end note
+
+@enduml

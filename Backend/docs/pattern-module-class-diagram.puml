@@ -1,0 +1,197 @@
+@startuml pattern_module_class_diagram
+title Backend - Pattern module class diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "web" {
+  class PatternController <<RestController>> {
+    +getPatterns()
+    +getPattern(code)
+    +getSchema(code)
+    +execute(request)
+  }
+}
+
+package "pattern.api" {
+  interface DesignPatternDemo {
+    +getCode(): String
+    +getMetadata(): PatternMetadata
+    +getSchema(): PatternSchema
+    +execute(request): PatternExecutionResult
+  }
+}
+
+package "pattern.application" {
+  class PatternService <<Service>> {
+    +getAllPatterns(): List
+    +getPattern(code): PatternMetadata
+    +getSchema(code): PatternSchema
+    +execute(request): PatternExecutionResult
+  }
+}
+
+package "pattern.registry" {
+  class PatternRegistry <<Component>>
+}
+
+package "pattern.domain" {
+  class PatternMetadata <<record>>
+  class PatternSchema <<record>>
+  class PatternField <<record>>
+  class PatternExecutionRequest <<record>>
+  class PatternExecutionResult <<record>>
+  class VisualizationGraph <<record>>
+  class VisualizationNode <<record>>
+  class VisualizationEdge <<record>>
+
+  enum PatternType
+  enum FieldType
+}
+
+package "demo.strategy" {
+  class StrategyPatternDemo <<Component>>
+  class StrategyConfig <<record>>
+}
+
+package "demo.strategy.domain" {
+  class PaymentContext
+  interface PaymentStrategy
+  class CardPaymentStrategy
+  class PaypalPaymentStrategy
+  class CryptoPaymentStrategy
+}
+
+package "demo.factory" {
+  class FactoryPatternDemo <<Component>>
+  class FactoryConfig <<record>>
+}
+
+package "demo.factory.domain" {
+  class VehicleFactory
+  interface Vehicle
+  class Car
+  class Bike
+}
+
+package "demo.observer" {
+  class ObserverPatternDemo <<Component>>
+  class ObserverConfig <<record>>
+}
+
+package "demo.observer.domain" {
+  class NotificationPublisher
+  interface NotificationObserver
+  class SubscriberObserver
+  class NotificationReceipt <<record>>
+}
+
+package "demo.singleton" {
+  class SingletonPatternDemo <<Component>>
+  class SingletonConfig <<record>>
+}
+
+package "demo.singleton.domain" {
+  class SingletonSettingsProvider
+  class GlobalSettingsManager
+  class ClientPerspective <<record>>
+}
+
+package "demo.flyweight" {
+  class FlyweightPatternDemo <<Component>>
+  class FlyweightConfig <<record>>
+}
+
+package "demo.flyweight.domain" {
+  class SceneObjectFlyweightFactory
+  class SharedSceneAsset <<record>>
+  class FlyweightAssetProfile <<record>>
+}
+
+package "demo.state" {
+  class StatePatternDemo <<Component>>
+  class StateConfig <<record>>
+}
+
+package "demo.state.domain" {
+  class CharacterContext
+  interface CharacterState
+  class IdleState
+  class RunningState
+  class JumpingState
+  class AttackingState
+  class TransitionResult <<record>>
+  class StateTransitionStep <<record>>
+  enum CharacterAction
+}
+
+PatternController --> PatternService
+PatternService --> PatternRegistry
+PatternRegistry o-- DesignPatternDemo : demos
+
+PatternMetadata --> PatternType
+PatternSchema *-- PatternField
+PatternField --> FieldType
+PatternExecutionResult *-- VisualizationGraph
+VisualizationGraph *-- VisualizationNode
+VisualizationGraph *-- VisualizationEdge
+
+DesignPatternDemo <|.. StrategyPatternDemo
+DesignPatternDemo <|.. FactoryPatternDemo
+DesignPatternDemo <|.. ObserverPatternDemo
+DesignPatternDemo <|.. SingletonPatternDemo
+DesignPatternDemo <|.. FlyweightPatternDemo
+DesignPatternDemo <|.. StatePatternDemo
+
+StrategyPatternDemo --> StrategyConfig
+StrategyPatternDemo --> PaymentContext
+PaymentContext --> PaymentStrategy
+PaymentStrategy <|.. CardPaymentStrategy
+PaymentStrategy <|.. PaypalPaymentStrategy
+PaymentStrategy <|.. CryptoPaymentStrategy
+
+FactoryPatternDemo --> FactoryConfig
+FactoryPatternDemo --> VehicleFactory
+VehicleFactory --> Vehicle
+Vehicle <|.. Car
+Vehicle <|.. Bike
+
+ObserverPatternDemo --> ObserverConfig
+ObserverPatternDemo --> NotificationPublisher
+NotificationPublisher o-- NotificationObserver
+NotificationPublisher --> NotificationReceipt
+NotificationObserver <|.. SubscriberObserver
+
+SingletonPatternDemo --> SingletonConfig
+SingletonPatternDemo --> SingletonSettingsProvider
+SingletonSettingsProvider --> GlobalSettingsManager
+SingletonPatternDemo --> ClientPerspective
+
+FlyweightPatternDemo --> FlyweightConfig
+FlyweightPatternDemo --> SceneObjectFlyweightFactory
+SceneObjectFlyweightFactory --> SharedSceneAsset
+SceneObjectFlyweightFactory --> FlyweightAssetProfile
+
+StatePatternDemo --> StateConfig
+StatePatternDemo --> CharacterContext
+CharacterContext --> CharacterState
+CharacterContext --> StateTransitionStep
+CharacterState --> TransitionResult
+CharacterState --> CharacterAction
+CharacterState <|.. IdleState
+CharacterState <|.. RunningState
+CharacterState <|.. JumpingState
+CharacterState <|.. AttackingState
+
+note bottom of PatternRegistry
+Le module pattern est extensible :
+chaque nouvelle demo est un bean Spring
+qui implemente DesignPatternDemo.
+end note
+
+@enduml

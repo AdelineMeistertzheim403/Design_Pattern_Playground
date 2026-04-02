@@ -1,0 +1,61 @@
+@startuml cicd_registry_deploy_diagram
+title Design Pattern Playground - CI/CD and private registry flow
+
+skinparam shadowing false
+skinparam linetype ortho
+left to right direction
+
+node "Developer machine" as Dev
+cloud "GitHub" as GitHub {
+  artifact "Git repository\nmain / pull requests" as Repo
+  node "GitHub Actions" as Actions {
+    node "backend job\n./mvnw test" as JobBackend
+    node "frontend job\nnpm run build" as JobFrontend
+    node "compose job\ndocker compose config" as JobCompose
+    node "publish job\nbuildx + push" as JobPublish
+    node "deploy job\nssh + rsync + deploy_prod.sh" as JobDeploy
+  }
+}
+
+node "VPS" as VPS {
+  node "Private Docker Registry" as Registry
+  node "Application deployment" as Prod
+}
+
+Dev --> Repo : push / PR
+Repo --> JobBackend
+Repo --> JobFrontend
+Repo --> JobCompose
+
+JobBackend --> JobPublish : needs success
+JobFrontend --> JobPublish : needs success
+JobCompose --> JobPublish : needs success
+
+JobPublish --> Registry : docker login\nbuild backend/frontend\npush tags sha + main
+
+JobPublish --> JobDeploy : on push main\nor workflow_dispatch
+JobDeploy --> VPS : SSH
+JobDeploy --> Prod : rsync repo\nupload .env\nAPP_IMAGE_TAG=${GITHUB_SHA}\n./scripts/deploy_prod.sh
+Prod --> Registry : docker login + pull images
+
+note right of JobPublish
+Secrets utilises :
+- REGISTRY_HOST
+- REGISTRY_NAMESPACE
+- REGISTRY_USERNAME
+- REGISTRY_PASSWORD
+end note
+
+note right of JobDeploy
+Secrets utilises :
+- VPS_SSH_*
+- VPS_APP_DIR
+- PROD_ENV_FILE
+end note
+
+note bottom of Prod
+Le VPS ne build plus les images applicatives.
+Il recupere les images depuis la registry privee.
+end note
+
+@enduml

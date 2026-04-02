@@ -1,0 +1,115 @@
+@startuml sequence_auth_refresh_end_to_end
+title Design Pattern Playground - End-to-end auth and refresh
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor User
+participant "Frontend\nAuthDialog" as AuthDialog
+participant "Frontend\nusePlaygroundApp" as AppHook
+participant "Frontend\napi.js" as FrontApi
+participant "Browser\ncookies HttpOnly" as BrowserCookies
+participant "Browser\nlocalStorage" as LocalStorage
+participant "Backend\nAuthController" as AuthController
+participant "Backend\nAuthService" as AuthService
+participant "Backend\nAuthCookieService" as CookieService
+participant "Backend\nJwtService" as JwtService
+participant "Backend\nUserAccountRepository" as UserRepo
+participant "Backend\nRefreshTokenSessionRepository" as RefreshRepo
+database "PostgreSQL" as DB
+
+== Login ==
+
+User -> AuthDialog : submit username + password
+AuthDialog -> AppHook : handleAuthSubmit(event)
+AppHook -> FrontApi : POST /api/auth/login
+FrontApi -> AuthController : login(AuthRequest)
+AuthController -> AuthService : login(username, password)
+AuthService -> UserRepo : findByUsernameIgnoreCase(username)
+UserRepo -> DB : SELECT user_accounts
+DB --> UserRepo : UserAccount
+AuthService -> AuthService : verify password hash
+AuthService -> RefreshRepo : deleteByExpiresAtBefore(now)
+RefreshRepo -> DB : DELETE expired sessions
+AuthService -> JwtService : generateToken(user)
+JwtService --> AuthService : accessToken
+AuthService -> RefreshRepo : save(new RefreshTokenSession)
+RefreshRepo -> DB : INSERT refresh_token_sessions
+DB --> RefreshRepo : persisted refresh token
+AuthService --> AuthController : AuthSession(access, refresh, user)
+AuthController -> CookieService : addAuthenticationCookies(headers, access, refresh)
+AuthController --> FrontApi : 200 AuthResponse + Set-Cookie
+FrontApi --> BrowserCookies : browser stores HttpOnly cookies
+FrontApi --> AppHook : response.user
+AppHook -> LocalStorage : persistSession(user)
+AppHook --> User : authenticated UI state
+
+== Session restore on app startup ==
+
+AppHook -> LocalStorage : loadPersistedUser()
+LocalStorage --> AppHook : cached public user
+AppHook -> FrontApi : GET /api/auth/me
+FrontApi -> AuthController : me(authentication)
+
+alt access token still valid
+  AuthController -> AuthService : getCurrentUser(authenticatedUser)
+  AuthService -> UserRepo : findById(userId)
+  UserRepo -> DB : SELECT user_accounts
+  DB --> UserRepo : UserAccount
+  AuthService --> AuthController : AuthUserResponse
+  AuthController --> FrontApi : 200 current user
+  FrontApi --> AppHook : user
+  AppHook -> LocalStorage : persistSession(user)
+else access token expired
+  AuthController --> FrontApi : 401 Unauthorized
+  AppHook -> FrontApi : POST /api/auth/refresh
+  FrontApi -> AuthController : refresh(request)
+  AuthController -> CookieService : extractRefreshToken(request)
+  CookieService --> AuthController : refresh token
+  AuthController -> AuthService : refresh(refreshToken)
+  AuthService -> RefreshRepo : findByToken(refreshToken)
+  RefreshRepo -> DB : SELECT refresh_token_sessions
+  DB --> RefreshRepo : refresh session
+  AuthService -> RefreshRepo : deleteByToken(oldToken)
+  RefreshRepo -> DB : DELETE old refresh token
+  AuthService -> JwtService : generateToken(user)
+  JwtService --> AuthService : new access token
+  AuthService -> RefreshRepo : save(new RefreshTokenSession)
+  RefreshRepo -> DB : INSERT rotated refresh token
+  AuthService --> AuthController : AuthSession(newAccess, newRefresh, user)
+  AuthController -> CookieService : addAuthenticationCookies(headers, newAccess, newRefresh)
+  AuthController --> FrontApi : 200 AuthResponse + rotated cookies
+  FrontApi --> BrowserCookies : replace cookies
+  FrontApi --> AppHook : response.user
+  AppHook -> LocalStorage : persistSession(user)
+end
+
+== Logout ==
+
+User -> AppHook : click logout
+AppHook -> FrontApi : POST /api/auth/logout
+FrontApi -> AuthController : logout(authentication, request)
+AuthController -> CookieService : extractRefreshToken(request)
+AuthController -> AuthService : logout(authenticatedUser, refreshToken)
+AuthService -> RefreshRepo : deleteByToken(...) or deleteByUser_Id(...)
+RefreshRepo -> DB : DELETE refresh sessions
+AuthController -> CookieService : clearAuthenticationCookies(headers)
+AuthController --> FrontApi : 204 No Content + expired cookies
+FrontApi --> BrowserCookies : clear cookies
+AppHook -> LocalStorage : clearPersistedSession()
+AppHook --> User : unauthenticated UI state
+
+note right of BrowserCookies
+Les tokens restent en cookies HttpOnly.
+Le frontend ne les lit jamais directement.
+end note
+
+note right of LocalStorage
+Le localStorage ne contient que
+les informations publiques du profil,
+pas les tokens.
+end note
+
+@enduml

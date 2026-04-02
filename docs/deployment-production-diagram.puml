@@ -1,0 +1,66 @@
+@startuml deployment_production_diagram
+title Design Pattern Playground - Production deployment
+
+skinparam shadowing false
+skinparam linetype ortho
+left to right direction
+
+cloud "Internet" as Internet
+node "DNS" as DNS
+
+node "VPS\nLinux + Docker + Compose" as VPS {
+  node "Docker network\ntraefik-public" as TraefikNet {
+    node "Traefik\nreverse proxy + TLS" as Traefik
+
+    node "Registry stack" as RegistryStack {
+      node "Docker Registry\nregistry:2" as Registry
+      file "htpasswd" as Htpasswd
+      folder "registry_data" as RegistryData
+    }
+
+    node "Application stack\ncompose.prod.yml" as AppStack {
+      node "Frontend container\nNginx static app" as Frontend
+      node "Backend container\nSpring Boot API" as Backend
+      database "PostgreSQL 16" as Postgres
+      folder "postgres_data" as PostgresData
+    }
+  }
+}
+
+Internet --> DNS
+DNS --> Traefik : APP_HOST\nREGISTRY_HOST
+
+Traefik --> Frontend : Host(APP_HOST)\nPath /
+Traefik --> Backend : Host(APP_HOST)\nPath /api
+Traefik --> Registry : Host(REGISTRY_HOST)
+
+Frontend --> Backend : HTTP /api\nsame origin via Traefik
+Backend --> Postgres : JDBC
+Postgres --> PostgresData
+
+Registry --> Htpasswd
+Registry --> RegistryData
+
+note right of Frontend
+Image tiree depuis la registry privee :
+${REGISTRY_HOST}/${REGISTRY_NAMESPACE}/frontend:${APP_IMAGE_TAG}
+end note
+
+note right of Backend
+Image tiree depuis la registry privee :
+${REGISTRY_HOST}/${REGISTRY_NAMESPACE}/backend:${APP_IMAGE_TAG}
+end note
+
+note bottom of Traefik
+Traefik publie :
+- frontend sur /
+- backend sur /api
+- registry sur REGISTRY_HOST
+end note
+
+note bottom of Backend
+Auth via cookies HttpOnly.
+Le frontend ne stocke pas les tokens d acces.
+end note
+
+@enduml

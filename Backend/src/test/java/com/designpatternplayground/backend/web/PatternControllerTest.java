@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(6)))
+			.andExpect(jsonPath("$", hasSize(7)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -151,11 +151,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(6))
+			.andExpect(jsonPath("$.totalPatterns").value(7))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(6)));
+			.andExpect(jsonPath("$.patterns", hasSize(7)));
 	}
 
 	@Test
@@ -270,6 +270,30 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.acceptedTransitions").value(5))
 			.andExpect(jsonPath("$.output.timeline", hasSize(5)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
+	void shouldExecuteDecoratorPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "decorator",
+				  "parameters": {
+				    "characterName": "Ember Knight",
+				    "baseType": "WARRIOR",
+				    "decorators": ["FIRE", "ICE"]
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("decorator"))
+			.andExpect(jsonPath("$.output.attack").value(20))
+			.andExpect(jsonPath("$.output.defense").value(12))
+			.andExpect(jsonPath("$.output.decoratorCount").value(2))
+			.andExpect(jsonPath("$.output.challengeMet").value(true))
+			.andExpect(jsonPath("$.output.stack", hasSize(3)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(4)));
 	}
 
 	private Cookie registerAndExtractAccessCookie(String username, String password) throws Exception {

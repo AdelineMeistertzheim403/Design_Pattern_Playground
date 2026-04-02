@@ -1,0 +1,331 @@
+@startuml backend_class_diagram
+title Design Pattern Playground - Backend class diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "Bootstrap & Config" {
+  class DesignPatternPlaygroundApplication <<SpringBootApplication>>
+  class SecurityConfig <<Configuration>>
+  class WebConfig <<Configuration>>
+  class GlobalExceptionHandler <<RestControllerAdvice>>
+  class ApiError
+}
+
+package "Web API" {
+  class AuthController <<RestController>> {
+    +register(request)
+    +login(request)
+    +refresh(request)
+    +me(authentication)
+    +logout(authentication, request)
+  }
+
+  class PatternController <<RestController>> {
+    +getPatterns()
+    +getPattern(code)
+    +getSchema(code)
+    +getQuiz(code)
+    +getQuizProgress(code, authentication)
+    +submitQuiz(code, request, authentication)
+    +execute(request)
+  }
+
+  class QuizDashboardController <<RestController>> {
+    +getDashboard(authentication)
+  }
+}
+
+package "Auth & Security" {
+  class AuthService <<Service>> {
+    +register(username, password): AuthSession
+    +login(username, password): AuthSession
+    +refresh(refreshToken): AuthSession
+    +logout(user, refreshToken)
+    +getCurrentUser(user): AuthUserResponse
+  }
+
+  class AuthPasswordHasher <<Service>>
+  class JwtService <<Service>>
+  class AuthCookieService <<Service>>
+  class JwtAuthenticationFilter <<Filter>>
+  class ApiAuthenticationEntryPoint <<Security>>
+
+  class AuthenticatedUser <<record>>
+  class AuthSession <<record>>
+  class AuthRequest <<record>>
+  class AuthResponse <<record>>
+  class AuthUserResponse <<record>>
+
+  class UserAccount <<Entity>>
+  interface UserAccountRepository <<Repository>>
+  class RefreshTokenSession <<Entity>>
+  interface RefreshTokenSessionRepository <<Repository>>
+}
+
+package "Pattern Core" {
+  interface DesignPatternDemo {
+    +getCode(): String
+    +getMetadata(): PatternMetadata
+    +getSchema(): PatternSchema
+    +execute(request): PatternExecutionResult
+  }
+
+  class PatternService <<Service>> {
+    +getAllPatterns(): List
+    +getPattern(code): PatternMetadata
+    +getSchema(code): PatternSchema
+    +execute(request): PatternExecutionResult
+  }
+
+  class PatternRegistry <<Component>>
+
+  class PatternMetadata <<record>>
+  class PatternSchema <<record>>
+  class PatternField <<record>>
+  class PatternExecutionRequest <<record>>
+  class PatternExecutionResult <<record>>
+  class VisualizationGraph <<record>>
+  class VisualizationNode <<record>>
+  class VisualizationEdge <<record>>
+
+  enum PatternType
+  enum FieldType
+}
+
+package "Quiz Core" {
+  interface PatternQuizProvider {
+    +getPatternCode(): String
+    +getQuiz(): PatternQuiz
+  }
+
+  class PatternQuizRegistry <<Component>>
+  class PatternQuizService <<Service>> {
+    +getQuiz(code): PatternQuiz
+  }
+  class PatternQuizProgressService <<Service>> {
+    +getProgress(patternCode, user): QuizProgressResponse
+    +submit(patternCode, user, request): QuizSubmissionResult
+  }
+  class QuizDashboardService <<Service>> {
+    +getDashboard(user): QuizDashboardResponse
+  }
+  class QuizScoringRules <<Utility>>
+
+  class PatternQuiz <<record>>
+  class QuizQuestion <<record>>
+  class QuizChoice <<record>>
+  class QuizMatchingItem <<record>>
+  class QuizMatchingPair <<record>>
+  class QuizOrderingItem <<record>>
+  class QuizAnswerSubmission <<record>>
+  class QuizSubmissionRequest <<record>>
+  class QuizQuestionResult <<record>>
+  class QuizSubmissionResult <<record>>
+  class QuizProgressResponse <<record>>
+  class QuizDashboardResponse <<record>>
+  class QuizDashboardPatternProgress <<record>>
+
+  class UserQuizProgress <<Entity>>
+  interface UserQuizProgressRepository <<Repository>>
+
+  enum QuestionType
+  enum QuestionDifficulty
+}
+
+package "Demo Patterns" {
+  package "Strategy" {
+    class StrategyPatternDemo <<Component>>
+    class PaymentContext
+    interface PaymentStrategy {
+      +pay(amount): String
+    }
+    class CardPaymentStrategy
+    class PaypalPaymentStrategy
+    class CryptoPaymentStrategy
+  }
+
+  package "Factory" {
+    class FactoryPatternDemo <<Component>>
+    class VehicleFactory
+    interface Vehicle
+    class Car
+    class Bike
+  }
+
+  package "Observer" {
+    class ObserverPatternDemo <<Component>>
+    class NotificationPublisher
+    interface NotificationObserver {
+      +update(source, message): NotificationReceipt
+    }
+    class SubscriberObserver
+    class NotificationReceipt <<record>>
+  }
+
+  package "Singleton" {
+    class SingletonPatternDemo <<Component>>
+    class SingletonSettingsProvider
+    class GlobalSettingsManager
+    class ClientPerspective <<record>>
+  }
+
+  package "Flyweight" {
+    class FlyweightPatternDemo <<Component>>
+    class SceneObjectFlyweightFactory
+    class SharedSceneAsset <<record>>
+    class FlyweightAssetProfile <<record>>
+  }
+
+  package "State" {
+    class StatePatternDemo <<Component>>
+    class CharacterContext
+    interface CharacterState {
+      +availableActions(): List
+      +onAction(action, characterName): TransitionResult
+    }
+    class IdleState
+    class RunningState
+    class JumpingState
+    class AttackingState
+    class TransitionResult <<record>>
+    class StateTransitionStep <<record>>
+    enum CharacterAction
+  }
+}
+
+package "Quiz Providers" {
+  class StrategyQuizProvider <<Component>>
+  class FactoryQuizProvider <<Component>>
+  class ObserverQuizProvider <<Component>>
+  class FlyweightQuizProvider <<Component>>
+  class SingletonQuizProvider <<Component>>
+  class StateQuizProvider <<Component>>
+}
+
+note top of DesignPatternPlaygroundApplication
+Diagramme d ensemble du backend.
+Les DTO mineurs, exceptions detaillees et
+objets de configuration propres a chaque demo
+sont volontairement omis pour garder le schema lisible.
+end note
+
+' Controllers to services
+AuthController --> AuthService
+AuthController --> AuthCookieService
+PatternController --> PatternService
+PatternController --> PatternQuizService
+PatternController --> PatternQuizProgressService
+QuizDashboardController --> QuizDashboardService
+
+' Security chain
+DesignPatternPlaygroundApplication ..> SecurityConfig
+SecurityConfig ..> JwtAuthenticationFilter
+SecurityConfig ..> ApiAuthenticationEntryPoint
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> AuthCookieService
+JwtService --> AuthenticatedUser
+
+' Auth domain and persistence
+AuthService --> UserAccountRepository
+AuthService --> RefreshTokenSessionRepository
+AuthService --> AuthPasswordHasher
+AuthService --> JwtService
+AuthService --> AuthSession
+AuthSession *-- AuthUserResponse
+AuthResponse *-- AuthUserResponse
+UserAccountRepository ..> UserAccount
+RefreshTokenSessionRepository ..> RefreshTokenSession
+RefreshTokenSession --> UserAccount
+
+' Pattern core
+PatternService --> PatternRegistry
+PatternRegistry o-- "6" DesignPatternDemo : demos
+PatternMetadata --> PatternType
+PatternSchema *-- PatternField
+PatternField --> FieldType
+PatternExecutionResult *-- VisualizationGraph
+VisualizationGraph *-- VisualizationNode
+VisualizationGraph *-- VisualizationEdge
+
+' Quiz core
+PatternQuizService --> PatternQuizRegistry
+PatternQuizService --> PatternService
+PatternQuizRegistry o-- "6" PatternQuizProvider : providers
+PatternQuizService ..> QuizScoringRules
+PatternQuiz --> "1..*" QuizQuestion
+QuizQuestion --> QuestionType
+QuizQuestion --> QuestionDifficulty
+QuizQuestion *-- "0..*" QuizChoice
+QuizQuestion *-- "0..*" QuizMatchingItem
+QuizQuestion *-- "0..*" QuizMatchingPair
+QuizQuestion *-- "0..*" QuizOrderingItem
+QuizSubmissionRequest *-- "1..*" QuizAnswerSubmission
+QuizSubmissionResult *-- "1..*" QuizQuestionResult
+QuizSubmissionResult *-- QuizProgressResponse
+QuizDashboardResponse *-- "1..*" QuizDashboardPatternProgress
+PatternQuizProgressService --> PatternQuizService
+PatternQuizProgressService --> UserAccountRepository
+PatternQuizProgressService --> UserQuizProgressRepository
+QuizDashboardService --> PatternService
+QuizDashboardService --> PatternQuizService
+QuizDashboardService --> UserQuizProgressRepository
+UserQuizProgressRepository ..> UserQuizProgress
+UserQuizProgress --> UserAccount
+
+' Demo implementations
+DesignPatternDemo <|.. StrategyPatternDemo
+DesignPatternDemo <|.. FactoryPatternDemo
+DesignPatternDemo <|.. ObserverPatternDemo
+DesignPatternDemo <|.. SingletonPatternDemo
+DesignPatternDemo <|.. FlyweightPatternDemo
+DesignPatternDemo <|.. StatePatternDemo
+
+StrategyPatternDemo --> PaymentContext
+PaymentContext --> PaymentStrategy
+PaymentStrategy <|.. CardPaymentStrategy
+PaymentStrategy <|.. PaypalPaymentStrategy
+PaymentStrategy <|.. CryptoPaymentStrategy
+
+FactoryPatternDemo --> VehicleFactory
+VehicleFactory --> Vehicle
+Vehicle <|.. Car
+Vehicle <|.. Bike
+
+ObserverPatternDemo --> NotificationPublisher
+NotificationPublisher o-- "0..*" NotificationObserver
+NotificationPublisher --> NotificationReceipt
+NotificationObserver <|.. SubscriberObserver
+
+SingletonPatternDemo --> SingletonSettingsProvider
+SingletonSettingsProvider --> GlobalSettingsManager
+SingletonPatternDemo --> ClientPerspective
+
+FlyweightPatternDemo --> SceneObjectFlyweightFactory
+SceneObjectFlyweightFactory --> SharedSceneAsset
+SceneObjectFlyweightFactory --> FlyweightAssetProfile
+
+StatePatternDemo --> CharacterContext
+CharacterContext --> CharacterState
+CharacterContext --> StateTransitionStep
+CharacterState --> TransitionResult
+CharacterState --> CharacterAction
+CharacterState <|.. IdleState
+CharacterState <|.. RunningState
+CharacterState <|.. JumpingState
+CharacterState <|.. AttackingState
+
+' Quiz providers
+PatternQuizProvider <|.. StrategyQuizProvider
+PatternQuizProvider <|.. FactoryQuizProvider
+PatternQuizProvider <|.. ObserverQuizProvider
+PatternQuizProvider <|.. FlyweightQuizProvider
+PatternQuizProvider <|.. SingletonQuizProvider
+PatternQuizProvider <|.. StateQuizProvider
+
+@enduml
