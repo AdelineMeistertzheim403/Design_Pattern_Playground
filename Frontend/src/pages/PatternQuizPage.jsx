@@ -168,7 +168,7 @@ function QuestionFeedback({
   question,
   evaluation,
 }) {
-  if (!evaluation) {
+  if (!evaluation || evaluation.questionId !== question.id) {
     return null
   }
 
@@ -632,7 +632,10 @@ export default function PatternQuizPage({
       return
     }
 
-    const evaluation = evaluateQuestion(currentQuestion, draftAnswer)
+    const evaluation = {
+      questionId: currentQuestion.id,
+      ...evaluateQuestion(currentQuestion, draftAnswer),
+    }
     setCurrentEvaluation(evaluation)
     setCompletedQuestions((currentResults) => [
       ...currentResults,
@@ -645,6 +648,7 @@ export default function PatternQuizPage({
   }
 
   function handleNextQuestion() {
+    setCurrentEvaluation(null)
     setCurrentIndex((current) => current + 1)
   }
 
