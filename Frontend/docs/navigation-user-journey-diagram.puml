@@ -1,0 +1,80 @@
+@startuml navigation_user_journey_diagram
+title Frontend - Navigation and user journey
+
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam state {
+  BackgroundColor #fffaf2
+  BorderColor #4b3f2f
+  ArrowColor #4b3f2f
+  FontColor #2f2516
+}
+
+[*] --> HomePage
+
+state "HomePage\nAccueil + catalogue" as HomePage
+state "PatternPage\nDemo + UML + pedagogie" as PatternPage
+state "PatternQuizPage\nQuiz d un pattern" as PatternQuizPage
+state "QuizDashboardPage\nProgression utilisateur" as QuizDashboardPage
+state "AuthDialog\nConnexion / inscription" as AuthDialog
+state "VisualizationModal\nScene / UML agrandis" as VisualizationModal
+state "NotFoundPage" as NotFoundPage
+
+HomePage --> PatternPage : choisir un pattern
+HomePage --> AuthDialog : connexion / inscription
+HomePage --> QuizDashboardPage : navbar \"Ma progression\"
+
+PatternPage --> HomePage : retour accueil
+PatternPage --> PatternPage : changer de pattern
+PatternPage --> VisualizationModal : ouvrir scene ou UML
+VisualizationModal --> PatternPage : fermer la modal
+
+PatternPage --> PatternQuizPage : ouvrir le quiz\nsi utilisateur connecte
+PatternPage --> AuthDialog : ouvrir le quiz\nsi utilisateur non connecte
+
+PatternQuizPage --> PatternPage : retour au pattern
+PatternQuizPage --> QuizDashboardPage : progression apres validation
+PatternQuizPage --> AuthDialog : session absente / expirée
+
+QuizDashboardPage --> PatternQuizPage : repasser un quiz
+QuizDashboardPage --> PatternPage : ouvrir un pattern
+QuizDashboardPage --> HomePage : retour accueil
+QuizDashboardPage --> AuthDialog : acces protege si non connecte
+
+AuthDialog --> HomePage : fermer sans action
+AuthDialog --> PatternPage : reprendre le pattern courant
+AuthDialog --> PatternQuizPage : continuer le quiz apres login
+AuthDialog --> QuizDashboardPage : ouvrir la progression apres login
+
+HomePage --> NotFoundPage : route inconnue
+PatternPage --> NotFoundPage : code pattern invalide
+PatternQuizPage --> NotFoundPage : code pattern invalide
+QuizDashboardPage --> NotFoundPage : route invalide
+NotFoundPage --> HomePage : retour accueil
+
+note right of HomePage
+Point d entree principal :
+- presentation du projet
+- filtre catalogue
+- acces aux patterns
+- entree vers auth
+end note
+
+note right of PatternPage
+Boucle pedagogique centrale :
+configurer -> visualiser -> executer -> comprendre -> lancer le quiz
+end note
+
+note right of PatternQuizPage
+Page reservee aux utilisateurs connectes.
+Elle alimente la progression persistante.
+end note
+
+note bottom of QuizDashboardPage
+Vue portfolio / suivi :
+scores, badges, progression par pattern.
+end note
+
+@enduml

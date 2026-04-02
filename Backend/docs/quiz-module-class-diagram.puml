@@ -1,0 +1,156 @@
+@startuml quiz_module_class_diagram
+title Backend - Quiz module class diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "web" {
+  class PatternController <<RestController>> {
+    +getQuiz(code)
+    +getQuizProgress(code, authentication)
+    +submitQuiz(code, request, authentication)
+  }
+
+  class QuizDashboardController <<RestController>> {
+    +getDashboard(authentication)
+  }
+}
+
+package "quiz.api" {
+  interface PatternQuizProvider {
+    +getPatternCode(): String
+    +getQuiz(): PatternQuiz
+  }
+}
+
+package "quiz.registry" {
+  class PatternQuizRegistry <<Component>>
+}
+
+package "quiz.application" {
+  class PatternQuizService <<Service>> {
+    +getQuiz(code): PatternQuiz
+  }
+  class PatternQuizProgressService <<Service>> {
+    +getProgress(patternCode, user): QuizProgressResponse
+    +submit(patternCode, user, request): QuizSubmissionResult
+  }
+  class QuizDashboardService <<Service>> {
+    +getDashboard(user): QuizDashboardResponse
+  }
+  class QuizScoringRules <<Utility>>
+}
+
+package "quiz.domain" {
+  class PatternQuiz <<record>>
+  class QuizQuestion <<record>>
+  class QuizChoice <<record>>
+  class QuizMatchingItem <<record>>
+  class QuizMatchingPair <<record>>
+  class QuizOrderingItem <<record>>
+  class QuizAnswerSubmission <<record>>
+  class QuizSubmissionRequest <<record>>
+  class QuizQuestionResult <<record>>
+  class QuizSubmissionResult <<record>>
+  class QuizProgressResponse <<record>>
+  class QuizDashboardResponse <<record>>
+  class QuizDashboardPatternProgress <<record>>
+  class UserQuizProgress <<Entity>>
+  interface UserQuizProgressRepository <<Repository>>
+  enum QuestionType
+  enum QuestionDifficulty
+}
+
+package "quiz.provider" {
+  class StrategyQuizProvider <<Component>>
+  class FactoryQuizProvider <<Component>>
+  class ObserverQuizProvider <<Component>>
+  class FlyweightQuizProvider <<Component>>
+  class SingletonQuizProvider <<Component>>
+  class StateQuizProvider <<Component>>
+}
+
+package "pattern.application" {
+  class PatternService <<Service>>
+}
+
+package "pattern.domain" {
+  class PatternMetadata <<record>>
+}
+
+package "auth.security" {
+  class AuthenticatedUser <<record>>
+}
+
+package "auth.domain" {
+  class UserAccount <<Entity>>
+  interface UserAccountRepository <<Repository>>
+}
+
+PatternController --> PatternQuizService
+PatternController --> PatternQuizProgressService
+QuizDashboardController --> QuizDashboardService
+
+PatternQuizService --> PatternQuizRegistry
+PatternQuizService --> PatternService
+PatternQuizService ..> QuizScoringRules
+
+PatternQuizProgressService --> PatternQuizService
+PatternQuizProgressService --> UserAccountRepository
+PatternQuizProgressService --> UserQuizProgressRepository
+
+QuizDashboardService --> PatternService
+QuizDashboardService --> PatternQuizService
+QuizDashboardService --> UserQuizProgressRepository
+
+PatternQuizRegistry o-- PatternQuizProvider : providers
+PatternQuizProvider <|.. StrategyQuizProvider
+PatternQuizProvider <|.. FactoryQuizProvider
+PatternQuizProvider <|.. ObserverQuizProvider
+PatternQuizProvider <|.. FlyweightQuizProvider
+PatternQuizProvider <|.. SingletonQuizProvider
+PatternQuizProvider <|.. StateQuizProvider
+
+PatternQuiz --> "1..*" QuizQuestion
+QuizQuestion --> QuestionType
+QuizQuestion --> QuestionDifficulty
+QuizQuestion *-- "0..*" QuizChoice
+QuizQuestion *-- "0..*" QuizMatchingItem
+QuizQuestion *-- "0..*" QuizMatchingPair
+QuizQuestion *-- "0..*" QuizOrderingItem
+
+QuizSubmissionRequest *-- "1..*" QuizAnswerSubmission
+QuizSubmissionResult *-- "1..*" QuizQuestionResult
+QuizSubmissionResult *-- QuizProgressResponse
+QuizDashboardResponse *-- "1..*" QuizDashboardPatternProgress
+
+UserQuizProgressRepository ..> UserQuizProgress
+UserQuizProgress --> UserAccount
+UserAccountRepository ..> UserAccount
+
+PatternQuizService --> PatternQuiz
+PatternQuizService --> PatternMetadata
+PatternQuizProgressService --> AuthenticatedUser
+QuizDashboardService --> AuthenticatedUser
+
+note bottom of PatternQuizService
+Le quiz est enrichi dynamiquement :
+la difficulte de chaque question est convertie
+en points selon la complexite du pattern.
+end note
+
+note bottom of UserQuizProgress
+La progression persistante conserve :
+- tentatives
+- meilleurs scores
+- pourcentages
+- badge debloque
+- date de validation
+end note
+
+@enduml

@@ -1,0 +1,116 @@
+@startuml frontend_component_diagram
+title Design Pattern Playground - Frontend component diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "Bootstrap" {
+  class main.jsx
+  class App
+}
+
+package "Shell & Routing" {
+  class SiteHeader
+  class AuthDialog
+  class VisualizationModal
+  class usePlaygroundApp <<hook>>
+  class playgroundUtils <<utils>>
+  class playgroundConstants <<constants>>
+  class api <<http client>>
+}
+
+package "Pages" {
+  class HomePage
+  class PatternPage
+  class PatternQuizPage
+  class QuizDashboardPage
+  class NotFoundPage
+}
+
+package "Visualization" {
+  class ExecutionScene
+  class UmlDiagram
+  class ZoomableViewport
+  class CollapsiblePanel
+}
+
+package "Quiz Hooks & Utils" {
+  class usePatternQuiz <<hook>>
+  class usePatternQuizProgress <<hook>>
+  class useQuizDashboard <<hook>>
+  class quizUtils <<utils>>
+}
+
+package "Static Learning Data" {
+  class fallbackPatterns
+  class fallbackQuizzes
+  class patternLearningContent
+  class patternUmlDiagrams
+}
+
+main.jsx --> App
+
+App --> SiteHeader
+App --> AuthDialog
+App --> VisualizationModal
+App --> usePlaygroundApp
+App --> HomePage
+App --> PatternPage
+App --> PatternQuizPage
+App --> QuizDashboardPage
+App --> NotFoundPage
+
+usePlaygroundApp --> api
+usePlaygroundApp --> playgroundUtils
+usePlaygroundApp --> playgroundConstants
+usePlaygroundApp --> fallbackPatterns
+usePlaygroundApp --> patternLearningContent
+usePlaygroundApp --> patternUmlDiagrams
+
+PatternPage --> CollapsiblePanel
+PatternPage --> ExecutionScene
+PatternPage --> UmlDiagram
+PatternPage --> playgroundUtils
+PatternPage --> playgroundConstants
+
+PatternQuizPage --> CollapsiblePanel
+PatternQuizPage --> usePatternQuiz
+PatternQuizPage --> usePatternQuizProgress
+PatternQuizPage --> api
+PatternQuizPage --> quizUtils
+PatternQuizPage --> playgroundConstants
+
+QuizDashboardPage --> useQuizDashboard
+QuizDashboardPage --> playgroundConstants
+
+ExecutionScene --> ZoomableViewport
+UmlDiagram --> ZoomableViewport
+
+usePatternQuiz --> api
+usePatternQuiz --> fallbackQuizzes
+usePatternQuiz --> quizUtils
+
+usePatternQuizProgress --> api
+useQuizDashboard --> api
+
+note bottom of usePlaygroundApp
+Hook d orchestration principal :
+- routing local
+- chargement catalogue/schema
+- etat formulaire
+- execution pattern
+- auth et session
+- modales UML / scene
+end note
+
+note right of api
+Le client HTTP parle au backend via fetch
+avec credentials: include pour les cookies HttpOnly.
+end note
+
+@enduml

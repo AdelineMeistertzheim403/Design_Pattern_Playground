@@ -1,0 +1,74 @@
+@startuml pattern_page_sequence
+title Frontend - Pattern page sequence
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor User
+participant App
+participant "usePlaygroundApp" as Hook
+participant "playgroundUtils" as Utils
+participant "api" as Api
+participant "PatternPage" as Page
+participant "ExecutionScene" as Scene
+
+== Navigation ==
+
+User -> App : click "Ouvrir la page du pattern"
+App -> Hook : navigate(/patterns/{code})
+activate Hook
+Hook -> Utils : parseRoute(path)
+Utils --> Hook : { name: "pattern", code }
+Hook --> App : route + selectedPattern
+deactivate Hook
+App -> Page : render props
+
+== Schema loading ==
+
+App -> Hook : effect on activePatternCode
+activate Hook
+Hook -> Hook : load fallback schema + reset form
+alt backend connected
+  Hook -> Api : getPatternSchema(code)
+  Api --> Hook : dynamic schema
+  Hook -> Hook : setSchema + buildInitialParameters()
+else backend fallback
+  Hook -> Hook : keep local schema
+end
+Hook --> App : schema + formValues
+deactivate Hook
+App -> Page : rerender with form
+
+== Live preview ==
+
+User -> Page : change field value
+Page -> Hook : updateFieldValue(field, value)
+activate Hook
+Hook -> Utils : normalizeParameters(schema, formValues)
+Hook -> Utils : buildPreviewExecution(code, schema, formValues)
+Utils --> Hook : preview execution
+Hook --> App : visualExecution + visualSourceLabel
+deactivate Hook
+App -> Scene : render "Apercu live"
+
+== Full execution ==
+
+User -> Page : submit "Lancer la demo"
+Page -> Hook : handleExecute(event)
+activate Hook
+Hook -> Utils : normalizeParameters(schema, formValues)
+alt backend connected
+  Hook -> Api : executePattern(payload)
+  Api --> Hook : execution result
+else backend fallback
+  Hook -> Utils : executeFallbackPattern(code, params)
+  Utils --> Hook : execution result
+end
+Hook --> App : execution + lastExecutedPayload
+deactivate Hook
+App -> Page : rerender result panels
+App -> Scene : render "Derniere execution"
+
+@enduml

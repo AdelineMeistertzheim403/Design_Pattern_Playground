@@ -1,0 +1,106 @@
+@startuml auth_module_class_diagram
+title Backend - Auth module class diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "config" {
+  class SecurityConfig <<Configuration>>
+}
+
+package "auth.web" {
+  class AuthController <<RestController>> {
+    +register(request)
+    +login(request)
+    +refresh(request)
+    +me(authentication)
+    +logout(authentication, request)
+  }
+  class AuthRequest <<record>>
+  class AuthResponse <<record>>
+  class AuthUserResponse <<record>>
+}
+
+package "auth.application" {
+  class AuthService <<Service>>
+  class AuthPasswordHasher <<Service>>
+  class AuthSession <<record>>
+}
+
+package "auth.security" {
+  class JwtAuthenticationFilter <<Filter>>
+  class JwtService <<Service>>
+  class AuthCookieService <<Service>>
+  class ApiAuthenticationEntryPoint <<Security>>
+  class AuthenticatedUser <<record>>
+}
+
+package "auth.domain" {
+  class UserAccount <<Entity>>
+  class RefreshTokenSession <<Entity>>
+  interface UserAccountRepository <<Repository>>
+  interface RefreshTokenSessionRepository <<Repository>>
+}
+
+package "common.exception" {
+  class AuthenticationFailedException
+  class UsernameAlreadyExistsException
+}
+
+SecurityConfig ..> JwtAuthenticationFilter
+SecurityConfig ..> ApiAuthenticationEntryPoint
+
+AuthController --> AuthService
+AuthController --> AuthCookieService
+AuthController --> AuthRequest
+AuthController --> AuthResponse
+AuthController --> AuthUserResponse
+
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> AuthCookieService
+JwtService --> AuthenticatedUser
+
+AuthService --> UserAccountRepository
+AuthService --> RefreshTokenSessionRepository
+AuthService --> AuthPasswordHasher
+AuthService --> JwtService
+AuthService --> AuthSession
+AuthService --> AuthUserResponse
+
+UserAccountRepository ..> UserAccount
+RefreshTokenSessionRepository ..> RefreshTokenSession
+RefreshTokenSession --> UserAccount
+AuthSession *-- AuthUserResponse
+AuthResponse *-- AuthUserResponse
+
+AuthService ..> AuthenticationFailedException
+AuthService ..> UsernameAlreadyExistsException
+JwtService ..> AuthenticationFailedException
+JwtAuthenticationFilter ..> AuthenticationFailedException
+
+note right of JwtService
+Genere et verifie les JWT access tokens.
+Claims utilises :
+- sub = username
+- uid = user id
+- iat / exp
+end note
+
+note right of AuthCookieService
+Gere deux cookies HttpOnly :
+- access token, path /api
+- refresh token, path /api/auth
+end note
+
+note bottom of AuthService
+Le refresh token est persiste en base.
+Chaque refresh invalide l ancien token
+et emet un nouveau couple access + refresh.
+end note
+
+@enduml

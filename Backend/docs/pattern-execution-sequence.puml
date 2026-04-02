@@ -1,0 +1,58 @@
+@startuml pattern_execution_sequence
+title Backend - Pattern execution sequence
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor Client
+participant "PatternController" as Controller
+participant "PatternService" as Service
+participant "PatternRegistry" as Registry
+participant "DesignPatternDemo\n(concrete bean)" as Demo
+participant "PatternExecutionRequest" as Request
+participant "Domain objects\n(pattern-specific)" as Domain
+
+Client -> Controller : POST /api/patterns/execute\nPatternExecutionRequest
+activate Controller
+
+Controller -> Request : validate @RequestBody
+Controller -> Service : execute(request)
+activate Service
+
+Service -> Registry : getByCode(request.patternCode)
+activate Registry
+Registry --> Service : DesignPatternDemo
+deactivate Registry
+
+Service -> Demo : execute(request)
+activate Demo
+
+Demo -> Demo : parse / validate parameters
+Demo -> Domain : instantiate context / collaborators
+activate Domain
+Domain --> Demo : computed behavior
+deactivate Domain
+
+Demo -> Demo : build logs + output + visualization
+Demo --> Service : PatternExecutionResult
+deactivate Demo
+
+Service --> Controller : PatternExecutionResult
+deactivate Service
+
+Controller --> Client : 200 OK + JSON result
+deactivate Controller
+
+note right of Demo
+Le bean concret varie selon patternCode :
+- StrategyPatternDemo
+- FactoryPatternDemo
+- ObserverPatternDemo
+- SingletonPatternDemo
+- FlyweightPatternDemo
+- StatePatternDemo
+end note
+
+@enduml

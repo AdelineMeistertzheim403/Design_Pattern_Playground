@@ -1,0 +1,120 @@
+@startuml sequence_quiz_submission_end_to_end
+title Design Pattern Playground - End-to-end quiz submission
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor User
+participant "Frontend\nPatternPage" as PatternPage
+participant "Frontend\nApp/usePlaygroundApp" as AppShell
+participant "Frontend\nPatternQuizPage" as QuizPage
+participant "Frontend\nusePatternQuiz" as UseQuiz
+participant "Frontend\nusePatternQuizProgress" as UseProgress
+participant "Frontend\napi.js" as FrontApi
+participant "Backend\nPatternController" as PatternController
+participant "Backend\nPatternQuizService" as QuizService
+participant "Backend\nPatternQuizProgressService" as ProgressService
+participant "Backend\nPatternQuizRegistry" as QuizRegistry
+participant "Backend\nUserAccountRepository" as UserRepo
+participant "Backend\nUserQuizProgressRepository" as ProgressRepo
+database "PostgreSQL" as DB
+
+== Open the quiz ==
+
+User -> PatternPage : click "Ouvrir le quiz"
+PatternPage -> AppShell : navigate(/patterns/{code}/quiz)
+AppShell --> QuizPage : render selectedPattern
+
+== Load quiz and current progress ==
+
+QuizPage -> UseQuiz : load quiz
+activate UseQuiz
+UseQuiz -> FrontApi : GET /api/patterns/{code}/quiz
+FrontApi -> PatternController : getQuiz(code)
+PatternController -> QuizService : getQuiz(code)
+QuizService -> QuizRegistry : getByPatternCode(code)
+QuizRegistry --> QuizService : PatternQuizProvider
+QuizService --> PatternController : PatternQuiz
+PatternController --> FrontApi : 200 quiz JSON
+FrontApi --> UseQuiz : quiz payload
+UseQuiz --> QuizPage : normalized quiz
+deactivate UseQuiz
+
+QuizPage -> UseProgress : load progress
+activate UseProgress
+UseProgress -> FrontApi : GET /api/patterns/{code}/quiz/progress
+FrontApi -> PatternController : getQuizProgress(code, auth)
+PatternController -> ProgressService : getProgress(code, authenticatedUser)
+ProgressService -> QuizService : getQuiz(code)
+ProgressService -> ProgressRepo : findByUser_IdAndPatternCodeIgnoreCase(...)
+ProgressRepo --> ProgressService : progress or empty
+ProgressRepo -> DB : SELECT user_quiz_progress
+DB --> ProgressRepo : row(s)
+ProgressService --> PatternController : QuizProgressResponse
+PatternController --> FrontApi : 200 progress JSON
+FrontApi --> UseProgress : progress payload
+UseProgress --> QuizPage : current progress
+deactivate UseProgress
+
+== Answer locally ==
+
+loop for each question
+  User -> QuizPage : answer question
+  QuizPage -> QuizPage : evaluateQuestion(...)\nvia quizUtils
+  QuizPage -> QuizPage : store completedQuestions
+end
+
+== Submit all answers ==
+
+QuizPage -> FrontApi : POST /api/patterns/{code}/quiz/submissions\nanswers[]
+FrontApi -> PatternController : submitQuiz(code, request, auth)
+PatternController -> ProgressService : submit(code, user, request)
+activate ProgressService
+
+ProgressService -> QuizService : getQuiz(code)
+QuizService -> QuizRegistry : getByPatternCode(code)
+QuizRegistry --> QuizService : PatternQuizProvider
+QuizService --> ProgressService : enriched PatternQuiz
+
+ProgressService -> UserRepo : getReferenceById(userId)
+UserRepo -> DB : SELECT user_accounts
+DB --> UserRepo : UserAccount
+
+ProgressService -> ProgressRepo : findByUser_IdAndPatternCodeIgnoreCase(...)
+ProgressRepo -> DB : SELECT user_quiz_progress
+DB --> ProgressRepo : existing row or none
+
+ProgressService -> ProgressService : evaluateQuestion(...) for each question
+ProgressService -> ProgressService : compute correctAnswers\ncorrectPercent\nearnedPoints\nbadgeUnlocked
+
+ProgressService -> ProgressRepo : save(progress)
+ProgressRepo -> DB : INSERT or UPDATE user_quiz_progress
+DB --> ProgressRepo : persisted progress
+ProgressRepo --> ProgressService : UserQuizProgress
+
+ProgressService --> PatternController : QuizSubmissionResult
+deactivate ProgressService
+PatternController --> FrontApi : 200 result JSON
+FrontApi --> QuizPage : submissionResult + progress
+
+== Render feedback ==
+
+QuizPage -> QuizPage : setSubmissionResult(result)
+QuizPage -> QuizPage : setProgress(result.progress)
+QuizPage --> User : show score, badge,\ncorrection, persisted progression
+
+note right of QuizPage
+L evaluation immediate question par question
+est faite localement dans le frontend.
+Le score persistant final est recalculé
+et autoritativement enregistré côté backend.
+end note
+
+note right of ProgressRepo
+Le badge est validé si le pourcentage
+de bonnes réponses atteint le seuil métier.
+end note
+
+@enduml

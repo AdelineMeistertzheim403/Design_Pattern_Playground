@@ -1,0 +1,94 @@
+@startuml auth_jwt_refresh_sequence
+title Backend - JWT + refresh token sequence
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor Browser
+participant "AuthController" as AuthController
+participant "AuthService" as AuthService
+participant "UserAccountRepository" as UserRepo
+participant "RefreshTokenSessionRepository" as RefreshRepo
+participant "AuthPasswordHasher" as Hasher
+participant "JwtService" as JwtService
+participant "AuthCookieService" as CookieService
+participant "JwtAuthenticationFilter" as JwtFilter
+participant "PatternController\n(or protected API)" as ProtectedApi
+
+== Login ==
+
+Browser -> AuthController : POST /api/auth/login\nusername + password
+activate AuthController
+AuthController -> AuthService : login(username, password)
+activate AuthService
+AuthService -> UserRepo : findByUsernameIgnoreCase(username)
+UserRepo --> AuthService : UserAccount
+AuthService -> Hasher : matches(password, salt, hash)
+Hasher --> AuthService : true
+AuthService -> RefreshRepo : deleteByExpiresAtBefore(now)
+AuthService -> JwtService : generateToken(user)
+JwtService --> AuthService : accessToken
+AuthService -> RefreshRepo : save(new RefreshTokenSession)
+RefreshRepo --> AuthService : refreshTokenSession
+AuthService --> AuthController : AuthSession(access, refresh, user)
+deactivate AuthService
+AuthController -> CookieService : addAuthenticationCookies(headers, access, refresh)
+AuthController --> Browser : 200 OK + Set-Cookie(access)\n+ Set-Cookie(refresh)
+deactivate AuthController
+
+== Access protected API ==
+
+Browser -> JwtFilter : GET /api/patterns/strategy/quiz\nCookie: access_token
+activate JwtFilter
+JwtFilter -> CookieService : extractAccessToken(request)
+CookieService --> JwtFilter : accessToken
+JwtFilter -> JwtService : parseToken(accessToken)
+JwtService --> JwtFilter : AuthenticatedUser
+JwtFilter --> ProtectedApi : SecurityContext authenticated
+deactivate JwtFilter
+
+ProtectedApi --> Browser : 200 OK
+
+== Refresh ==
+
+Browser -> AuthController : POST /api/auth/refresh\nCookie: refresh_token
+activate AuthController
+AuthController -> CookieService : extractRefreshToken(request)
+CookieService --> AuthController : refreshToken
+AuthController -> AuthService : refresh(refreshToken)
+activate AuthService
+AuthService -> RefreshRepo : findByToken(refreshToken)
+RefreshRepo --> AuthService : RefreshTokenSession
+AuthService -> RefreshRepo : deleteByToken(oldToken)
+AuthService -> JwtService : generateToken(user)
+JwtService --> AuthService : newAccessToken
+AuthService -> RefreshRepo : save(new RefreshTokenSession)
+RefreshRepo --> AuthService : newRefreshTokenSession
+AuthService --> AuthController : AuthSession(newAccess, newRefresh, user)
+deactivate AuthService
+AuthController -> CookieService : addAuthenticationCookies(headers, newAccess, newRefresh)
+AuthController --> Browser : 200 OK + rotated cookies
+deactivate AuthController
+
+== Logout ==
+
+Browser -> AuthController : POST /api/auth/logout
+activate AuthController
+AuthController -> CookieService : extractRefreshToken(request)
+AuthController -> AuthService : logout(authenticatedUser, refreshToken)
+activate AuthService
+AuthService -> RefreshRepo : deleteByToken(...) or deleteByUser_Id(...)
+AuthService --> AuthController : void
+deactivate AuthService
+AuthController -> CookieService : clearAuthenticationCookies(headers)
+AuthController --> Browser : 204 No Content + expired cookies
+deactivate AuthController
+
+note right of RefreshRepo
+Le refresh token est persiste en base,
+contrairement a l access token JWT qui reste stateless.
+end note
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml visualization_module_diagram
+title Frontend - Visualization module diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "Page composition" {
+  class PatternPage
+  class CollapsiblePanel
+}
+
+package "Visualization components" {
+  class ExecutionScene
+  class UmlDiagram
+  class VisualizationModal
+  class ZoomableViewport
+}
+
+package "Static content" {
+  class patternLearningContent
+  class patternUmlDiagrams
+}
+
+package "Utility layer" {
+  class playgroundUtils <<utils>>
+}
+
+PatternPage --> CollapsiblePanel
+PatternPage --> ExecutionScene
+PatternPage --> UmlDiagram
+PatternPage --> playgroundUtils
+PatternPage --> patternLearningContent
+PatternPage --> patternUmlDiagrams
+
+VisualizationModal --> ExecutionScene
+VisualizationModal --> UmlDiagram
+ExecutionScene --> ZoomableViewport
+UmlDiagram --> ZoomableViewport
+
+note right of ExecutionScene
+Rendu runtime du pattern :
+- scene SVG
+- variations par pattern
+- mode compact / modal
+- apercu live vs derniere execution
+end note
+
+note right of UmlDiagram
+Rendu structurel :
+- layout par pattern
+- couleurs semantiques
+- zoom / pan
+- modal grand format
+end note
+
+@enduml

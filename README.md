@@ -6,6 +6,16 @@ Ce depot contient un backend Spring Boot et un frontend React pour simuler et vi
 
 - `Backend/` : API Spring Boot 4 avec un registre de patterns, des schemas dynamiques, une authentification JWT via cookies `HttpOnly` et une persistance PostgreSQL.
 - `Frontend/` : application React 19 + Vite + Tailwind qui consomme l API et degrade en mode local si le backend est indisponible.
+- `docs/` : diagrammes PlantUML transverses au produit complet.
+
+## Documentation Et Diagrammes
+
+La documentation PlantUML est répartie en trois niveaux :
+
+- [docs/README.md](./docs/README.md) : vision système globale et boucle pédagogique
+- [docs/README.md](./docs/README.md) : vision système globale, boucle pédagogique et déploiement
+- [Backend/docs/README.md](./Backend/docs/README.md) : architecture backend, modules et séquences
+- [Frontend/docs/README.md](./Frontend/docs/README.md) : architecture frontend, navigation, quiz et visualisation
 
 ## Prerequis
 

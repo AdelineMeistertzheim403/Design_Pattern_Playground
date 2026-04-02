@@ -1,0 +1,68 @@
+@startuml usecase_platform_overview
+left to right direction
+title Frontend - Use case overview
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Visiteur" as Visitor
+actor "Utilisateur connecte" as Member
+
+rectangle "Design Pattern Playground" {
+  usecase "Consulter la page\nd accueil" as UC_HOME
+  usecase "Rechercher un\npattern" as UC_SEARCH
+  usecase "Consulter le catalogue\ndes patterns" as UC_CATALOG
+  usecase "Ouvrir la page\nd un pattern" as UC_PATTERN
+  usecase "Configurer une demo" as UC_CONFIGURE
+  usecase "Executer une simulation" as UC_EXECUTE
+  usecase "Consulter la scene SVG" as UC_SCENE
+  usecase "Consulter le diagramme UML" as UC_UML
+  usecase "Ouvrir une visualisation\nen grand format" as UC_MODAL
+  usecase "Lire les explications\npedagogiques" as UC_LEARN
+  usecase "Creer un compte" as UC_REGISTER
+  usecase "Se connecter" as UC_LOGIN
+  usecase "Passer le quiz\nd un pattern" as UC_QUIZ
+  usecase "Consulter sa progression" as UC_PROGRESS
+  usecase "Se deconnecter" as UC_LOGOUT
+}
+
+Visitor --> UC_HOME
+Visitor --> UC_SEARCH
+Visitor --> UC_CATALOG
+Visitor --> UC_PATTERN
+Visitor --> UC_CONFIGURE
+Visitor --> UC_EXECUTE
+Visitor --> UC_SCENE
+Visitor --> UC_UML
+Visitor --> UC_LEARN
+Visitor --> UC_REGISTER
+Visitor --> UC_LOGIN
+
+Member --|> Visitor
+Member --> UC_QUIZ
+Member --> UC_PROGRESS
+Member --> UC_LOGOUT
+
+UC_PATTERN .> UC_CONFIGURE : <<include>>
+UC_PATTERN .> UC_SCENE : <<include>>
+UC_PATTERN .> UC_UML : <<include>>
+UC_PATTERN .> UC_LEARN : <<include>>
+
+UC_SCENE .> UC_MODAL : <<extend>>
+UC_UML .> UC_MODAL : <<extend>>
+
+UC_QUIZ .> UC_PATTERN : <<extend>>
+UC_PROGRESS .> UC_QUIZ : <<extend>>
+
+note bottom of UC_QUIZ
+Accessible uniquement
+apres authentification.
+end note
+
+note bottom of UC_EXECUTE
+Le frontend peut executer
+via backend ou fallback local.
+end note
+
+@enduml
