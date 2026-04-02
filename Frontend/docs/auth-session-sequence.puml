@@ -1,0 +1,81 @@
+@startuml auth_session_sequence
+title Frontend - Auth and session sequence
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor User
+participant App
+participant "SiteHeader / PatternPage" as Trigger
+participant "AuthDialog" as Dialog
+participant "usePlaygroundApp" as Hook
+participant "api" as Api
+database "Backend\n(cookie-based auth)" as Backend
+collections "localStorage" as Storage
+
+== Open auth modal ==
+
+User -> Trigger : click Connexion / Inscription
+Trigger -> Hook : openAuth(mode)
+Hook --> App : isAuthOpen = true
+App -> Dialog : render modal
+
+== Login or register ==
+
+User -> Dialog : submit credentials
+Dialog -> Hook : handleAuthSubmit(event)
+activate Hook
+Hook -> Api : loginUser(payload)\nor registerUser(payload)
+Api -> Backend : POST /api/auth/login or /register
+Backend --> Api : AuthResponse + Set-Cookie
+Api --> Hook : response.user
+Hook -> Storage : persistSession(user)
+Hook --> App : currentUser updated\nisAuthOpen = false
+deactivate Hook
+
+== Session restore on startup ==
+
+App -> Hook : initial mount
+activate Hook
+Hook -> Storage : loadPersistedUser()
+Storage --> Hook : cached user or null
+alt backend connected
+  Hook -> Api : getCurrentUser()
+  alt access cookie still valid
+    Api -> Backend : GET /api/auth/me
+    Backend --> Api : current user
+    Api --> Hook : user
+  else access expired
+    Hook -> Api : refreshUserSession()
+    Api -> Backend : POST /api/auth/refresh
+    Backend --> Api : AuthResponse + rotated cookies
+    Api --> Hook : response.user
+  end
+  Hook -> Storage : persistSession(user)
+else backend fallback
+  Hook -> Hook : keep local UI session only
+end
+Hook --> App : currentUser settled
+deactivate Hook
+
+== Logout ==
+
+User -> Trigger : click Deconnexion
+Trigger -> Hook : handleLogout()
+activate Hook
+Hook -> Api : logoutUser()
+Api -> Backend : POST /api/auth/logout
+Backend --> Api : 204 + clear cookies
+Hook -> Storage : clearPersistedSession()
+Hook --> App : currentUser = null
+deactivate Hook
+
+note right of Hook
+Le frontend ne manipule jamais
+les cookies HttpOnly directement.
+Il s appuie sur fetch + credentials: include.
+end note
+
+@enduml

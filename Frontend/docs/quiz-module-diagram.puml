@@ -1,0 +1,70 @@
+@startuml quiz_module_diagram
+title Frontend - Quiz module diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "Pages" {
+  class PatternQuizPage
+  class QuizDashboardPage
+}
+
+package "Hooks" {
+  class usePatternQuiz <<hook>>
+  class usePatternQuizProgress <<hook>>
+  class useQuizDashboard <<hook>>
+}
+
+package "Quiz logic" {
+  class quizUtils <<utils>>
+}
+
+package "Static data" {
+  class fallbackQuizzes
+}
+
+package "HTTP client" {
+  class api <<http client>>
+}
+
+package "Shared components" {
+  class CollapsiblePanel
+}
+
+PatternQuizPage --> usePatternQuiz
+PatternQuizPage --> usePatternQuizProgress
+PatternQuizPage --> api
+PatternQuizPage --> quizUtils
+PatternQuizPage --> CollapsiblePanel
+
+QuizDashboardPage --> useQuizDashboard
+
+usePatternQuiz --> api
+usePatternQuiz --> fallbackQuizzes
+usePatternQuiz --> quizUtils
+usePatternQuizProgress --> api
+useQuizDashboard --> api
+
+quizUtils ..> fallbackQuizzes
+
+note bottom of PatternQuizPage
+La page quiz gere :
+- chargement du quiz
+- etat des reponses
+- evaluation locale question par question
+- soumission finale au backend
+- affichage du score et de la progression
+end note
+
+note bottom of usePatternQuiz
+Le frontend degrade proprement :
+quiz backend si disponible,
+sinon fallback local normalise.
+end note
+
+@enduml

@@ -1,0 +1,83 @@
+@startuml app_shell_module_diagram
+title Frontend - App shell and routing module
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+package "Entry" {
+  class main.jsx
+  class App
+}
+
+package "Shell components" {
+  class SiteHeader
+  class AuthDialog
+  class VisualizationModal
+}
+
+package "Pages" {
+  class HomePage
+  class PatternPage
+  class PatternQuizPage
+  class QuizDashboardPage
+  class NotFoundPage
+}
+
+package "Hooks" {
+  class usePlaygroundApp <<hook>>
+}
+
+package "Utils" {
+  class playgroundUtils <<utils>>
+  class playgroundConstants <<constants>>
+}
+
+package "Data sources" {
+  class api <<http client>>
+  class fallbackPatterns
+  class patternLearningContent
+  class patternUmlDiagrams
+}
+
+main.jsx --> App
+App --> usePlaygroundApp
+App --> SiteHeader
+App --> AuthDialog
+App --> VisualizationModal
+
+App --> HomePage
+App --> PatternPage
+App --> PatternQuizPage
+App --> QuizDashboardPage
+App --> NotFoundPage
+
+usePlaygroundApp --> api
+usePlaygroundApp --> playgroundUtils
+usePlaygroundApp --> playgroundConstants
+usePlaygroundApp --> fallbackPatterns
+usePlaygroundApp --> patternLearningContent
+usePlaygroundApp --> patternUmlDiagrams
+
+playgroundUtils ..> fallbackPatterns
+
+note bottom of App
+Le composant App reste leger :
+il selectionne la page a afficher
+selon la route normalisee et transmet
+les callbacks issus de usePlaygroundApp.
+end note
+
+note bottom of playgroundUtils
+Le routing est gere sans react-router.
+La navigation repose sur :
+- parseRoute()
+- history.pushState()
+- popstate listener
+end note
+
+@enduml

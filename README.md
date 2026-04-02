@@ -6,6 +6,16 @@ Ce depot contient un backend Spring Boot et un frontend React pour simuler et vi
 
 - `Backend/` : API Spring Boot 4 avec un registre de patterns, des schemas dynamiques, une authentification JWT via cookies `HttpOnly` et une persistance PostgreSQL.
 - `Frontend/` : application React 19 + Vite + Tailwind qui consomme l API et degrade en mode local si le backend est indisponible.
+- `docs/` : diagrammes PlantUML transverses au produit complet.
+
+## Documentation Et Diagrammes
+
+La documentation PlantUML est répartie en trois niveaux :
+
+- [docs/README.md](./docs/README.md) : vision système globale et boucle pédagogique
+- [docs/README.md](./docs/README.md) : vision système globale, boucle pédagogique et déploiement
+- [Backend/docs/README.md](./Backend/docs/README.md) : architecture backend, modules et séquences
+- [Frontend/docs/README.md](./Frontend/docs/README.md) : architecture frontend, navigation, quiz et visualisation
 
 ## Prerequis
 
@@ -72,10 +82,11 @@ Le frontend Vite passe par le proxy `/api`, ce qui permet d utiliser les cookies
 
 ## Docker Prod
 
-Le compose de prod n expose pas de ports. Il publie les services via Traefik avec un routage sur le meme host :
+Le compose de prod n expose pas de ports publiquement. Il publie les services applicatifs via Traefik avec un routage sur le meme host :
 
 - frontend sur `/`
 - backend sur `/api`
+- `adminer` uniquement sur `127.0.0.1` du VPS pour un acces via tunnel SSH
 
 Preparation :
 
@@ -96,9 +107,34 @@ Prerequis prod :
 - une valeur `APP_HOST` definie dans `.env`
 - une registry privee disponible via `REGISTRY_HOST`
 - des variables PostgreSQL definies dans `.env`
+- une valeur `ADMINER_HOST_PORT` si tu veux changer le port local VPS utilise par `adminer`
 - un `APP_JWT_SECRET` fort dans `.env`
 - si vous voulez appeler une API sur une autre origine, renseigner `VITE_API_URL` lors du build GitHub Actions
 - si le frontend et l API ne sont plus servis sur la meme origine, adaptez `APP_COOKIE_SAME_SITE` et `APP_COOKIE_SECURE`
+
+### Acces Adminer via tunnel SSH
+
+Le service `adminer` de prod n est pas expose sur Internet. Il ecoute uniquement sur `127.0.0.1:${ADMINER_HOST_PORT:-18080}` du VPS.
+
+Depuis ta machine locale :
+
+```bash
+ssh -L 18080:127.0.0.1:18080 debian@ton-vps
+```
+
+Puis ouvre :
+
+```text
+http://localhost:18080
+```
+
+Champs a utiliser dans Adminer :
+
+- `System` : `PostgreSQL`
+- `Server` : `postgres`
+- `Username` : valeur de `POSTGRES_USER`
+- `Password` : valeur de `POSTGRES_PASSWORD`
+- `Database` : valeur de `POSTGRES_DB`
 
 ## Registry Privee Sur Le VPS
 
@@ -127,6 +163,7 @@ TRAEFIK_CERTRESOLVER=letsencrypt
 POSTGRES_DB=design_pattern_playground
 POSTGRES_USER=design_pattern_playground
 POSTGRES_PASSWORD=change-me
+ADMINER_HOST_PORT=18080
 APP_JWT_SECRET=change-me-with-a-long-random-secret
 APP_COOKIE_SECURE=true
 APP_COOKIE_SAME_SITE=Lax
@@ -257,9 +294,15 @@ npm run build
 - `strategy` : choix dynamique d une strategie de paiement avec logs et visualisation simple.
 - `factory` : creation dynamique d un vehicule via une fabrique avec schema genere par le backend.
 - `observer` : propagation d un evenement a plusieurs abonnes avec logs de souscription et notifications.
+- `singleton` : comparaison avec / sans instance unique partagee entre plusieurs clients.
+- `state` : machine a etats interactive avec timeline, transitions et scene SVG dediee.
+- `flyweight` : simulation memoire avec mutualisation d instances et comparaison live.
+- `decorator` : empilement de power-ups sur un composant de base avec stats cumulees et pile de wrappers.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
+- quiz proteges par authentification avec progression persistee, score pondere et badges
+- page dediee de progression utilisateur accessible depuis la navbar
 - authentification utilisateur avec inscription et connexion
 - session geree par cookies `HttpOnly` avec access token court et refresh token rotatif
 - persistance des comptes et sessions de refresh dans PostgreSQL
@@ -302,6 +345,6 @@ Exemple `factory` :
 
 ## Suite logique
 
-- Ajouter `observer`, `singleton` puis `builder`.
-- Remplacer la visualisation cartes/liens par un rendu SVG ou canvas.
+- Ajouter `builder`, `command` et d autres patterns tres visuels comme `adapter` ou `command`.
+- Continuer a enrichir les scenes SVG et les quiz par pattern.
 - Ajouter un mode apprentissage et un mode developpeur avec code Java genere.

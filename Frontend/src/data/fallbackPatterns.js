@@ -24,6 +24,14 @@ export const fallbackPatterns = [
     complexityLevel: 'ADVANCED',
   },
   {
+    code: 'decorator',
+    name: 'Decorator',
+    type: 'STRUCTURAL',
+    description: "Ajoute des comportements a un objet en l enveloppant avec des couches successives, sans modifier sa classe d origine.",
+    useCase: "Empiler des power-ups sur un personnage, enrichir un cafe customisable ou combiner des effets sans explosion de classes.",
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'factory',
     name: 'Factory Method',
     type: 'CREATIONAL',
@@ -150,6 +158,34 @@ const fallbackSchemas = {
       },
     ],
   },
+  decorator: {
+    fields: [
+      {
+        name: 'characterName',
+        label: 'Nom du personnage',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Ember Knight',
+      },
+      {
+        name: 'baseType',
+        label: 'Archetype de base',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WARRIOR', 'MAGE', 'ROGUE'],
+        defaultValue: 'WARRIOR',
+      },
+      {
+        name: 'decorators',
+        label: 'Decorators',
+        type: 'LIST',
+        required: true,
+        allowedValues: ['FIRE', 'SHIELD', 'SPEED', 'ICE'],
+        defaultValue: 'FIRE, SHIELD',
+      },
+    ],
+  },
   factory: {
     fields: [
       {
@@ -233,6 +269,54 @@ const flyweightProfiles = {
   },
 }
 
+const decoratorBaseProfiles = {
+  WARRIOR: {
+    code: 'WARRIOR',
+    label: 'Guardian Knight',
+    description: 'Profil stable avec un bon socle defensif.',
+    stats: { attack: 10, defense: 8, speed: 4, control: 2 },
+  },
+  MAGE: {
+    code: 'MAGE',
+    label: 'Arcane Weaver',
+    description: 'Profil technique qui valorise les effets elementaires.',
+    stats: { attack: 8, defense: 4, speed: 5, control: 9 },
+  },
+  ROGUE: {
+    code: 'ROGUE',
+    label: 'Shadow Runner',
+    description: 'Profil mobile et offensif pour les empilements rapides.',
+    stats: { attack: 9, defense: 5, speed: 8, control: 3 },
+  },
+}
+
+const decoratorDefinitions = {
+  FIRE: {
+    code: 'FIRE',
+    layerLabel: 'FireDecorator',
+    effect: 'Ajoute une aura offensive et des attaques enflammees.',
+    stats: { attack: 6, defense: 0, speed: 0, control: 0 },
+  },
+  SHIELD: {
+    code: 'SHIELD',
+    layerLabel: 'ShieldDecorator',
+    effect: 'Ajoute une surcouche defensive sans toucher au composant de base.',
+    stats: { attack: 0, defense: 10, speed: 0, control: 0 },
+  },
+  SPEED: {
+    code: 'SPEED',
+    layerLabel: 'SpeedDecorator',
+    effect: 'Ajoute un buff de mobilite visible immediatement dans les stats.',
+    stats: { attack: 0, defense: 0, speed: 5, control: 0 },
+  },
+  ICE: {
+    code: 'ICE',
+    layerLabel: 'IceDecorator',
+    effect: 'Ajoute du controle de zone et renforce legerement l offense et la defense.',
+    stats: { attack: 4, defense: 4, speed: 0, control: 5 },
+  },
+}
+
 function normalizeInteger(value, fallbackValue, minimum, maximum) {
   const parsed = Math.round(Number(value ?? fallbackValue))
 
@@ -264,6 +348,12 @@ function normalizeOrderedList(rawValue) {
   return (Array.isArray(rawValue) ? rawValue : `${rawValue ?? ''}`.split(','))
     .map((value) => `${value}`.trim())
     .filter(Boolean)
+}
+
+function normalizeOrderedUniqueList(rawValue) {
+  return normalizeOrderedList(rawValue)
+    .map((value) => value.toUpperCase())
+    .filter((value, index, array) => array.indexOf(value) === index)
 }
 
 const stateActionLabels = {
@@ -434,6 +524,69 @@ function buildFlyweightVisualization({
       { from: 'scene', to: 'instances', label: 'allocate' },
     ],
   }
+}
+
+function numericStat(value) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function addDecoratorStats(baseStats, bonusStats) {
+  return {
+    attack: numericStat(baseStats.attack) + numericStat(bonusStats.attack),
+    defense: numericStat(baseStats.defense) + numericStat(bonusStats.defense),
+    speed: numericStat(baseStats.speed) + numericStat(bonusStats.speed),
+    control: numericStat(baseStats.control) + numericStat(bonusStats.control),
+  }
+}
+
+function buildDecoratorVisualization(baseProfile, stack, finalStats, challengeMet) {
+  const decoratorLayers = stack.slice(1)
+  const nodes = [
+    {
+      id: 'base',
+      label: baseProfile.label,
+      type: 'component',
+      data: { detail: 'composant de base' },
+    },
+  ]
+  const edges = []
+
+  let wrappedId = 'base'
+  let outermostId = 'base'
+
+  decoratorLayers.forEach((layer, index) => {
+    const nodeId = `decorator-${index + 1}`
+    nodes.push({
+      id: nodeId,
+      label: layer.layerLabel,
+      type: 'decorator',
+      data: { detail: layer.effect },
+    })
+    edges.push({
+      from: nodeId,
+      to: wrappedId,
+      label: 'wraps',
+    })
+    wrappedId = nodeId
+    outermostId = nodeId
+  })
+
+  nodes.push({
+    id: 'result',
+    label: challengeMet ? 'Build valide' : 'Build final',
+    type: 'output',
+    data: {
+      message: `ATK ${finalStats.attack} / DEF ${finalStats.defense} / SPD ${finalStats.speed} / CTRL ${finalStats.control}`,
+    },
+  })
+  edges.push({
+    from: outermostId,
+    to: 'result',
+    label: 'render',
+  })
+
+  return { nodes, edges }
 }
 
 const fallbackExecutors = {
@@ -725,6 +878,93 @@ const fallbackExecutors = {
         useFlyweight,
         variantCount,
       }),
+    }
+  },
+  decorator: (parameters) => {
+    const characterName = `${parameters.characterName ?? ''}`.trim() || 'Ember Knight'
+    const baseType = `${parameters.baseType ?? 'WARRIOR'}`.toUpperCase()
+    const baseProfile = decoratorBaseProfiles[baseType] ?? decoratorBaseProfiles.WARRIOR
+    const decorators = normalizeOrderedUniqueList(parameters.decorators)
+
+    decorators.forEach((code) => {
+      if (!decoratorDefinitions[code]) {
+        throw new Error(`Decorator inconnu : ${code}`)
+      }
+    })
+
+    const logs = [
+      `Creation du composant de base ${characterName} sur le profil ${baseProfile.label}.`,
+      `Stats de depart : ATK ${baseProfile.stats.attack} / DEF ${baseProfile.stats.defense} / SPD ${baseProfile.stats.speed} / CTRL ${baseProfile.stats.control}.`,
+    ]
+
+    const stack = [
+      {
+        code: 'BASE',
+        layerClass: 'BaseCharacter',
+        layerLabel: baseProfile.label,
+        effect: baseProfile.description,
+        ...baseProfile.stats,
+      },
+    ]
+
+    let runningStats = { ...baseProfile.stats }
+
+    decorators.forEach((code) => {
+      const definition = decoratorDefinitions[code]
+      runningStats = addDecoratorStats(runningStats, definition.stats)
+      logs.push(`Ajout de ${definition.layerLabel} autour du composant courant.`)
+      logs.push(`Effet applique : ${definition.effect}`)
+      stack.push({
+        code: definition.code,
+        layerClass: definition.layerLabel,
+        layerLabel: definition.layerLabel,
+        effect: definition.effect,
+        ...runningStats,
+      })
+    })
+
+    const challengeGoal = 'attaque >= 20 et defense >= 10'
+    const challengeMet = runningStats.attack >= 20 && runningStats.defense >= 10
+
+    logs.push(
+      `Stats finales : ATK ${runningStats.attack} / DEF ${runningStats.defense} / SPD ${runningStats.speed} / CTRL ${runningStats.control}.`,
+    )
+    logs.push(
+      challengeMet
+        ? 'Objectif atteint : le build depasse le seuil cible.'
+        : 'Objectif non atteint : il reste de la marge pour optimiser la pile de decorators.',
+    )
+
+    return {
+      patternCode: 'decorator',
+      summary: decorators.length === 0
+        ? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
+        : "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.",
+      logs,
+      output: {
+        characterName,
+        baseType: baseProfile.code,
+        baseLabel: baseProfile.label,
+        decoratorCount: decorators.length,
+        decorators,
+        attack: runningStats.attack,
+        defense: runningStats.defense,
+        speed: runningStats.speed,
+        control: runningStats.control,
+        activeEffects: [
+          `Socle de base ${baseProfile.label}`,
+          ...decorators.map((code) => decoratorDefinitions[code].effect),
+        ],
+        challengeGoal,
+        challengeMet,
+        classExplosionExamples: [
+          `${baseProfile.label.replaceAll(' ', '')}FireShield`,
+          `${baseProfile.label.replaceAll(' ', '')}FireSpeed`,
+          `${baseProfile.label.replaceAll(' ', '')}ShieldIce`,
+        ],
+        stack,
+      },
+      visualization: buildDecoratorVisualization(baseProfile, stack, runningStats, challengeMet),
     }
   },
   factory: (parameters) => {

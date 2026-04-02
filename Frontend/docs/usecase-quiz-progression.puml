@@ -1,0 +1,51 @@
+@startuml usecase_quiz_progression
+left to right direction
+title Frontend - Use case quiz and progression
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Utilisateur connecte" as Member
+
+rectangle "Module Quiz & Progression" {
+  usecase "Ouvrir le quiz\nd un pattern" as UC_OPEN_QUIZ
+  usecase "Charger les questions" as UC_LOAD_QUIZ
+  usecase "Repondre question\npar question" as UC_ANSWER
+  usecase "Valider une question" as UC_VALIDATE_STEP
+  usecase "Soumettre le quiz" as UC_SUBMIT
+  usecase "Recevoir un score\net des points" as UC_SCORE
+  usecase "Debloquer un badge\nsi 75% minimum" as UC_BADGE
+  usecase "Consulter la correction" as UC_FEEDBACK
+  usecase "Repasser un quiz" as UC_RETAKE
+  usecase "Consulter le tableau\nde progression" as UC_DASHBOARD
+  usecase "Comparer ses scores\npar pattern" as UC_COMPARE
+}
+
+Member --> UC_OPEN_QUIZ
+Member --> UC_ANSWER
+Member --> UC_SUBMIT
+Member --> UC_RETAKE
+Member --> UC_DASHBOARD
+
+UC_OPEN_QUIZ .> UC_LOAD_QUIZ : <<include>>
+UC_ANSWER .> UC_VALIDATE_STEP : <<include>>
+UC_SUBMIT .> UC_SCORE : <<include>>
+UC_SUBMIT .> UC_FEEDBACK : <<include>>
+UC_SUBMIT .> UC_BADGE : <<extend>>
+UC_DASHBOARD .> UC_COMPARE : <<include>>
+UC_RETAKE .> UC_OPEN_QUIZ : <<include>>
+
+note right of UC_BADGE
+Condition metier :
+75% minimum de bonnes reponses.
+end note
+
+note bottom of UC_SCORE
+Le score depend :
+- des bonnes reponses
+- de la difficulte de la question
+- de la complexite du pattern
+end note
+
+@enduml

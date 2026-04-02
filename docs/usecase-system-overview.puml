@@ -1,0 +1,77 @@
+@startuml usecase_system_overview
+left to right direction
+title Design Pattern Playground - System use case overview
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Visiteur" as Visitor
+actor "Utilisateur connecte" as Member
+
+rectangle "Design Pattern Playground\n(Frontend React + Backend Spring Boot)" {
+  usecase "Explorer le catalogue\nde patterns" as UC_CATALOG
+  usecase "Consulter une fiche\npattern" as UC_PATTERN_PAGE
+  usecase "Configurer une demo" as UC_CONFIGURE
+  usecase "Executer une simulation" as UC_EXECUTE
+  usecase "Visualiser le pattern\n(scene SVG + UML)" as UC_VISUALIZE
+  usecase "Lire le contenu\npedagogique" as UC_LEARN
+  usecase "Creer un compte" as UC_REGISTER
+  usecase "Se connecter" as UC_LOGIN
+  usecase "Maintenir une session\nsecurisee" as UC_SESSION
+  usecase "Passer un quiz" as UC_QUIZ
+  usecase "Obtenir un score\npondere" as UC_SCORE
+  usecase "Debloquer un badge" as UC_BADGE
+  usecase "Suivre sa progression" as UC_PROGRESS
+  usecase "Consulter ses statistiques\npar pattern" as UC_STATS
+}
+
+database "PostgreSQL" as DB
+
+Visitor --> UC_CATALOG
+Visitor --> UC_PATTERN_PAGE
+Visitor --> UC_CONFIGURE
+Visitor --> UC_EXECUTE
+Visitor --> UC_VISUALIZE
+Visitor --> UC_LEARN
+Visitor --> UC_REGISTER
+Visitor --> UC_LOGIN
+
+Member --|> Visitor
+Member --> UC_QUIZ
+Member --> UC_PROGRESS
+
+UC_PATTERN_PAGE .> UC_CONFIGURE : <<include>>
+UC_PATTERN_PAGE .> UC_VISUALIZE : <<include>>
+UC_PATTERN_PAGE .> UC_LEARN : <<include>>
+UC_EXECUTE .> UC_PATTERN_PAGE : <<extend>>
+
+UC_LOGIN .> UC_SESSION : <<include>>
+UC_REGISTER .> UC_SESSION : <<include>>
+UC_QUIZ .> UC_SCORE : <<include>>
+UC_QUIZ .> UC_BADGE : <<extend>>
+UC_PROGRESS .> UC_STATS : <<include>>
+
+UC_SESSION --> DB : users + refresh tokens
+UC_PROGRESS --> DB : quiz progress
+UC_BADGE --> DB : persisted status
+
+note right of UC_EXECUTE
+Le backend peut executer la demo,
+mais le frontend peut aussi degrader
+sur un fallback local si l API est indisponible.
+end note
+
+note right of UC_SCORE
+Le score depend :
+- des bonnes reponses
+- de la difficulte des questions
+- de la complexite du pattern
+end note
+
+note bottom of UC_BADGE
+Badge valide si 75% minimum
+de bonnes reponses.
+end note
+
+@enduml
