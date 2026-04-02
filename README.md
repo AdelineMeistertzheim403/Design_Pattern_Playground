@@ -82,10 +82,11 @@ Le frontend Vite passe par le proxy `/api`, ce qui permet d utiliser les cookies
 
 ## Docker Prod
 
-Le compose de prod n expose pas de ports. Il publie les services via Traefik avec un routage sur le meme host :
+Le compose de prod n expose pas de ports publiquement. Il publie les services applicatifs via Traefik avec un routage sur le meme host :
 
 - frontend sur `/`
 - backend sur `/api`
+- `adminer` uniquement sur `127.0.0.1` du VPS pour un acces via tunnel SSH
 
 Preparation :
 
@@ -106,9 +107,34 @@ Prerequis prod :
 - une valeur `APP_HOST` definie dans `.env`
 - une registry privee disponible via `REGISTRY_HOST`
 - des variables PostgreSQL definies dans `.env`
+- une valeur `ADMINER_HOST_PORT` si tu veux changer le port local VPS utilise par `adminer`
 - un `APP_JWT_SECRET` fort dans `.env`
 - si vous voulez appeler une API sur une autre origine, renseigner `VITE_API_URL` lors du build GitHub Actions
 - si le frontend et l API ne sont plus servis sur la meme origine, adaptez `APP_COOKIE_SAME_SITE` et `APP_COOKIE_SECURE`
+
+### Acces Adminer via tunnel SSH
+
+Le service `adminer` de prod n est pas expose sur Internet. Il ecoute uniquement sur `127.0.0.1:${ADMINER_HOST_PORT:-18080}` du VPS.
+
+Depuis ta machine locale :
+
+```bash
+ssh -L 18080:127.0.0.1:18080 debian@ton-vps
+```
+
+Puis ouvre :
+
+```text
+http://localhost:18080
+```
+
+Champs a utiliser dans Adminer :
+
+- `System` : `PostgreSQL`
+- `Server` : `postgres`
+- `Username` : valeur de `POSTGRES_USER`
+- `Password` : valeur de `POSTGRES_PASSWORD`
+- `Database` : valeur de `POSTGRES_DB`
 
 ## Registry Privee Sur Le VPS
 
@@ -137,6 +163,7 @@ TRAEFIK_CERTRESOLVER=letsencrypt
 POSTGRES_DB=design_pattern_playground
 POSTGRES_USER=design_pattern_playground
 POSTGRES_PASSWORD=change-me
+ADMINER_HOST_PORT=18080
 APP_JWT_SECRET=change-me-with-a-long-random-secret
 APP_COOKIE_SECURE=true
 APP_COOKIE_SAME_SITE=Lax
