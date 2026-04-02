@@ -36,6 +36,8 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 
 	private static final List<String> AVAILABLE_DECORATORS = List.of("FIRE", "SHIELD", "SPEED", "ICE");
 	private static final String CHALLENGE_GOAL = "attaque >= 20 et defense >= 10";
+	private static final String WITH_DECORATOR = "WITH_DECORATOR";
+	private static final String WITHOUT_DECORATOR = "WITHOUT_DECORATOR";
 
 	@Override
 	public String getCode() {
@@ -57,6 +59,14 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 	@Override
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
+			new PatternField(
+				"mode",
+				"Mode",
+				FieldType.SELECT,
+				true,
+				List.of(WITH_DECORATOR, WITHOUT_DECORATOR),
+				WITH_DECORATOR
+			),
 			new PatternField(
 				"characterName",
 				"Nom du personnage",
@@ -87,13 +97,16 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 	@Override
 	public PatternExecutionResult execute(PatternExecutionRequest request) {
 		DecoratorConfig config = toConfig(request.parameters());
+		boolean useDecorator = WITH_DECORATOR.equals(config.mode());
 		HeroArchetype archetype = HeroArchetype.fromCode(config.baseType());
 		CharacterComponent component = new BaseCharacter(config.characterName(), archetype);
 		List<String> logs = new ArrayList<>();
 		List<Map<String, Object>> stack = new ArrayList<>();
+		List<String> activeEffects = new ArrayList<>();
 
 		logs.add("Creation du composant de base " + config.characterName() + " sur le profil " + archetype.label() + ".");
 		logs.add("Stats de depart : " + describeStats(component.stats()) + ".");
+		activeEffects.add("Socle de base " + archetype.label());
 		stack.add(toLayerMap(
 			"BASE",
 			"BaseCharacter",
@@ -102,21 +115,49 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 			component.stats()
 		));
 
-		for (String decoratorCode : config.decorators()) {
-			CharacterDecorator decorator = applyDecorator(component, decoratorCode);
-			component = decorator;
-			logs.add("Ajout de " + decorator.layerLabel() + " autour du composant courant.");
-			logs.add("Effet applique : " + decorator.effectLabel());
-			stack.add(toLayerMap(
-				decorator.code(),
-				decorator.getClass().getSimpleName(),
-				decorator.layerLabel(),
-				decorator.effectLabel(),
-				decorator.stats()
-			));
-		}
+		CharacterStats finalStats;
 
-		CharacterStats finalStats = component.stats();
+		if (useDecorator) {
+			for (String decoratorCode : config.decorators()) {
+				CharacterDecorator decorator = applyDecorator(component, decoratorCode);
+				component = decorator;
+				logs.add("Ajout de " + decorator.layerLabel() + " autour du composant courant.");
+				logs.add("Effet applique : " + decorator.effectLabel());
+				activeEffects.add(decorator.effectLabel());
+				stack.add(toLayerMap(
+					decorator.code(),
+					decorator.getClass().getSimpleName(),
+					decorator.layerLabel(),
+					decorator.effectLabel(),
+					decorator.stats()
+				));
+			}
+
+			finalStats = component.stats();
+		} else {
+			CharacterStats runningStats = archetype.baseStats();
+			logs.add("Mode sans Decorator : les effets sont regroupes dans une classe concrete specialisee.");
+
+			for (String decoratorCode : config.decorators()) {
+				String layerLabel = layerLabelFor(decoratorCode);
+				String effectLabel = effectLabelFor(decoratorCode);
+				runningStats = applyDirectBonus(runningStats, decoratorCode);
+				logs.add("Effet " + layerLabel + " integre directement dans une classe monolithique.");
+				logs.add("Variation appliquee : " + effectLabel);
+				activeEffects.add(effectLabel);
+			}
+
+			finalStats = runningStats;
+			if (!config.decorators().isEmpty()) {
+				stack.add(toLayerMap(
+					"MONOLITH",
+					archetype.label().replace(" ", "") + "Combo",
+					"Monolithic build",
+					"Toutes les variations sont codees dans une seule classe concrete.",
+					finalStats
+				));
+			}
+		}
 		boolean challengeMet = finalStats.attack() >= 20 && finalStats.defense() >= 10;
 
 		logs.add("Stats finales : " + describeStats(finalStats) + ".");
@@ -125,6 +166,8 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 			: "Objectif non atteint : il reste de la marge pour optimiser la pile de decorators.");
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
+		output.put("mode", useDecorator ? WITH_DECORATOR : WITHOUT_DECORATOR);
+		output.put("modeLabel", useDecorator ? "Avec Decorator" : "Sans Decorator");
 		output.put("characterName", config.characterName());
 		output.put("baseType", archetype.code());
 		output.put("baseLabel", archetype.label());
@@ -134,7 +177,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 		output.put("defense", finalStats.defense());
 		output.put("speed", finalStats.speed());
 		output.put("control", finalStats.control());
-		output.put("activeEffects", component.activeEffects());
+		output.put("activeEffects", activeEffects);
 		output.put("challengeGoal", CHALLENGE_GOAL);
 		output.put("challengeMet", challengeMet);
 		output.put("classExplosionExamples", classExplosionExamples(archetype));
@@ -142,9 +185,11 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 
 		return new PatternExecutionResult(
 			getCode(),
-			config.decorators().isEmpty()
-				? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
-				: "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.",
+			useDecorator
+				? (config.decorators().isEmpty()
+					? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
+					: "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.")
+				: "Sans Decorator, les memes effets doivent etre regroupes dans une classe specialisee plus rigide et moins composable.",
 			logs,
 			output,
 			buildVisualization(archetype, stack, finalStats, challengeMet)
@@ -206,6 +251,36 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 		};
 	}
 
+	private CharacterStats applyDirectBonus(CharacterStats stats, String decoratorCode) {
+		return switch (decoratorCode) {
+			case "FIRE" -> stats.add(6, 0, 0, 0);
+			case "SHIELD" -> stats.add(0, 10, 0, 0);
+			case "SPEED" -> stats.add(0, 0, 5, 0);
+			case "ICE" -> stats.add(4, 4, 0, 5);
+			default -> throw new InvalidPatternConfigurationException("Decorator inconnu : " + decoratorCode);
+		};
+	}
+
+	private String layerLabelFor(String decoratorCode) {
+		return switch (decoratorCode) {
+			case "FIRE" -> "FireDecorator";
+			case "SHIELD" -> "ShieldDecorator";
+			case "SPEED" -> "SpeedDecorator";
+			case "ICE" -> "IceDecorator";
+			default -> throw new InvalidPatternConfigurationException("Decorator inconnu : " + decoratorCode);
+		};
+	}
+
+	private String effectLabelFor(String decoratorCode) {
+		return switch (decoratorCode) {
+			case "FIRE" -> "Ajoute une aura offensive et des attaques enflammees.";
+			case "SHIELD" -> "Ajoute une surcouche defensive sans toucher au composant de base.";
+			case "SPEED" -> "Ajoute un buff de mobilite visible immediatement dans les stats.";
+			case "ICE" -> "Ajoute du controle de zone et renforce legerement l offense et la defense.";
+			default -> throw new InvalidPatternConfigurationException("Decorator inconnu : " + decoratorCode);
+		};
+	}
+
 	private Map<String, Object> toLayerMap(
 		String code,
 		String layerClass,
@@ -247,10 +322,19 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 		}
 
 		String characterName = requireText(parameters.get("characterName"), "characterName");
+		String mode = requireMode(parameters.get("mode"));
 		String baseType = requireText(parameters.get("baseType"), "baseType").toUpperCase(Locale.ROOT);
 		List<String> decorators = extractDecorators(parameters.get("decorators"));
 
-		return new DecoratorConfig(characterName, baseType, decorators);
+		return new DecoratorConfig(mode, characterName, baseType, decorators);
+	}
+
+	private String requireMode(Object value) {
+		String mode = requireText(value, "mode").toUpperCase(Locale.ROOT);
+		if (!WITH_DECORATOR.equals(mode) && !WITHOUT_DECORATOR.equals(mode)) {
+			throw new InvalidPatternConfigurationException("mode doit valoir WITH_DECORATOR ou WITHOUT_DECORATOR.");
+		}
+		return mode;
 	}
 
 	private String requireText(Object value, String fieldName) {

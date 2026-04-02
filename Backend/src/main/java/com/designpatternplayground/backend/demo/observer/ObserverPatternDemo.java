@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Component;
@@ -28,6 +30,9 @@ import com.designpatternplayground.backend.pattern.domain.VisualizationNode;
 @Component
 public class ObserverPatternDemo implements DesignPatternDemo {
 
+	private static final String WITH_OBSERVER = "WITH_OBSERVER";
+	private static final String WITHOUT_OBSERVER = "WITHOUT_OBSERVER";
+
 	@Override
 	public String getCode() {
 		return "observer";
@@ -48,6 +53,14 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 	@Override
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
+			new PatternField(
+				"mode",
+				"Mode",
+				FieldType.SELECT,
+				true,
+				List.of(WITH_OBSERVER, WITHOUT_OBSERVER),
+				WITH_OBSERVER
+			),
 			new PatternField("subjectName", "Nom du sujet", FieldType.TEXT, true, null, "ReleasePublisher"),
 			new PatternField(
 				"observers",
@@ -65,47 +78,69 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 	public PatternExecutionResult execute(PatternExecutionRequest request) {
 		ObserverConfig config = toConfig(request.parameters());
 		List<String> logs = new ArrayList<>();
+		boolean useObserver = WITH_OBSERVER.equals(config.mode());
+		String modeLabel = useObserver ? "Avec Observer" : "Sans Observer";
+		List<NotificationReceipt> deliveries;
 
-		NotificationPublisher publisher = new NotificationPublisher(config.subjectName());
-		logs.add("Creation du sujet : " + publisher.name() + ".");
+		if (useObserver) {
+			NotificationPublisher publisher = new NotificationPublisher(config.subjectName());
+			logs.add("Creation du sujet : " + publisher.name() + ".");
 
-		List<NotificationObserver> subscribers = config.observers().stream()
-			.map(SubscriberObserver::new)
-			.map(NotificationObserver.class::cast)
-			.toList();
+			List<NotificationObserver> subscribers = config.observers().stream()
+				.map(SubscriberObserver::new)
+				.map(NotificationObserver.class::cast)
+				.toList();
 
-		for (NotificationObserver observer : subscribers) {
-			publisher.subscribe(observer);
-			logs.add("Abonnement de " + observer.name() + ".");
+			for (NotificationObserver observer : subscribers) {
+				publisher.subscribe(observer);
+				logs.add("Abonnement de " + observer.name() + ".");
+			}
+
+			logs.add("Emission de l evenement : " + config.message() + ".");
+			deliveries = publisher.notifyObservers(config.message());
+			logs.add("Le sujet notifie " + deliveries.size() + " observer(s).");
+		} else {
+			logs.add("Mode sans Observer : le sujet connait explicitement toutes les cibles.");
+			logs.add("Creation du module emetteur : " + config.subjectName() + ".");
+			deliveries = config.observers().stream()
+				.map(observer -> new NotificationReceipt(
+					observer,
+					observer + " recoit la notification de " + config.subjectName() + " : " + config.message()
+				))
+				.toList();
+			logs.add("Emission de l evenement : " + config.message() + ".");
+			logs.add("Boucle manuelle sur " + deliveries.size() + " dependance(s) concretes.");
 		}
-
-		logs.add("Emission de l evenement : " + config.message() + ".");
-		List<NotificationReceipt> deliveries = publisher.notifyObservers(config.message());
-		logs.add("Le sujet notifie " + deliveries.size() + " observer(s).");
 
 		for (NotificationReceipt delivery : deliveries) {
 			logs.add(delivery.detail());
 		}
 
-		Map<String, Object> output = Map.of(
-			"subjectName", config.subjectName(),
-			"observerCount", deliveries.size(),
-			"message", config.message(),
-			"observers", config.observers(),
-			"deliveries", deliveries.stream()
-				.map(delivery -> Map.of(
-					"observer", delivery.observerName(),
-					"detail", delivery.detail()
-				))
-				.toList()
-		);
+		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
+		output.put("mode", useObserver ? WITH_OBSERVER : WITHOUT_OBSERVER);
+		output.put("modeLabel", modeLabel);
+		output.put("subjectName", config.subjectName());
+		output.put("observerCount", deliveries.size());
+		output.put("message", config.message());
+		output.put("observers", config.observers());
+		output.put("deliveries", deliveries.stream()
+			.map(delivery -> Map.of(
+				"observer", delivery.observerName(),
+				"detail", delivery.detail()
+			))
+			.toList());
 
 		List<VisualizationNode> nodes = new ArrayList<>();
 		nodes.add(new VisualizationNode("subject", config.subjectName(), "subject", Map.of("active", true)));
-		nodes.add(new VisualizationNode("event", "Evenement", "event", Map.of("message", config.message())));
+		nodes.add(new VisualizationNode(
+			"event",
+			useObserver ? "Evenement" : "Manual loop",
+			"event",
+			Map.of("message", useObserver ? config.message() : "couplage direct")
+		));
 
 		List<VisualizationEdge> edges = new ArrayList<>();
-		edges.add(new VisualizationEdge("subject", "event", "publish"));
+		edges.add(new VisualizationEdge("subject", "event", useObserver ? "publish" : "iterate"));
 
 		IntStream.range(0, deliveries.size()).forEach(index -> {
 			NotificationReceipt delivery = deliveries.get(index);
@@ -117,12 +152,14 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 				"observer",
 				Map.of("selected", true, "detail", delivery.detail())
 			));
-			edges.add(new VisualizationEdge("event", nodeId, "notify"));
+			edges.add(new VisualizationEdge("event", nodeId, useObserver ? "notify" : "call"));
 		});
 
 		return new PatternExecutionResult(
 			getCode(),
-			"Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient.",
+			useObserver
+				? "Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient."
+				: "Sans Observer, l emetteur appelle directement chaque cible concrete et augmente son couplage.",
 			logs,
 			output,
 			new VisualizationGraph(nodes, edges)
@@ -134,6 +171,7 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
 		}
 
+		String mode = normalizeMode(parameters.get("mode"));
 		String subjectName = normalizeRequiredText(parameters.get("subjectName"), "subjectName");
 		String message = normalizeRequiredText(parameters.get("message"), "message");
 		List<String> observers = extractObservers(parameters.get("observers"));
@@ -142,7 +180,15 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 			throw new InvalidPatternConfigurationException("Au moins un observer est obligatoire.");
 		}
 
-		return new ObserverConfig(subjectName, observers, message);
+		return new ObserverConfig(mode, subjectName, observers, message);
+	}
+
+	private String normalizeMode(Object value) {
+		String mode = normalizeRequiredText(value, "mode").toUpperCase(Locale.ROOT);
+		if (!WITH_OBSERVER.equals(mode) && !WITHOUT_OBSERVER.equals(mode)) {
+			throw new InvalidPatternConfigurationException("mode doit valoir WITH_OBSERVER ou WITHOUT_OBSERVER.");
+		}
+		return mode;
 	}
 
 	private String normalizeRequiredText(Object value, String fieldName) {
