@@ -1,5 +1,21 @@
 export const fallbackPatterns = [
   {
+    code: 'mediator',
+    name: 'Mediator',
+    type: 'BEHAVIORAL',
+    description: "Centralise les echanges entre plusieurs objets pour qu ils passent par un hub commun au lieu de se connaitre tous directement.",
+    useCase: "Construire un chat multijoueur ou les messages transitent par un salon central pour reduire le couplage entre participants.",
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'chain',
+    name: 'Chain of Responsibility',
+    type: 'BEHAVIORAL',
+    description: "Fait circuler une requete dans une chaine de handlers capables de la laisser passer, de la bloquer ou de la traiter.",
+    useCase: "Visualiser un pipeline auth -> validation -> traitement ou chaque maillon prend une decision locale sans gros controller central.",
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'command',
     name: 'Command',
     type: 'BEHAVIORAL',
@@ -66,6 +82,94 @@ export const fallbackPatterns = [
 ]
 
 const fallbackSchemas = {
+  mediator: {
+    fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_MEDIATOR', 'WITHOUT_MEDIATOR'],
+        defaultValue: 'WITH_MEDIATOR',
+      },
+      {
+        name: 'roomName',
+        label: 'Nom du salon',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Arena Chat',
+      },
+      {
+        name: 'participants',
+        label: 'Participants',
+        type: 'LIST',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Luna, Kiro, Nova',
+      },
+      {
+        name: 'senderName',
+        label: 'Expediteur',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Luna',
+      },
+      {
+        name: 'message',
+        label: 'Message',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Focus target center lane',
+      },
+    ],
+  },
+  chain: {
+    fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_CHAIN', 'WITHOUT_CHAIN'],
+        defaultValue: 'WITH_CHAIN',
+      },
+      {
+        name: 'requestName',
+        label: 'Nom de la requete',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Export mensuel',
+      },
+      {
+        name: 'tokenState',
+        label: 'Etat du token',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['VALID', 'EXPIRED', 'MISSING'],
+        defaultValue: 'VALID',
+      },
+      {
+        name: 'payloadState',
+        label: 'Etat du payload',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['VALID', 'INVALID'],
+        defaultValue: 'VALID',
+      },
+      {
+        name: 'processingTarget',
+        label: 'Traitement cible',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['REPORT_EXPORT', 'BULK_IMPORT', 'PASSWORD_RESET'],
+        defaultValue: 'REPORT_EXPORT',
+      },
+    ],
+  },
   command: {
     fields: [
       {
@@ -478,6 +582,172 @@ const commandActionLabels = {
   REDO: 'Redo',
 }
 
+const chainTokenStates = {
+  VALID: {
+    code: 'VALID',
+    label: 'Token valide',
+  },
+  EXPIRED: {
+    code: 'EXPIRED',
+    label: 'Token expire',
+  },
+  MISSING: {
+    code: 'MISSING',
+    label: 'Token manquant',
+  },
+}
+
+const chainPayloadStates = {
+  VALID: {
+    code: 'VALID',
+    label: 'Payload valide',
+  },
+  INVALID: {
+    code: 'INVALID',
+    label: 'Payload invalide',
+  },
+}
+
+const chainProcessingTargets = {
+  REPORT_EXPORT: {
+    code: 'REPORT_EXPORT',
+    label: 'Export de rapport',
+    handledMessage: 'Le service de reporting genere le fichier demande.',
+  },
+  BULK_IMPORT: {
+    code: 'BULK_IMPORT',
+    label: 'Import en masse',
+    handledMessage: 'Le service d import planifie le traitement des donnees.',
+  },
+  PASSWORD_RESET: {
+    code: 'PASSWORD_RESET',
+    label: 'Reinitialisation de mot de passe',
+    handledMessage: 'Le service IAM emet un jeton de reinitialisation.',
+  },
+}
+
+function normalizeMediatorParticipants(rawValue, senderName) {
+  const values = normalizeUniqueList(rawValue)
+
+  if (!values.includes(senderName)) {
+    return normalizeUniqueList([senderName, ...values])
+  }
+
+  return values
+}
+
+function createMediatorVisualization(useMediator, roomName, senderName, recipients, message) {
+  const nodes = [
+    {
+      id: 'sender',
+      label: senderName,
+      type: 'client',
+      data: { detail: 'expediteur' },
+    },
+    {
+      id: 'mediator',
+      label: useMediator ? 'ChatRoomMediator' : 'Mediator bypassed',
+      type: 'context',
+      data: { detail: roomName },
+    },
+    ...recipients.map((recipient, index) => ({
+      id: `recipient-${index}`,
+      label: recipient,
+      type: 'observer',
+      data: { detail: 'colleague' },
+    })),
+    {
+      id: 'result',
+      label: 'Deliveries',
+      type: 'output',
+      data: { message },
+    },
+  ]
+
+  const edges = useMediator
+    ? [
+      { from: 'sender', to: 'mediator', label: 'send' },
+      ...recipients.map((_, index) => ({ from: 'mediator', to: `recipient-${index}`, label: 'relay' })),
+      { from: 'mediator', to: 'result', label: 'summary' },
+    ]
+    : [
+      ...recipients.map((_, index) => ({ from: 'sender', to: `recipient-${index}`, label: 'direct' })),
+      { from: 'sender', to: 'result', label: 'summary' },
+    ]
+
+  return { nodes, edges }
+}
+
+function createChainStep(index, handlerCode, handlerLabel, status, passed, detail) {
+  return {
+    index,
+    handlerCode,
+    handlerLabel,
+    status,
+    passed,
+    detail,
+  }
+}
+
+function buildChainVisualization(useChain, requestName, tokenLabel, payloadLabel, processingLabel, steps, accepted) {
+  const activeHandler = steps[steps.length - 1]?.handlerCode ?? 'AUTH'
+
+  return {
+    nodes: [
+      {
+        id: 'request',
+        label: requestName,
+        type: 'client',
+        data: { detail: processingLabel },
+      },
+      {
+        id: 'controller',
+        label: useChain ? 'Handler chain' : 'RequestController',
+        type: 'context',
+        data: { detail: useChain ? 'maillons relies' : 'if / else centralises' },
+      },
+      {
+        id: 'auth',
+        label: useChain ? 'AuthenticationHandler' : 'Auth check',
+        type: 'decorator',
+        data: { detail: tokenLabel, active: activeHandler === 'AUTH' },
+      },
+      {
+        id: 'validation',
+        label: useChain ? 'ValidationHandler' : 'Validation check',
+        type: 'decorator',
+        data: { detail: payloadLabel, active: activeHandler === 'VALIDATION' },
+      },
+      {
+        id: 'processing',
+        label: useChain ? 'ProcessingHandler' : 'Processing branch',
+        type: 'component',
+        data: { detail: processingLabel, active: activeHandler === 'PROCESSING' },
+      },
+      {
+        id: 'result',
+        label: accepted ? 'Requete acceptee' : 'Requete rejetee',
+        type: 'output',
+        data: { message: steps[steps.length - 1]?.detail ?? '' },
+      },
+    ],
+    edges: useChain
+      ? [
+        { from: 'request', to: 'auth', label: 'enter' },
+        { from: 'auth', to: 'validation', label: 'pass' },
+        { from: 'validation', to: 'processing', label: 'pass' },
+        { from: 'processing', to: 'result', label: accepted ? 'handle' : 'stop' },
+      ]
+      : [
+        { from: 'request', to: 'controller', label: 'dispatch' },
+        { from: 'controller', to: 'auth', label: 'check' },
+        { from: 'controller', to: 'validation', label: 'check' },
+        { from: 'controller', to: 'processing', label: 'branch' },
+        { from: 'processing', to: 'result', label: accepted ? 'handle' : 'stop' },
+      ],
+  }
+}
+
 function createCommandBoard(boardName, actorName, gridSize = 5) {
   return {
     boardName,
@@ -849,6 +1119,243 @@ function buildDecoratorVisualization(baseProfile, stack, finalStats, challengeMe
 }
 
 const fallbackExecutors = {
+  mediator: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_MEDIATOR'}`.trim().toUpperCase()
+    const useMediator = mode !== 'WITHOUT_MEDIATOR'
+    const roomName = `${parameters.roomName ?? ''}`.trim() || 'Arena Chat'
+    const senderName = `${parameters.senderName ?? ''}`.trim() || 'Luna'
+    const participants = normalizeMediatorParticipants(parameters.participants, senderName)
+    const message = `${parameters.message ?? ''}`.trim() || 'Focus target center lane'
+
+    if (participants.length < 3) {
+      throw new Error('Au moins trois participants sont requis pour la demo Mediator.')
+    }
+
+    const recipients = participants.filter((participant) => participant !== senderName)
+    const deliveries = recipients.map((recipient, index) => ({
+      index: index + 1,
+      from: senderName,
+      to: recipient,
+      via: useMediator ? roomName : 'direct link',
+      transport: useMediator ? 'MEDIATED' : 'DIRECT',
+      detail: `${recipient} recoit "${message}" depuis ${senderName} via ${useMediator ? roomName : 'direct link'}.`,
+    }))
+    const logs = useMediator
+      ? [
+        `Creation du ChatRoomMediator ${roomName}.`,
+        `Enregistrement des participants dans le mediator : ${participants.join(', ')}.`,
+        `${senderName} envoie son message au hub central.`,
+        ...deliveries.map((delivery) => `${roomName} transmet le message a ${delivery.to}.`),
+      ]
+      : [
+        `Mode sans Mediator : ${senderName} connait directement tous les autres joueurs.`,
+        ...deliveries.map((delivery) => `${senderName} envoie directement un message a ${delivery.to}.`),
+      ]
+
+    return {
+      patternCode: 'mediator',
+      summary: useMediator
+        ? 'Mediator centralise les conversations dans un hub unique. Les participants ne dependent plus directement les uns des autres.'
+        : 'Sans Mediator, l expediteur connait chaque destinataire et multiplie les liens directs entre objets du chat.',
+      logs,
+      output: {
+        mode,
+        modeLabel: useMediator ? 'Avec Mediator' : 'Sans Mediator',
+        roomName,
+        participants,
+        participantCount: participants.length,
+        senderName,
+        recipients,
+        recipientCount: recipients.length,
+        message,
+        deliveredCount: deliveries.length,
+        senderCouplingCount: useMediator ? 1 : recipients.length,
+        directLinkCount: useMediator ? 0 : recipients.length,
+        deliveryModeLabel: useMediator ? 'Transit via mediator' : 'Messages directs',
+        deliveries,
+      },
+      visualization: createMediatorVisualization(useMediator, roomName, senderName, recipients, message),
+    }
+  },
+  chain: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_CHAIN'}`.trim().toUpperCase()
+    const useChain = mode !== 'WITHOUT_CHAIN'
+    const requestName = `${parameters.requestName ?? ''}`.trim() || 'Export mensuel'
+    const tokenState = chainTokenStates[`${parameters.tokenState ?? 'VALID'}`.trim().toUpperCase()] ?? chainTokenStates.VALID
+    const payloadState = chainPayloadStates[`${parameters.payloadState ?? 'VALID'}`.trim().toUpperCase()] ?? chainPayloadStates.VALID
+    const processingTarget = chainProcessingTargets[`${parameters.processingTarget ?? 'REPORT_EXPORT'}`.trim().toUpperCase()]
+      ?? chainProcessingTargets.REPORT_EXPORT
+    const logs = []
+    const steps = []
+
+    if (useChain) {
+      logs.push('Construction de la chaine AuthenticationHandler -> ValidationHandler -> ProcessingHandler.')
+      logs.push(`La requete ${requestName} entre dans le premier maillon.`)
+
+      if (tokenState.code === 'VALID') {
+        steps.push(createChainStep(
+          1,
+          'AUTH',
+          'AuthenticationHandler',
+          'PASSED',
+          true,
+          `Token valide : ${requestName} peut passer au maillon suivant.`,
+        ))
+      } else {
+        steps.push(createChainStep(
+          1,
+          'AUTH',
+          'AuthenticationHandler',
+          'REJECTED',
+          false,
+          tokenState.code === 'EXPIRED'
+            ? 'Token expire : la requete est arretee des le controle d authentification.'
+            : 'Aucun token fourni : la requete est rejetee avant toute validation metier.',
+        ))
+      }
+
+      if (steps[steps.length - 1].passed) {
+        if (payloadState.code === 'VALID') {
+          steps.push(createChainStep(
+            2,
+            'VALIDATION',
+            'ValidationHandler',
+            'PASSED',
+            true,
+            `Payload valide : ${requestName} peut continuer jusqu au traitement.`,
+          ))
+        } else {
+          steps.push(createChainStep(
+            2,
+            'VALIDATION',
+            'ValidationHandler',
+            'REJECTED',
+            false,
+            'Payload invalide : la chaine stoppe avant le service metier.',
+          ))
+        }
+      }
+
+      if (steps[steps.length - 1].passed) {
+        steps.push(createChainStep(
+          3,
+          'PROCESSING',
+          'ProcessingHandler',
+          'HANDLED',
+          true,
+          processingTarget.handledMessage,
+        ))
+      }
+    } else {
+      logs.push('Mode sans Chain of Responsibility : un RequestController centralise tous les controles.')
+      logs.push(`La requete ${requestName} traverse une suite de if / else dans une seule classe.`)
+
+      if (tokenState.code === 'VALID') {
+        steps.push(createChainStep(
+          1,
+          'AUTH',
+          'Inline auth check',
+          'PASSED',
+          true,
+          'Le controller valide le token dans une condition inline.',
+        ))
+      } else {
+        steps.push(createChainStep(
+          1,
+          'AUTH',
+          'Inline auth check',
+          'REJECTED',
+          false,
+          tokenState.code === 'EXPIRED'
+            ? 'Le controller detecte un token expire et arrete la requete.'
+            : 'Le controller detecte l absence de token et bloque la requete.',
+        ))
+      }
+
+      if (steps[steps.length - 1].passed) {
+        if (payloadState.code === 'VALID') {
+          steps.push(createChainStep(
+            2,
+            'VALIDATION',
+            'Inline validation check',
+            'PASSED',
+            true,
+            'Le payload passe la validation inline du controller.',
+          ))
+        } else {
+          steps.push(createChainStep(
+            2,
+            'VALIDATION',
+            'Inline validation check',
+            'REJECTED',
+            false,
+            'Le controller refuse le payload avant le traitement metier.',
+          ))
+        }
+      }
+
+      if (steps[steps.length - 1].passed) {
+        steps.push(createChainStep(
+          3,
+          'PROCESSING',
+          'Inline processing branch',
+          'HANDLED',
+          true,
+          processingTarget.handledMessage,
+        ))
+      }
+    }
+
+    steps.forEach((step) => {
+      logs.push(`Etape ${step.index} - ${step.handlerLabel} : ${step.detail}`)
+    })
+
+    const lastStep = steps[steps.length - 1]
+    const accepted = lastStep?.status === 'HANDLED'
+    const handledBy = accepted
+      ? (useChain ? 'ProcessingHandler' : 'RequestController')
+      : lastStep?.handlerLabel ?? ''
+    const stoppedAt = lastStep?.handlerCode ?? 'AUTH'
+
+    return {
+      patternCode: 'chain',
+      summary: useChain
+        ? 'Chaque maillon decide s il traite la requete, la rejette ou la transmet au suivant. La chaine reste modulaire et chaque controle est localise.'
+        : 'Sans chaine, les controles restent regroupes dans un seul controller procedural, ce qui centralise les conditions et rigidifie le flux.',
+      logs,
+      output: {
+        mode,
+        modeLabel: useChain ? 'Avec Chain of Responsibility' : 'Sans Chain of Responsibility',
+        requestName,
+        tokenState: tokenState.code,
+        tokenLabel: tokenState.label,
+        payloadState: payloadState.code,
+        payloadLabel: payloadState.label,
+        processingTarget: processingTarget.code,
+        processingTargetLabel: processingTarget.label,
+        finalDecision: accepted ? 'ACCEPTED' : 'REJECTED',
+        decisionLabel: accepted
+          ? `Requete acceptee et traitee par ${handledBy}.`
+          : `Requete stoppee par ${handledBy}.`,
+        accepted,
+        handledBy,
+        stoppedAt,
+        visitedHandlers: steps.map((step) => step.handlerCode),
+        passedHandlers: steps.filter((step) => step.passed).length,
+        stepCount: steps.length,
+        steps,
+      },
+      visualization: buildChainVisualization(
+        useChain,
+        requestName,
+        tokenState.label,
+        payloadState.label,
+        processingTarget.label,
+        steps,
+        accepted,
+      ),
+    }
+  },
   command: (parameters) => {
     const mode = `${parameters.mode ?? 'WITH_COMMAND'}`.toUpperCase()
     const useCommand = mode !== 'WITHOUT_COMMAND'

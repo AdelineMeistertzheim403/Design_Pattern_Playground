@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(8)))
+			.andExpect(jsonPath("$", hasSize(10)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(8))
+			.andExpect(jsonPath("$.totalPatterns").value(10))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(8)));
+			.andExpect(jsonPath("$.patterns", hasSize(10)));
 	}
 
 	@Test
@@ -325,6 +325,56 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.undoStack", hasSize(4)))
 			.andExpect(jsonPath("$.output.successfulControlCommands").value(2))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
+	void shouldExecuteChainPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "chain",
+				  "parameters": {
+				    "mode": "WITH_CHAIN",
+				    "requestName": "Export mensuel",
+				    "tokenState": "VALID",
+				    "payloadState": "VALID",
+				    "processingTarget": "REPORT_EXPORT"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("chain"))
+			.andExpect(jsonPath("$.output.accepted").value(true))
+			.andExpect(jsonPath("$.output.finalDecision").value("ACCEPTED"))
+			.andExpect(jsonPath("$.output.visitedHandlers", hasSize(3)))
+			.andExpect(jsonPath("$.output.steps", hasSize(3)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
+	void shouldExecuteMediatorPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "mediator",
+				  "parameters": {
+				    "mode": "WITH_MEDIATOR",
+				    "roomName": "Arena Chat",
+				    "participants": ["Luna", "Kiro", "Nova"],
+				    "senderName": "Luna",
+				    "message": "Focus target center lane"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("mediator"))
+			.andExpect(jsonPath("$.output.participantCount").value(3))
+			.andExpect(jsonPath("$.output.recipientCount").value(2))
+			.andExpect(jsonPath("$.output.deliveredCount").value(2))
+			.andExpect(jsonPath("$.output.senderCouplingCount").value(1))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
 	}
 
 	private Cookie registerAndExtractAccessCookie(String username, String password) throws Exception {
