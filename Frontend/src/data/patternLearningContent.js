@@ -29,6 +29,35 @@ const defaultLearningContent = {
 }
 
 export const patternLearningContent = {
+  command: {
+    strapline: 'Chaque action devient un objet autonome, donc on peut la declencher, l historiser, l annuler et la rejouer.',
+    intuition:
+      "Command separe le bouton ou l interface qui demande une action de l objet qui sait reellement l executer. Ce decouplage rend l historique et undo / redo naturels.",
+    readingGuide:
+      "Observe d abord la grille centrale et l etat final du robot. Puis regarde les piles undo / redo et enfin la timeline pour voir a quel moment une action est executee, annulee ou rejouee.",
+    studentAngle:
+      "Le vrai declic est de voir qu une action n est plus juste un clic, mais un objet qu on peut stocker, empiler et reexecuter.",
+    developerAngle:
+      "Le pattern devient pertinent pour un editeur, un jeu tactique, des macros, une file d actions ou tout systeme qui doit historiser des operations reversibles.",
+    playfulPrompt:
+      "Compare avec et sans Command, puis regarde ce qu il reste possible quand tu veux faire undo ou redo.",
+    steps: [
+      'Le client construit une commande concrete.',
+      'L invoker declenche cette commande sans connaitre le detail du receiver.',
+      'Le receiver applique la vraie mutation sur son etat.',
+      'L historique rend ensuite undo / redo possibles.',
+    ],
+    glossary: [
+      {
+        term: 'Invoker',
+        definition: "Objet qui declenche la commande et peut maintenir l historique sans connaitre le detail du travail metier.",
+      },
+      {
+        term: 'Receiver',
+        definition: "Objet qui sait vraiment effectuer l action demandee par la commande.",
+      },
+    ],
+  },
   singleton: {
     strapline: 'Plusieurs clients pointent vers une seule instance, donc la configuration reste coherente partout.',
     intuition:
