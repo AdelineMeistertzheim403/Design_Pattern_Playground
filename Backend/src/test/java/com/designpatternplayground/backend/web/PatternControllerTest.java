@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(7)))
+			.andExpect(jsonPath("$", hasSize(8)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(7))
+			.andExpect(jsonPath("$.totalPatterns").value(8))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(7)));
+			.andExpect(jsonPath("$.patterns", hasSize(8)));
 	}
 
 	@Test
@@ -299,6 +299,32 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.challengeMet").value(true))
 			.andExpect(jsonPath("$.output.stack", hasSize(3)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(4)));
+	}
+
+	@Test
+	void shouldExecuteCommandPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "command",
+				  "parameters": {
+				    "mode": "WITH_COMMAND",
+				    "boardName": "Arena Grid",
+				    "actorName": "Pixel Bot",
+				    "actions": ["ADD_BEACON", "MOVE_RIGHT", "MOVE_UP", "UNDO", "REDO", "DELETE_BEACON"]
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("command"))
+			.andExpect(jsonPath("$.output.positionX").value(1))
+			.andExpect(jsonPath("$.output.positionY").value(1))
+			.andExpect(jsonPath("$.output.beaconCount").value(0))
+			.andExpect(jsonPath("$.output.history", hasSize(6)))
+			.andExpect(jsonPath("$.output.undoStack", hasSize(4)))
+			.andExpect(jsonPath("$.output.successfulControlCommands").value(2))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
 	}
 
 	private Cookie registerAndExtractAccessCookie(String username, String password) throws Exception {

@@ -1,5 +1,13 @@
 export const fallbackPatterns = [
   {
+    code: 'command',
+    name: 'Command',
+    type: 'BEHAVIORAL',
+    description: "Encapsule une action dans un objet pour pouvoir la declencher, l historiser, l annuler et la rejouer sans coupler l interface au receiver.",
+    useCase: "Construire un simulateur undo / redo, un editeur ou un mini jeu d actions historisees avec piles de commandes.",
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'singleton',
     name: 'Singleton',
     type: 'CREATIONAL',
@@ -58,6 +66,42 @@ export const fallbackPatterns = [
 ]
 
 const fallbackSchemas = {
+  command: {
+    fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_COMMAND', 'WITHOUT_COMMAND'],
+        defaultValue: 'WITH_COMMAND',
+      },
+      {
+        name: 'boardName',
+        label: 'Nom de la grille',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Arena Grid',
+      },
+      {
+        name: 'actorName',
+        label: 'Nom de l agent',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Pixel Bot',
+      },
+      {
+        name: 'actions',
+        label: 'Sequence d actions',
+        type: 'LIST',
+        required: true,
+        allowedValues: ['ADD_BEACON', 'MOVE_RIGHT', 'MOVE_UP', 'MOVE_LEFT', 'DELETE_BEACON', 'UNDO', 'REDO'],
+        defaultValue: 'ADD_BEACON, MOVE_RIGHT, MOVE_UP, UNDO, REDO, DELETE_BEACON',
+      },
+    ],
+  },
   singleton: {
     fields: [
       {
@@ -424,6 +468,181 @@ const stateDefinitions = {
   },
 }
 
+const commandActionLabels = {
+  ADD_BEACON: 'Ajouter balise',
+  MOVE_RIGHT: 'Deplacer a droite',
+  MOVE_UP: 'Monter',
+  MOVE_LEFT: 'Deplacer a gauche',
+  DELETE_BEACON: 'Supprimer balise',
+  UNDO: 'Undo',
+  REDO: 'Redo',
+}
+
+function createCommandBoard(boardName, actorName, gridSize = 5) {
+  return {
+    boardName,
+    actorName,
+    gridSize,
+    x: 0,
+    y: 0,
+    beaconCount: 0,
+  }
+}
+
+function snapshotCommandBoard(board) {
+  return {
+    x: board.x,
+    y: board.y,
+    beaconCount: board.beaconCount,
+  }
+}
+
+function restoreCommandBoard(board, snapshot) {
+  board.x = snapshot.x
+  board.y = snapshot.y
+  board.beaconCount = snapshot.beaconCount
+}
+
+function applyCommandBoardAction(board, actionCode) {
+  switch (actionCode) {
+    case 'ADD_BEACON':
+      board.beaconCount += 1
+      break
+    case 'MOVE_RIGHT':
+      board.x = Math.min(board.gridSize - 1, board.x + 1)
+      break
+    case 'MOVE_UP':
+      board.y = Math.min(board.gridSize - 1, board.y + 1)
+      break
+    case 'MOVE_LEFT':
+      board.x = Math.max(0, board.x - 1)
+      break
+    case 'DELETE_BEACON':
+      board.beaconCount = Math.max(0, board.beaconCount - 1)
+      break
+    default:
+      break
+  }
+}
+
+function createCommandEntry(rawEntry) {
+  const actionCode = typeof rawEntry === 'string'
+    ? rawEntry
+    : `${rawEntry?.actionCode ?? rawEntry?.code ?? 'COMMAND'}`
+
+  return {
+    actionCode,
+    actionLabel: commandActionLabels[actionCode] ?? actionCode,
+    commandClass: `${actionCode
+      .toLowerCase()
+      .split('_')
+      .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join('')}Command`,
+  }
+}
+
+function createCommandStep(index, actionCode, operationType, accepted, detail, board, undoStack, redoStack) {
+  return {
+    index,
+    actionCode,
+    actionLabel: commandActionLabels[actionCode] ?? actionCode,
+    operationType,
+    accepted,
+    detail,
+    positionX: board.x,
+    positionY: board.y,
+    beaconCount: board.beaconCount,
+    undoDepth: undoStack.length,
+    redoDepth: redoStack.length,
+    undoStack: undoStack.map(createCommandEntry),
+    redoStack: redoStack.map(createCommandEntry),
+  }
+}
+
+function commandExecutionDetail(actorName, actionCode) {
+  switch (actionCode) {
+    case 'ADD_BEACON':
+      return `${actorName} depose une balise sur la grille.`
+    case 'MOVE_RIGHT':
+      return `${actorName} avance d une case vers la droite.`
+    case 'MOVE_UP':
+      return `${actorName} monte d une case.`
+    case 'MOVE_LEFT':
+      return `${actorName} recule d une case vers la gauche.`
+    case 'DELETE_BEACON':
+      return `${actorName} retire une balise active.`
+    default:
+      return 'Action executee.'
+  }
+}
+
+function commandDirectDetail(actorName, actionCode) {
+  switch (actionCode) {
+    case 'ADD_BEACON':
+      return `${actorName} ajoute directement une balise sans objet commande.`
+    case 'MOVE_RIGHT':
+      return `${actorName} est deplace a droite par le controleur direct.`
+    case 'MOVE_UP':
+      return `${actorName} est deplace vers le haut par le controleur direct.`
+    case 'MOVE_LEFT':
+      return `${actorName} est deplace a gauche par le controleur direct.`
+    case 'DELETE_BEACON':
+      return `${actorName} supprime une balise par appel direct.`
+    default:
+      return 'Mutation directe.'
+  }
+}
+
+function buildCommandVisualization(useCommand, board, undoStack, redoStack) {
+  return {
+    nodes: [
+      {
+        id: 'controller',
+        label: useCommand ? 'CommandInvoker' : 'DirectController',
+        type: 'context',
+        data: { detail: useCommand ? 'dispatch + history' : 'mutations directes' },
+      },
+      {
+        id: 'command',
+        label: useCommand ? 'BoardCommand' : 'Inline actions',
+        type: 'cluster',
+        data: { detail: useCommand ? 'actions encapsulees' : 'aucun objet commande' },
+      },
+      {
+        id: 'receiver',
+        label: 'ArenaBoard',
+        type: 'component',
+        data: { detail: `${board.actorName} sur ${board.boardName}` },
+      },
+      {
+        id: 'undo',
+        label: 'Undo stack',
+        type: 'decorator',
+        data: { detail: `${undoStack.length} commande(s)` },
+      },
+      {
+        id: 'redo',
+        label: 'Redo stack',
+        type: 'decorator',
+        data: { detail: `${redoStack.length} commande(s)` },
+      },
+      {
+        id: 'result',
+        label: 'Etat final',
+        type: 'output',
+        data: { message: `x=${board.x} y=${board.y} balises=${board.beaconCount}` },
+      },
+    ],
+    edges: [
+      { from: 'controller', to: 'command', label: useCommand ? 'dispatch' : 'inline' },
+      { from: 'command', to: 'receiver', label: useCommand ? 'execute' : 'mutate' },
+      { from: 'receiver', to: 'result', label: 'state' },
+      { from: 'controller', to: 'undo', label: useCommand ? 'push/pop' : 'empty' },
+      { from: 'controller', to: 'redo', label: useCommand ? 'redo' : 'empty' },
+    ],
+  }
+}
+
 function simulateStateTransition(currentState, actionCode, characterName) {
   switch (currentState) {
     case 'IDLE':
@@ -630,6 +849,195 @@ function buildDecoratorVisualization(baseProfile, stack, finalStats, challengeMe
 }
 
 const fallbackExecutors = {
+  command: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_COMMAND'}`.toUpperCase()
+    const useCommand = mode !== 'WITHOUT_COMMAND'
+    const boardName = `${parameters.boardName ?? ''}`.trim() || 'Arena Grid'
+    const actorName = `${parameters.actorName ?? ''}`.trim() || 'Pixel Bot'
+    const actions = normalizeOrderedList(parameters.actions).map((value) => `${value}`.trim().toUpperCase()).filter(Boolean)
+    const board = createCommandBoard(boardName, actorName)
+    const logs = []
+    const history = []
+    const undoStack = []
+    const redoStack = []
+
+    if (actions.length === 0) {
+      throw new Error('Au moins une action est obligatoire.')
+    }
+
+    if (useCommand) {
+      logs.push(`Creation du receiver ${boardName} pour ${actorName}.`)
+      logs.push('Initialisation du CommandInvoker avec deux piles : undo et redo.')
+
+      actions.forEach((actionCode, index) => {
+        if (actionCode === 'UNDO') {
+          if (undoStack.length === 0) {
+            const step = createCommandStep(
+              index + 1,
+              actionCode,
+              'UNDO',
+              false,
+              'Aucune commande a annuler : la pile undo est vide.',
+              board,
+              undoStack,
+              redoStack,
+            )
+            logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+            history.push(step)
+            return
+          }
+
+          const lastCommand = undoStack.shift()
+          restoreCommandBoard(board, lastCommand.beforeState)
+          redoStack.unshift(lastCommand)
+          const step = createCommandStep(
+            index + 1,
+            actionCode,
+            'UNDO',
+            true,
+            `Undo retire ${lastCommand.actionLabel.toLowerCase()} de la pile active et restaure l etat precedent.`,
+            board,
+            undoStack.map(({ actionCode: code }) => code),
+            redoStack.map(({ actionCode: code }) => code),
+          )
+          logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+          history.push(step)
+          return
+        }
+
+        if (actionCode === 'REDO') {
+          if (redoStack.length === 0) {
+            const step = createCommandStep(
+              index + 1,
+              actionCode,
+              'REDO',
+              false,
+              'Aucune commande a rejouer : la pile redo est vide.',
+              board,
+              undoStack.map(({ actionCode: code }) => code),
+              redoStack.map(({ actionCode: code }) => code),
+            )
+            logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+            history.push(step)
+            return
+          }
+
+          const replayedCommand = redoStack.shift()
+          replayedCommand.beforeState = snapshotCommandBoard(board)
+          applyCommandBoardAction(board, replayedCommand.actionCode)
+          undoStack.unshift(replayedCommand)
+          const step = createCommandStep(
+            index + 1,
+            actionCode,
+            'REDO',
+            true,
+            `Redo rejoue ${replayedCommand.actionLabel.toLowerCase()} depuis la pile redo.`,
+            board,
+            undoStack.map(({ actionCode: code }) => code),
+            redoStack.map(({ actionCode: code }) => code),
+          )
+          logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+          history.push(step)
+          return
+        }
+
+        const commandRecord = {
+          actionCode,
+          actionLabel: commandActionLabels[actionCode] ?? actionCode,
+          beforeState: snapshotCommandBoard(board),
+        }
+        applyCommandBoardAction(board, actionCode)
+        undoStack.unshift(commandRecord)
+        redoStack.length = 0
+        const step = createCommandStep(
+          index + 1,
+          actionCode,
+          'EXECUTE',
+          true,
+          commandExecutionDetail(actorName, actionCode),
+          board,
+          undoStack.map(({ actionCode: code }) => code),
+          redoStack.map(({ actionCode: code }) => code),
+        )
+        logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+        history.push(step)
+      })
+    } else {
+      logs.push(`Mode sans Command : ${actorName} modifie directement ${boardName}.`)
+      logs.push('Aucune pile de commandes n est maintenue, donc undo et redo ne peuvent pas fonctionner.')
+
+      actions.forEach((actionCode, index) => {
+        if (actionCode === 'UNDO' || actionCode === 'REDO') {
+          const step = createCommandStep(
+            index + 1,
+            actionCode,
+            'BLOCKED',
+            false,
+            `Le controleur direct ne stocke aucune commande : ${(commandActionLabels[actionCode] ?? actionCode).toLowerCase()} est impossible.`,
+            board,
+            [],
+            [],
+          )
+          logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+          history.push(step)
+          return
+        }
+
+        applyCommandBoardAction(board, actionCode)
+        const step = createCommandStep(
+          index + 1,
+          actionCode,
+          'DIRECT',
+          true,
+          commandDirectDetail(actorName, actionCode),
+          board,
+          [],
+          [],
+        )
+        logs.push(`Action ${step.index} - ${step.actionCode} : ${step.detail}`)
+        history.push(step)
+      })
+    }
+
+    const blockedCommands = history.filter((step) => !step.accepted).length
+    const successfulControlCommands = history.filter((step) => (
+      step.accepted && (step.actionCode === 'UNDO' || step.actionCode === 'REDO')
+    )).length
+    const visitedCells = [...new Set(history.map((step) => `${step.positionX},${step.positionY}`))]
+    const finalUndoStack = useCommand
+      ? undoStack.map((entry) => createCommandEntry(entry.actionCode))
+      : []
+    const finalRedoStack = useCommand
+      ? redoStack.map((entry) => createCommandEntry(entry.actionCode))
+      : []
+
+    return {
+      patternCode: 'command',
+      summary: useCommand
+        ? "Command encapsule chaque action dans un objet autonome. L invoker peut donc conserver un historique, annuler et rejouer des operations."
+        : "Sans Command, l interface appelle directement le receiver. Les actions partent, mais aucune pile n existe pour les annuler proprement.",
+      logs,
+      output: {
+        mode: useCommand ? 'WITH_COMMAND' : 'WITHOUT_COMMAND',
+        modeLabel: useCommand ? 'Avec Command' : 'Sans Command',
+        boardName,
+        actorName,
+        boardSize: board.gridSize,
+        positionX: board.x,
+        positionY: board.y,
+        beaconCount: board.beaconCount,
+        actionCount: actions.length,
+        executedCommands: history.filter((step) => step.accepted).length,
+        blockedCommands,
+        successfulControlCommands,
+        undoStack: finalUndoStack,
+        redoStack: finalRedoStack,
+        visitedCells,
+        history,
+      },
+      visualization: buildCommandVisualization(useCommand, board, finalUndoStack, finalRedoStack),
+    }
+  },
   singleton: (parameters) => {
     const mode = `${parameters.mode ?? 'WITH_SINGLETON'}`.toUpperCase()
     const useSingleton = mode !== 'WITHOUT_SINGLETON'

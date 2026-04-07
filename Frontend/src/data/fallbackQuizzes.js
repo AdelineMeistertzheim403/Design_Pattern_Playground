@@ -64,7 +64,155 @@ function matching(id, label, difficulty, explanation, leftItems, rightItems, cor
   }
 }
 
+function ordering(id, label, difficulty, explanation, orderingItems, correctOrder) {
+  return {
+    id,
+    label,
+    type: 'ORDERING',
+    difficulty,
+    points: 0,
+    explanation,
+    choices: [],
+    correctChoiceIds: [],
+    leftItems: [],
+    rightItems: [],
+    correctPairs: [],
+    orderingItems,
+    correctOrder,
+  }
+}
+
 export const fallbackQuizzes = {
+  command: {
+    patternCode: 'command',
+    title: 'Quiz Command',
+    description: 'Teste ta comprehension des requetes encapsulees, de l invoker, du receiver et de la reversibilite undo / redo.',
+    passingPercent: 75,
+    badgeLabel: 'Badge valide',
+    maxPoints: 0,
+    questions: [
+      singleChoice(
+        'command-q1',
+        'Le pattern Command permet surtout de :',
+        'EASY',
+        "Command encapsule une requete dans un objet pour pouvoir la declencher, la stocker ou l annuler.",
+        [
+          choice('create', 'Creer des objets'),
+          choice('memory', 'Partager la memoire'),
+          choice('encapsulate', 'Encapsuler une action dans un objet'),
+        ],
+        'encapsulate',
+      ),
+      trueFalse(
+        'command-q2',
+        'Une commande peut etre historisee puis rejouee plus tard.',
+        'EASY',
+        "C est l un des grands interets du pattern pour l historique, les files ou les macros.",
+        true,
+      ),
+      singleChoice(
+        'command-q3',
+        'Command appartient a la famille :',
+        'EASY',
+        'Command est un pattern comportemental.',
+        [
+          choice('creational', 'Creation'),
+          choice('structural', 'Structurel'),
+          choice('behavioral', 'Comportemental'),
+        ],
+        'behavioral',
+      ),
+      singleChoice(
+        'command-q4',
+        'Quel role declenche les commandes sans connaitre leur implementation detaillee ?',
+        'MEDIUM',
+        "L invoker lance une commande via son contrat sans connaitre les details du receiver.",
+        [
+          choice('receiver', 'Le receiver'),
+          choice('invoker', 'L invoker'),
+          choice('database', 'La base de donnees'),
+        ],
+        'invoker',
+      ),
+      matching(
+        'command-q5',
+        'Associe chaque role a sa responsabilite.',
+        'MEDIUM',
+        "La commande encapsule, l invoker declenche, le receiver effectue le vrai travail.",
+        [
+          item('command', 'Command'),
+          item('invoker', 'Invoker'),
+          item('receiver', 'Receiver'),
+        ],
+        [
+          item('encapsulate', 'Encapsule l action'),
+          item('trigger', 'Declenche'),
+          item('execute', 'Execute le vrai travail'),
+        ],
+        [
+          pair('command', 'encapsulate'),
+          pair('invoker', 'trigger'),
+          pair('receiver', 'execute'),
+        ],
+      ),
+      singleChoice(
+        'command-q6',
+        'Pourquoi Command facilite-t-il undo / redo ?',
+        'HARD',
+        "Chaque action existe comme objet autonome, donc on peut la conserver dans un historique et la rejouer ou l annuler.",
+        [
+          choice('history', 'Parce que les actions sont historisees comme objets'),
+          choice('inheritance', 'Parce qu il utilise surtout l heritage'),
+          choice('singleton', 'Parce qu il impose une instance unique'),
+        ],
+        'history',
+      ),
+      trueFalse(
+        'command-q7',
+        'Sans Command, un bouton Undo devient souvent plus difficile a implementer proprement.',
+        'MEDIUM',
+        "Sans objet commande et sans historique explicite, il faut reconstruire l etat avec une logique plus fragile.",
+        true,
+      ),
+      singleChoice(
+        'command-q8',
+        'Quel exemple illustre bien Command ?',
+        'EASY',
+        "Un editeur avec undo / redo ou un simulateur d actions joueur sont des exemples tres classiques.",
+        [
+          choice('editor', 'Editeur avec undo / redo'),
+          choice('entity', 'Entite JPA'),
+          choice('dto', 'DTO'),
+        ],
+        'editor',
+      ),
+      singleChoice(
+        'command-q9',
+        'Le receiver :',
+        'MEDIUM',
+        "Le receiver est l objet qui sait vraiment comment effectuer l action metier.",
+        [
+          choice('real-work', 'Porte le vrai comportement metier'),
+          choice('history', 'Stocke uniquement l historique'),
+          choice('choose', 'Choisit toujours la commande'),
+        ],
+        'real-work',
+      ),
+      ordering(
+        'command-q10',
+        'Remets la boucle Command dans le bon ordre.',
+        'HARD',
+        "Le client cree la commande, l invoker la declenche, le receiver agit, puis l historique permet undo / redo.",
+        [
+          item('create', 'Le client cree la commande'),
+          item('trigger', 'L invoker declenche la commande'),
+          item('execute', 'Le receiver applique l action'),
+          item('history', 'L historique permet undo / redo'),
+        ],
+        ['create', 'trigger', 'execute', 'history'],
+      ),
+    ],
+  },
   factory: {
     patternCode: 'factory',
     title: 'Quiz Factory Method',

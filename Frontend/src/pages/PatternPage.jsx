@@ -73,6 +73,41 @@ function getComparisonOptions(patternCode, field) {
   }))
 }
 
+function getListFieldOrderLabel(patternCode, field) {
+  if (patternCode === 'command' && field.name === 'actions') {
+    return 'Ordre de la sequence'
+  }
+
+  return 'Ordre d empilement'
+}
+
+function getListFieldEmptyMessage(patternCode, field) {
+  if (patternCode === 'command' && field.name === 'actions') {
+    return "Aucune action selectionnee. La demo ne pourra pas illustrer la pile de commandes."
+  }
+
+  return 'Aucun decorator selectionne. La demo montrera alors uniquement le composant de base.'
+}
+
+function getListFieldHint(patternCode, field) {
+  if (patternCode === 'command' && field.name === 'actions') {
+    return "Clique pour ajouter une action a la sequence. Tu peux repeter plusieurs fois la meme action, puis retirer chaque etape individuellement."
+  }
+
+  return "Clique pour ajouter ou retirer une couche. L ordre affiche correspond a l ordre d empilement des wrappers."
+}
+
+function moveListValue(values, fromIndex, toIndex) {
+  if (!Array.isArray(values) || fromIndex < 0 || toIndex < 0 || fromIndex >= values.length || toIndex >= values.length) {
+    return values
+  }
+
+  const nextValues = [...values]
+  const [item] = nextValues.splice(fromIndex, 1)
+  nextValues.splice(toIndex, 0, item)
+  return nextValues
+}
+
 function PatternFormField({
   field,
   formValues,
@@ -141,6 +176,88 @@ function PatternFormField({
           />
           <p className="text-sm leading-7 text-stone-600">{numericUi.hint}</p>
         </div>
+      ) : field.type === 'LIST' && patternCode === 'command' && field.name === 'actions' && (field.allowedValues?.length ?? 0) > 0 ? (
+        <div className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
+          <div className="flex flex-wrap gap-2">
+            {(field.allowedValues ?? []).map((value) => (
+              <button
+                key={value}
+                className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:-translate-y-0.5 hover:border-black/20"
+                type="button"
+                onClick={() => onFieldValueChange(field, [...selectedListValues, value])}
+              >
+                + {value}
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-black/8 bg-white/72 px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">{getListFieldOrderLabel(patternCode, field)}</p>
+              {selectedListValues.length > 0 ? (
+                <button
+                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition hover:border-black/20"
+                  type="button"
+                  onClick={() => onFieldValueChange(field, [])}
+                >
+                  Vider
+                </button>
+              ) : null}
+            </div>
+
+            {selectedListValues.length > 0 ? (
+              <div className="mt-3 grid gap-2">
+                {selectedListValues.map((value, index) => (
+                  <div
+                    key={`${value}-${index}`}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-black/8 bg-stone-950 px-3 py-2 text-white"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-white/14 px-2.5 py-1 text-[11px] font-semibold tracking-[0.08em] text-white/86">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm font-semibold">{value}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="rounded-full border border-white/18 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10 disabled:opacity-35"
+                        disabled={index === 0}
+                        type="button"
+                        onClick={() => onFieldValueChange(field, moveListValue(selectedListValues, index, index - 1))}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        className="rounded-full border border-white/18 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10 disabled:opacity-35"
+                        disabled={index === selectedListValues.length - 1}
+                        type="button"
+                        onClick={() => onFieldValueChange(field, moveListValue(selectedListValues, index, index + 1))}
+                      >
+                        ↓
+                      </button>
+                      <button
+                        className="rounded-full border border-white/18 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10"
+                        type="button"
+                        onClick={() => onFieldValueChange(field, selectedListValues.filter((_, itemIndex) => itemIndex !== index))}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm leading-7 text-stone-600">
+                {getListFieldEmptyMessage(patternCode, field)}
+              </p>
+            )}
+          </div>
+
+          <p className="text-sm leading-7 text-stone-600">
+            {getListFieldHint(patternCode, field)}
+          </p>
+        </div>
       ) : field.type === 'LIST' && (field.allowedValues?.length ?? 0) > 0 ? (
         <div className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
           <div className="flex flex-wrap gap-2">
@@ -171,7 +288,7 @@ function PatternFormField({
           </div>
 
           <div className="rounded-2xl border border-black/8 bg-white/72 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Ordre d empilement</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">{getListFieldOrderLabel(patternCode, field)}</p>
             {selectedListValues.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {selectedListValues.map((value, index) => (
@@ -185,13 +302,13 @@ function PatternFormField({
               </div>
             ) : (
               <p className="mt-3 text-sm leading-7 text-stone-600">
-                Aucun decorator selectionne. La demo montrera alors uniquement le composant de base.
+                {getListFieldEmptyMessage(patternCode, field)}
               </p>
             )}
           </div>
 
           <p className="text-sm leading-7 text-stone-600">
-            Clique pour ajouter ou retirer une couche. L ordre affiche correspond a l ordre d empilement des wrappers.
+            {getListFieldHint(patternCode, field)}
           </p>
         </div>
       ) : field.type === 'LIST' ? (
