@@ -29,6 +29,64 @@ const defaultLearningContent = {
 }
 
 export const patternLearningContent = {
+  mediator: {
+    strapline: 'Les participants ne se parlent plus tous directement : un hub central orchestre les messages.',
+    intuition:
+      "Mediator remplace un reseau de dependances croisées par un point de coordination unique. Chaque colleague depend du mediator, pas de tous les autres objets du systeme.",
+    readingGuide:
+      "Observe d abord le trajet du message dans la scene, puis compare avec et sans mediator. L UML montre le hub central, la scene runtime montre la reduction du couplage.",
+    studentAngle:
+      "Le declic pedagogique est simple : les joueurs discutent toujours entre eux, mais plus aucun ne porte la logique complete du reseau.",
+    developerAngle:
+      "Le pattern devient utile pour des chats, des interfaces riches, des salles de jeu, des dashboards ou des workflows ou beaucoup d objets doivent se coordonner.",
+    playfulPrompt:
+      "Ajoute des participants, change l expediteur et compare la difference entre des messages directs et un hub de diffusion central.",
+    steps: [
+      'Le colleague expediteur envoie un message.',
+      'Le mediator central recoit cet evenement.',
+      'Le mediator choisit les destinataires a notifier.',
+      'Les autres colleagues recoivent le message sans connaitre toute la topologie du chat.',
+    ],
+    glossary: [
+      {
+        term: 'Mediator',
+        definition: 'Objet central qui coordonne les interactions entre plusieurs colleagues.',
+      },
+      {
+        term: 'Colleague',
+        definition: 'Participant du systeme qui communique via le mediator plutot que directement avec tous les autres.',
+      },
+    ],
+  },
+  chain: {
+    strapline: 'La requete traverse une suite de maillons autonomes qui peuvent la laisser passer, la bloquer ou la traiter.',
+    intuition:
+      "Chain of Responsibility decoupe un pipeline en handlers specialises. Chaque maillon connait son propre test et delegue au suivant au lieu d encombrer un controller unique de if / else.",
+    readingGuide:
+      "Observe d abord le trajet de la requete dans la scene, puis regarde quel handler a stoppe ou traite le flux. L UML montre la liaison entre handlers, la scene raconte le passage runtime.",
+    studentAngle:
+      "Le declic pedagogique est de voir qu une requete ne connait pas son destinataire final : elle avance maillon apres maillon jusqu a ce qu un handler prenne la main.",
+    developerAngle:
+      "Le pattern devient pertinent dans des middlewares HTTP, des pipelines de validation, des workflows de moderation ou des circuits de support multi-niveaux.",
+    playfulPrompt:
+      "Change l etat du token ou du payload, relance la demo et regarde a quel endroit la requete est stoppee ou laissee passer.",
+    steps: [
+      'Le client envoie une requete au premier handler.',
+      'Chaque handler decide localement si la requete peut continuer.',
+      'La chaine s arrete des qu un maillon rejette ou traite le flux.',
+      'Comparer ce comportement avec un controller monolithique plein de conditions.',
+    ],
+    glossary: [
+      {
+        term: 'Handler',
+        definition: 'Maillon specialise qui peut verifier, traiter ou deleguer la requete au suivant.',
+      },
+      {
+        term: 'Propagation',
+        definition: 'Passage de la requete d un maillon a l autre jusqu a une decision finale.',
+      },
+    ],
+  },
   command: {
     strapline: 'Chaque action devient un objet autonome, donc on peut la declencher, l historiser, l annuler et la rejouer.',
     intuition:

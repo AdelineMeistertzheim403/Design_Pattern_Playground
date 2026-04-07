@@ -1,5 +1,9 @@
 # Design Pattern Playground
 
+[![CI/CD](https://github.com/AdelineMeistertzheim403/Design_Pattern_Playground/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/AdelineMeistertzheim403/Design_Pattern_Playground/actions/workflows/ci-cd.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-81%25-brightgreen)](#qualite)
+![Dockerized](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+
 Ce depot contient un backend Spring Boot et un frontend React pour simuler et visualiser des design patterns de maniere interactive.
 
 ## Structure
@@ -12,8 +16,7 @@ Ce depot contient un backend Spring Boot et un frontend React pour simuler et vi
 
 La documentation PlantUML est répartie en trois niveaux :
 
-- [docs/README.md](./docs/README.md) : vision système globale et boucle pédagogique
-- [docs/README.md](./docs/README.md) : vision système globale, boucle pédagogique et déploiement
+- [docs/README.md](./docs/README.md) : vision système globale, boucle pédagogique, séquences transverse et déploiement
 - [Backend/docs/README.md](./Backend/docs/README.md) : architecture backend, modules et séquences
 - [Frontend/docs/README.md](./Frontend/docs/README.md) : architecture frontend, navigation, quiz et visualisation
 
@@ -22,6 +25,13 @@ La documentation PlantUML est répartie en trois niveaux :
 - Java 17
 - Node.js + npm
 - Pas besoin de Maven installe globalement : le backend utilise `./mvnw`
+
+## Qualite
+
+- Pipeline CI/CD GitHub Actions : workflow `CI/CD`
+- Coverage backend JaCoCo actuel : `81%` de lignes couvertes
+- Generation du rapport : `cd Backend && ./mvnw verify`
+- Rapport HTML local : `Backend/target/site/jacoco/index.html`
 
 ## Demarrer le backend
 
