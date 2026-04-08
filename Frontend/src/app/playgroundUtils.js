@@ -1,5 +1,13 @@
 import { AUTH_USER_STORAGE_KEY, patternFieldUi } from './playgroundConstants'
 
+function splitListValue(rawValue) {
+  return `${rawValue ?? ''}`
+    .replace(/\r/g, '')
+    .split(/\n|,/)
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
 export function buildPatternPath(code) {
   return `/patterns/${code}`
 }
@@ -51,7 +59,7 @@ export function buildInitialParameters(schema) {
         }
 
         if (field.type === 'LIST') {
-          return [field.name, field.defaultValue.split(',').map((value) => value.trim()).filter(Boolean)]
+          return [field.name, splitListValue(field.defaultValue)]
         }
 
         return [field.name, field.defaultValue]
@@ -88,13 +96,7 @@ export function normalizeParameters(schema, formValues) {
           return [field.name, rawValue]
         }
 
-        return [
-          field.name,
-          `${rawValue ?? ''}`
-            .split(',')
-            .map((value) => value.trim())
-            .filter(Boolean),
-        ]
+        return [field.name, splitListValue(rawValue)]
       }
 
       return [field.name, rawValue]
