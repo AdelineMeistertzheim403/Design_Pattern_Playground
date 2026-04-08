@@ -42,6 +42,14 @@ export const fallbackPatterns = [
     complexityLevel: 'INTERMEDIATE',
   },
   {
+    code: 'proxy',
+    name: 'Proxy',
+    type: 'STRUCTURAL',
+    description: 'Place un intermediaire devant une ressource pour controler l acces, retarder son chargement ou masquer sa nature reelle.',
+    useCase: 'Filtrer l acces a une ressource sensible, cacher un appel reseau lourd ou activer un lazy loading avant la vraie ressource.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'builder',
     name: 'Builder',
     type: 'CREATIONAL',
@@ -122,6 +130,7 @@ export const patternPreviewTaglinesByCode = {
   mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
   observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
   prototype: 'Un blueprint source genere des clones qui partagent ou non leur etat profond.',
+  proxy: 'Une ressource reste derriere un gardien qui autorise, bloque ou charge plus tard.',
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
@@ -136,6 +145,7 @@ export const specializedScenePatternCodes = [
   'flyweight',
   'mediator',
   'prototype',
+  'proxy',
   'singleton',
   'state',
 ]

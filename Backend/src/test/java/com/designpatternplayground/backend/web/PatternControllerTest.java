@@ -32,6 +32,7 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$", hasSize(13)))
+			.andExpect(jsonPath("$", hasSize(13)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -235,6 +236,32 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.initialClones", hasSize(4)))
 			.andExpect(jsonPath("$.output.clones", hasSize(4)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(7)));
+	}
+
+	@Test
+	void shouldExecuteProxyPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "proxy",
+				  "parameters": {
+				    "mode": "WITH_PROXY",
+				    "requestLabel": "Open premium vault",
+				    "requesterRole": "MEMBER",
+				    "resourceCode": "VAULT_VIDEO",
+				    "cacheState": "COLD"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("proxy"))
+			.andExpect(jsonPath("$.output.accessGranted").value(true))
+			.andExpect(jsonPath("$.output.lazyLoadTriggered").value(true))
+			.andExpect(jsonPath("$.output.securityLeak").value(false))
+			.andExpect(jsonPath("$.output.stepCount").value(4))
+			.andExpect(jsonPath("$.output.steps", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
 	}
 
 	@Test

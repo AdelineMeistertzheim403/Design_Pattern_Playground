@@ -317,6 +317,7 @@ npm run build
 - `flyweight` : simulation memoire avec mutualisation d instances et comparaison live.
 - `decorator` : empilement de power-ups sur un composant de base avec stats cumulees et pile de wrappers.
 - `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
+- `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
