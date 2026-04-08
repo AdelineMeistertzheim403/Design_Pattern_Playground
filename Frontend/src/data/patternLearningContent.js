@@ -29,6 +29,35 @@ const defaultLearningContent = {
 }
 
 export const patternLearningContent = {
+  adapter: {
+    strapline: 'La source legacy garde son interface, mais un pont la rend branchable sur une cible moderne.',
+    intuition:
+      "Adapter traduit un contrat existant vers celui attendu par le client. On evite ainsi de reecrire le systeme legacy juste pour le rendre compatible avec un nouvel ecosysteme.",
+    readingGuide:
+      "Observe d abord la difference entre le signal source et le signal adapte dans la scene. L UML montre la structure Target / Adapter / Adaptee, la scene runtime montre la transformation du flux en direct.",
+    studentAngle:
+      "Le declic pedagogique est de voir qu on ne corrige pas la source ou la cible : on ajoute un traducteur entre les deux.",
+    developerAngle:
+      "Le pattern devient pertinent quand tu relies une API legacy, un vieux format de fichier, un connecteur physique ou un SDK historique a un nouveau contrat applicatif.",
+    playfulPrompt:
+      "Change le scenario et regarde comment le meme principe rend compatibles un connecteur, un protocole serie ou un format XML.",
+    steps: [
+      'La source emet avec son interface historique.',
+      'Le client attend un contrat cible incompatible.',
+      'L Adapter traduit l appel ou le payload vers le bon format.',
+      'La cible consomme ensuite le resultat comme si elle parlait nativement a la source.',
+    ],
+    glossary: [
+      {
+        term: 'Target',
+        definition: 'Contrat attendu par le client ou le systeme moderne.',
+      },
+      {
+        term: 'Adaptee',
+        definition: 'Composant existant dont l interface native ne colle pas au contrat cible.',
+      },
+    ],
+  },
   mediator: {
     strapline: 'Les participants ne se parlent plus tous directement : un hub central orchestre les messages.',
     intuition:

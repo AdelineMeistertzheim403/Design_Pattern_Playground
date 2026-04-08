@@ -24,6 +24,14 @@ export const fallbackPatterns = [
     complexityLevel: 'INTERMEDIATE',
   },
   {
+    code: 'adapter',
+    name: 'Adapter',
+    type: 'STRUCTURAL',
+    description: "Traduit une interface incompatible vers le contrat attendu par le client sans modifier le composant legacy.",
+    useCase: "Connecter une source historique a une cible moderne en convertissant connecteur, protocole ou format de message.",
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'builder',
     name: 'Builder',
     type: 'CREATIONAL',
@@ -211,6 +219,34 @@ const fallbackSchemas = {
         required: true,
         allowedValues: ['ADD_BEACON', 'MOVE_RIGHT', 'MOVE_UP', 'MOVE_LEFT', 'DELETE_BEACON', 'UNDO', 'REDO'],
         defaultValue: 'ADD_BEACON, MOVE_RIGHT, MOVE_UP, UNDO, REDO, DELETE_BEACON',
+      },
+    ],
+  },
+  adapter: {
+    fields: [
+      {
+        name: 'mode',
+        label: 'Mode',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['WITH_ADAPTER', 'WITHOUT_ADAPTER'],
+        defaultValue: 'WITH_ADAPTER',
+      },
+      {
+        name: 'scenario',
+        label: 'Scenario',
+        type: 'SELECT',
+        required: true,
+        allowedValues: ['VGA_TO_HDMI', 'SERIAL_TO_REST', 'XML_TO_JSON'],
+        defaultValue: 'VGA_TO_HDMI',
+      },
+      {
+        name: 'payloadLabel',
+        label: 'Signal a transporter',
+        type: 'TEXT',
+        required: true,
+        allowedValues: null,
+        defaultValue: 'Telemetry burst 42',
       },
     ],
   },
@@ -792,6 +828,57 @@ const builderFinishStyles = {
   },
 }
 
+const adapterScenarios = {
+  VGA_TO_HDMI: {
+    code: 'VGA_TO_HDMI',
+    label: 'Legacy console -> Smart screen',
+    sourceSystem: 'LegacyConsole',
+    sourceInterface: 'VGA output',
+    sourceProtocol: 'Analog video',
+    sourceSignalTemplate: '%s :: 640x480 analog frame',
+    adapterClassName: 'VgaToHdmiAdapter',
+    adapterRole: 'Convertit un flux VGA analogique vers une sortie HDMI comprise par l ecran moderne.',
+    targetSystem: 'SmartScreen',
+    targetInterface: 'HDMI input',
+    targetProtocol: 'HDMI digital',
+    adaptedSignalTemplate: '%s :: HDMI 1080p bridge',
+    failureReason: 'Le SmartScreen attend une entree HDMI numerique. Un branchement direct VGA echoue.',
+    successDetail: 'L adaptateur encapsule le signal analogique et expose une sortie HDMI exploitable.',
+  },
+  SERIAL_TO_REST: {
+    code: 'SERIAL_TO_REST',
+    label: 'Factory sensor -> Cloud dashboard',
+    sourceSystem: 'FactorySensor',
+    sourceInterface: 'RS-232 port',
+    sourceProtocol: 'Serial frames',
+    sourceSignalTemplate: 'FRAME[%s]|crc=42',
+    adapterClassName: 'SerialToRestAdapter',
+    adapterRole: 'Traduit des trames serie vers un appel REST JSON attendu par le dashboard cloud.',
+    targetSystem: 'CloudDashboard',
+    targetInterface: 'HTTPS endpoint',
+    targetProtocol: 'REST JSON',
+    adaptedSignalTemplate: '{"event":"%s","transport":"https"}',
+    failureReason: 'Le dashboard cloud attend une requete REST JSON. Une trame serie brute ne peut pas etre consommee telle quelle.',
+    successDetail: 'L adaptateur mappe la trame serie et publie un payload JSON sur l endpoint HTTP cible.',
+  },
+  XML_TO_JSON: {
+    code: 'XML_TO_JSON',
+    label: 'Legacy CRM -> Mobile API',
+    sourceSystem: 'LegacyCRM',
+    sourceInterface: 'SOAP XML feed',
+    sourceProtocol: 'XML envelope',
+    sourceSignalTemplate: '<event><label>%s</label></event>',
+    adapterClassName: 'XmlToJsonAdapter',
+    adapterRole: 'Traduit un message XML historique vers un DTO JSON accepte par une API mobile moderne.',
+    targetSystem: 'MobileApi',
+    targetInterface: 'JSON endpoint',
+    targetProtocol: 'REST JSON',
+    adaptedSignalTemplate: '{"label":"%s","source":"legacy-crm"}',
+    failureReason: 'L API mobile ne parle pas SOAP XML. Le contrat cible impose un payload JSON simple.',
+    successDetail: 'L adaptateur consomme le XML historique et renvoie un DTO JSON compatible avec l API.',
+  },
+}
+
 function normalizeInteger(value, fallbackValue, minimum, maximum) {
   const parsed = Math.round(Number(value ?? fallbackValue))
 
@@ -800,6 +887,80 @@ function normalizeInteger(value, fallbackValue, minimum, maximum) {
   }
 
   return Math.min(maximum, Math.max(minimum, parsed))
+}
+
+function formatAdapterSignal(template, payloadLabel) {
+  return template.replace('%s', payloadLabel)
+}
+
+function createAdapterStep(index, stageCode, title, systemLabel, protocolLabel, signalLabel, detail, success) {
+  return {
+    index,
+    stageCode,
+    title,
+    systemLabel,
+    protocolLabel,
+    signalLabel,
+    detail,
+    success,
+  }
+}
+
+function buildAdapterVisualization(scenario, sourceSignal, adaptedSignal, compatible) {
+  return {
+    nodes: [
+      {
+        id: 'source',
+        label: scenario.sourceSystem,
+        type: 'client',
+        data: { detail: scenario.sourceProtocol },
+      },
+      {
+        id: 'source-port',
+        label: scenario.sourceInterface,
+        type: 'component',
+        data: { detail: sourceSignal },
+      },
+      {
+        id: 'adapter',
+        label: compatible ? scenario.adapterClassName : 'NoAdapter',
+        type: 'decorator',
+        data: { detail: compatible ? 'conversion bridge' : 'missing translation' },
+      },
+      {
+        id: 'target-port',
+        label: scenario.targetInterface,
+        type: 'strategy',
+        data: { detail: scenario.targetProtocol },
+      },
+      {
+        id: 'target',
+        label: scenario.targetSystem,
+        type: 'observer',
+        data: { detail: compatible ? adaptedSignal : 'incompatible input' },
+      },
+      {
+        id: 'result',
+        label: compatible ? 'Compatible' : 'Rejected',
+        type: 'output',
+        data: { message: compatible ? scenario.successDetail : scenario.failureReason },
+      },
+    ],
+    edges: compatible
+      ? [
+        { from: 'source', to: 'source-port', label: 'emit' },
+        { from: 'source-port', to: 'adapter', label: 'adapt' },
+        { from: 'adapter', to: 'target-port', label: 'convert' },
+        { from: 'target-port', to: 'target', label: 'deliver' },
+        { from: 'target', to: 'result', label: 'ready' },
+      ]
+      : [
+        { from: 'source', to: 'source-port', label: 'emit' },
+        { from: 'source-port', to: 'target-port', label: 'mismatch' },
+        { from: 'target-port', to: 'target', label: 'reject' },
+        { from: 'target', to: 'result', label: 'stop' },
+      ],
+  }
 }
 
 function roundToSingleDecimal(value) {
@@ -1550,6 +1711,104 @@ function buildBuilderVisualization(product, stages, readyLabel, useBuilder, buil
 }
 
 const fallbackExecutors = {
+  adapter: (parameters) => {
+    const mode = `${parameters.mode ?? 'WITH_ADAPTER'}`.trim().toUpperCase()
+    const useAdapter = mode !== 'WITHOUT_ADAPTER'
+    const scenario = adapterScenarios[`${parameters.scenario ?? 'VGA_TO_HDMI'}`.trim().toUpperCase()] ?? adapterScenarios.VGA_TO_HDMI
+    const payloadLabel = `${parameters.payloadLabel ?? ''}`.trim() || 'Telemetry burst 42'
+    const sourceSignal = formatAdapterSignal(scenario.sourceSignalTemplate, payloadLabel)
+    const adaptedSignal = formatAdapterSignal(scenario.adaptedSignalTemplate, payloadLabel)
+    const steps = [
+      createAdapterStep(
+        1,
+        'SOURCE_EMIT',
+        'Emission source',
+        scenario.sourceSystem,
+        scenario.sourceProtocol,
+        sourceSignal,
+        `${scenario.sourceSystem} emet le signal via ${scenario.sourceInterface}.`,
+        true,
+      ),
+      ...(useAdapter
+        ? [
+            createAdapterStep(
+              2,
+              'ADAPT',
+              'Conversion',
+              scenario.adapterClassName,
+              'Target -> Adaptee bridge',
+              adaptedSignal,
+              scenario.adapterRole,
+              true,
+            ),
+            createAdapterStep(
+              3,
+              'TARGET_CONSUME',
+              'Reception cible',
+              scenario.targetSystem,
+              scenario.targetProtocol,
+              adaptedSignal,
+              scenario.successDetail,
+              true,
+            ),
+          ]
+        : [
+            createAdapterStep(
+              2,
+              'TARGET_REJECT',
+              'Echec de compatibilite',
+              scenario.targetSystem,
+              scenario.targetProtocol,
+              sourceSignal,
+              scenario.failureReason,
+              false,
+            ),
+          ]),
+    ]
+    const logs = [
+      `La source ${scenario.sourceSystem} emet ${sourceSignal} sur ${scenario.sourceInterface}.`,
+      ...(useAdapter
+        ? [
+            `L adapter ${scenario.adapterClassName} convertit le signal vers ${scenario.targetProtocol}.`,
+            `${scenario.targetSystem} consomme ensuite ${adaptedSignal} sur ${scenario.targetInterface}.`,
+          ]
+        : [
+            `Sans adapter, la cible ${scenario.targetSystem} refuse le signal brut.`,
+          ]),
+    ]
+    const compatible = useAdapter
+
+    return {
+      patternCode: 'adapter',
+      summary: compatible
+        ? 'Adapter traduit l interface legacy vers le contrat attendu par la cible sans toucher ni au client ni a l adaptee.'
+        : 'Sans Adapter, la source et la cible restent incompatibles. Le client tente de brancher deux contrats qui ne se comprennent pas.',
+      logs,
+      output: {
+        mode,
+        modeLabel: compatible ? 'Avec Adapter' : 'Sans Adapter',
+        scenario: scenario.code,
+        scenarioLabel: scenario.label,
+        payloadLabel,
+        sourceSystem: scenario.sourceSystem,
+        sourceInterface: scenario.sourceInterface,
+        sourceProtocol: scenario.sourceProtocol,
+        sourceSignal,
+        adapterClassName: scenario.adapterClassName,
+        adapterRole: scenario.adapterRole,
+        targetSystem: scenario.targetSystem,
+        targetInterface: scenario.targetInterface,
+        targetProtocol: scenario.targetProtocol,
+        adaptedSignal,
+        compatible,
+        compatibilityLabel: compatible ? 'Compatibilite obtenue' : 'Connexion refusee',
+        failureReason: scenario.failureReason,
+        stepCount: steps.length,
+        steps,
+      },
+      visualization: buildAdapterVisualization(scenario, sourceSignal, adaptedSignal, compatible),
+    }
+  },
   mediator: (parameters) => {
     const mode = `${parameters.mode ?? 'WITH_MEDIATOR'}`.trim().toUpperCase()
     const useMediator = mode !== 'WITHOUT_MEDIATOR'

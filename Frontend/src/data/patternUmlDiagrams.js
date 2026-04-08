@@ -1,3 +1,92 @@
+const adapterDiagram = {
+  viewBox: '0 0 1160 700',
+  classes: [
+    {
+      id: 'client',
+      x: 72,
+      y: 240,
+      width: 254,
+      height: 132,
+      title: 'CompatibilityClient',
+      stereotype: 'Client',
+      methods: ['+ connect(target: TargetPort)', '+ play(signal)'],
+      tone: 'teal',
+    },
+    {
+      id: 'target',
+      x: 430,
+      y: 80,
+      width: 282,
+      height: 136,
+      title: 'TargetPort',
+      stereotype: 'Target',
+      methods: ['+ receive(signal): CompatiblePayload'],
+      tone: 'sand',
+    },
+    {
+      id: 'adapter',
+      x: 430,
+      y: 288,
+      width: 300,
+      height: 172,
+      title: 'PlugCompatibilityAdapter',
+      stereotype: 'Adapter',
+      fields: ['- adaptee: LegacySignalSource'],
+      methods: ['+ receive(signal)', '+ translateLegacySignal()'],
+      tone: 'accent',
+    },
+    {
+      id: 'adaptee',
+      x: 836,
+      y: 300,
+      width: 254,
+      height: 150,
+      title: 'LegacySignalSource',
+      stereotype: 'Adaptee',
+      methods: ['+ legacyOutput(): LegacySignal'],
+      tone: 'teal',
+    },
+    {
+      id: 'payload',
+      x: 826,
+      y: 86,
+      width: 264,
+      height: 122,
+      title: 'CompatiblePayload',
+      stereotype: 'Modern Contract',
+      fields: ['+ protocol: String', '+ connector: String'],
+      tone: 'accent',
+    },
+  ],
+  relations: [
+    {
+      from: 'client',
+      to: 'target',
+      label: 'depends on',
+      marker: 'arrow',
+    },
+    {
+      from: 'adapter',
+      to: 'target',
+      label: 'implements',
+      marker: 'triangle',
+      dashed: true,
+    },
+    {
+      from: 'adapter',
+      to: 'adaptee',
+      label: 'wraps',
+      marker: 'diamond',
+    },
+    {
+      from: 'target',
+      to: 'payload',
+      label: 'returns',
+      marker: 'arrow',
+    },
+  ],
+}
+
 const singletonDiagram = {
   viewBox: '0 0 1160 640',
   classes: [
@@ -1242,6 +1331,7 @@ const observerDiagram = {
 }
 
 export const patternUmlDiagrams = {
+  adapter: adapterDiagram,
   mediator: mediatorDiagram,
   chain: chainDiagram,
   command: commandDiagram,
