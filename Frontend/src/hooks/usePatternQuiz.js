@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import { getFallbackQuiz } from '../data/fallbackQuizzes'
 import { getPatternQuiz } from '../lib/api'
+import { loadFallbackQuiz } from '../patterns/loaders'
 import { normalizeQuiz } from '../quiz/quizUtils'
 
 export default function usePatternQuiz(patternCode, patternComplexityLevel, backendStatus, enabled = true) {
-  const [quiz, setQuiz] = useState(() => (
-    enabled ? normalizeQuiz(getFallbackQuiz(patternCode), patternComplexityLevel) : null
-  ))
+  const [quiz, setQuiz] = useState(null)
   const [quizError, setQuizError] = useState('')
   const [isQuizLoading, setIsQuizLoading] = useState(false)
 
@@ -22,16 +20,30 @@ export default function usePatternQuiz(patternCode, patternComplexityLevel, back
       }
     }
 
-    const localQuiz = normalizeQuiz(getFallbackQuiz(patternCode), patternComplexityLevel)
-    setQuiz(localQuiz)
+    setQuiz(null)
     setQuizError('')
+    setIsQuizLoading(true)
 
     const loadQuiz = async () => {
-      if (backendStatus !== 'connected') {
-        return
+      const localQuiz = normalizeQuiz(
+        await loadFallbackQuiz(patternCode),
+        patternComplexityLevel,
+      )
+
+      if (!ignore) {
+        setQuiz(localQuiz)
       }
 
-      setIsQuizLoading(true)
+      if (backendStatus !== 'connected') {
+        if (!ignore) {
+          setIsQuizLoading(false)
+
+          if (!localQuiz) {
+            setQuizError("Le quiz n a pas pu etre charge.")
+          }
+        }
+        return
+      }
 
       try {
         const remoteQuiz = await getPatternQuiz(patternCode)
@@ -39,10 +51,8 @@ export default function usePatternQuiz(patternCode, patternComplexityLevel, back
           setQuiz(normalizeQuiz(remoteQuiz, patternComplexityLevel))
         }
       } catch (error) {
-        if (!ignore) {
-          if (!localQuiz) {
-            setQuizError(error.message ?? "Le quiz n a pas pu etre charge.")
-          }
+        if (!ignore && !localQuiz) {
+          setQuizError(error.message ?? "Le quiz n a pas pu etre charge.")
         }
       } finally {
         if (!ignore) {
