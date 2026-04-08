@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(10)))
+			.andExpect(jsonPath("$", hasSize(11)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,38 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(10))
+			.andExpect(jsonPath("$.totalPatterns").value(11))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(10)));
+			.andExpect(jsonPath("$.patterns", hasSize(11)));
+	}
+
+	@Test
+	void shouldExecuteBuilderPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "builder",
+				  "parameters": {
+				    "mode": "WITH_BUILDER",
+				    "buildName": "Aurora Mk II",
+				    "productType": "CAR",
+				    "silhouette": "BALANCED",
+				    "coreModule": "ELECTRIC",
+				    "addonModule": "SUPPORT",
+				    "finishStyle": "CLASSIC"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("builder"))
+			.andExpect(jsonPath("$.output.productType").value("CAR"))
+			.andExpect(jsonPath("$.output.stageCount").value(4))
+			.andExpect(jsonPath("$.output.challengeMet").value(true))
+			.andExpect(jsonPath("$.output.stages", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(9)));
 	}
 
 	@Test

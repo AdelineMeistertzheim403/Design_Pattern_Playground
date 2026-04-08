@@ -232,6 +232,35 @@ export const patternLearningContent = {
       },
     ],
   },
+  builder: {
+    strapline: 'Le produit se construit morceau par morceau au lieu de sortir d un constructeur geant opaque.',
+    intuition:
+      "Builder separe le processus de construction du produit final. Le client exprime un besoin, le director orchestre l ordre, et le builder concret pose chaque brique clairement.",
+    readingGuide:
+      "Observe d abord la progression des etapes dans la scene, puis regarde l objet se completer. L UML montre le trio Client / Director / Builder, la scene runtime montre la construction progressive.",
+    studentAngle:
+      "Le declic pedagogique est de voir qu on ne cree pas un objet complexe en une seule ligne obscure : on le fabrique par etapes lisibles.",
+    developerAngle:
+      "Builder devient utile des qu un constructeur accumule trop de parametres, que l ordre de creation compte, ou qu on veut produire plusieurs variantes d un meme objet.",
+    playfulPrompt:
+      "Change le type d objet, rejoue l assemblage puis compare avec et sans Builder pour voir quand le produit apparait et comment les etapes restent lisibles.",
+    steps: [
+      'Le client demande un type de build et des options.',
+      'Le Director impose un ordre de construction stable.',
+      'Le Builder concret pose chaque etape une a une.',
+      'Le produit final est recupere avec une structure complete et un processus lisible.',
+    ],
+    glossary: [
+      {
+        term: 'Director',
+        definition: "Objet qui orchestre l ordre des etapes de construction sans contenir le produit final.",
+      },
+      {
+        term: 'Builder concret',
+        definition: "Implementation qui assemble reellement le produit a chaque etape.",
+      },
+    ],
+  },
   factory: {
     strapline: 'Le client demande un produit, la fabrique choisit la bonne classe concrete.',
     intuition:
