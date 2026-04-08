@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(12)))
+			.andExpect(jsonPath("$", hasSize(13)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(12))
+			.andExpect(jsonPath("$.totalPatterns").value(13))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(12)));
+			.andExpect(jsonPath("$.patterns", hasSize(13)));
 	}
 
 	@Test
@@ -208,6 +208,32 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.challengeMet").value(true))
 			.andExpect(jsonPath("$.output.stages", hasSize(4)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(9)));
+	}
+
+	@Test
+	void shouldExecuteProxyPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "proxy",
+				  "parameters": {
+				    "mode": "WITH_PROXY",
+				    "requestLabel": "Open premium vault",
+				    "requesterRole": "MEMBER",
+				    "resourceCode": "VAULT_VIDEO",
+				    "cacheState": "COLD"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("proxy"))
+			.andExpect(jsonPath("$.output.accessGranted").value(true))
+			.andExpect(jsonPath("$.output.lazyLoadTriggered").value(true))
+			.andExpect(jsonPath("$.output.securityLeak").value(false))
+			.andExpect(jsonPath("$.output.stepCount").value(4))
+			.andExpect(jsonPath("$.output.steps", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
 	}
 
 	@Test
