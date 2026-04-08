@@ -2,6 +2,14 @@ export const defaultPatternCode = 'strategy'
 
 export const fallbackPatterns = [
   {
+    code: 'prototype',
+    name: 'Prototype',
+    type: 'CREATIONAL',
+    description: 'Duplique un objet deja configure pour creer rapidement de nouvelles variantes sans repasser par toute la construction.',
+    useCase: 'Cloner un robot, un drone ou un avatar puis observer la difference entre copie superficielle et copie profonde.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'mediator',
     name: 'Mediator',
     type: 'BEHAVIORAL',
@@ -113,6 +121,7 @@ export const patternPreviewTaglinesByCode = {
   flyweight: 'Des milliers d objets partagent le meme etat intrinseque.',
   mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
   observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
+  prototype: 'Un blueprint source genere des clones qui partagent ou non leur etat profond.',
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
@@ -126,6 +135,7 @@ export const specializedScenePatternCodes = [
   'decorator',
   'flyweight',
   'mediator',
+  'prototype',
   'singleton',
   'state',
 ]
