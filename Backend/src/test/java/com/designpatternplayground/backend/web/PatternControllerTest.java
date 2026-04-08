@@ -265,6 +265,29 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecuteFacadePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "facade",
+				  "parameters": {
+				    "mode": "WITH_FACADE",
+				    "routineCode": "CINEMA_MODE",
+				    "triggerLabel": "Start"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("facade"))
+			.andExpect(jsonPath("$.output.systemsReady").value(true))
+			.andExpect(jsonPath("$.output.manualTouchCount").value(1))
+			.andExpect(jsonPath("$.output.stepCount").value(6))
+			.andExpect(jsonPath("$.output.steps", hasSize(6)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
 	void shouldExecuteStrategyPattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)
