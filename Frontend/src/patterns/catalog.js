@@ -1,0 +1,139 @@
+export const defaultPatternCode = 'strategy'
+
+export const fallbackPatterns = [
+  {
+    code: 'mediator',
+    name: 'Mediator',
+    type: 'BEHAVIORAL',
+    description: "Centralise les echanges entre plusieurs objets pour qu ils passent par un hub commun au lieu de se connaitre tous directement.",
+    useCase: 'Construire un chat multijoueur ou les messages transitent par un salon central pour reduire le couplage entre participants.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'chain',
+    name: 'Chain of Responsibility',
+    type: 'BEHAVIORAL',
+    description: 'Fait circuler une requete dans une chaine de handlers capables de la laisser passer, de la bloquer ou de la traiter.',
+    useCase: 'Visualiser un pipeline auth -> validation -> traitement ou chaque maillon prend une decision locale sans gros controller central.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'command',
+    name: 'Command',
+    type: 'BEHAVIORAL',
+    description: "Encapsule une action dans un objet pour pouvoir la declencher, l historiser, l annuler et la rejouer sans coupler l interface au receiver.",
+    useCase: 'Construire un simulateur undo / redo, un editeur ou un mini jeu d actions historisees avec piles de commandes.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'adapter',
+    name: 'Adapter',
+    type: 'STRUCTURAL',
+    description: 'Traduit une interface incompatible vers le contrat attendu par le client sans modifier le composant legacy.',
+    useCase: 'Connecter une source historique a une cible moderne en convertissant connecteur, protocole ou format de message.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'builder',
+    name: 'Builder',
+    type: 'CREATIONAL',
+    description: 'Construit un objet complexe etape par etape au lieu de pousser une longue liste de parametres dans un constructeur geant.',
+    useCase: 'Assembler visuellement une voiture, un personnage ou une maison en posant structure, noyau, module et finition dans un ordre lisible.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'singleton',
+    name: 'Singleton',
+    type: 'CREATIONAL',
+    description: "Garantit qu un service central ne possede qu une seule instance partagee dans toute l application.",
+    useCase: 'Partager la meme configuration globale, le meme logger ou le meme gestionnaire audio entre plusieurs clients.',
+    complexityLevel: 'BEGINNER',
+  },
+  {
+    code: 'state',
+    name: 'State',
+    type: 'BEHAVIORAL',
+    description: "Fait varier le comportement d un contexte selon son etat interne sans multiplier les conditions dans le code client.",
+    useCase: 'Piloter une machine a etats de personnage, un workflow ou un cycle de vie UI avec des transitions explicites.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'flyweight',
+    name: 'Flyweight',
+    type: 'STRUCTURAL',
+    description: "Partage l etat intrinseque entre de nombreux objets pour eviter de multiplier les instances lourdes en memoire.",
+    useCase: 'Afficher des milliers d arbres, particules ou projectiles en mutualisant textures, meshes et autres donnees communes.',
+    complexityLevel: 'ADVANCED',
+  },
+  {
+    code: 'decorator',
+    name: 'Decorator',
+    type: 'STRUCTURAL',
+    description: "Ajoute des comportements a un objet en l enveloppant avec des couches successives, sans modifier sa classe d origine.",
+    useCase: 'Empiler des power-ups sur un personnage, enrichir un cafe customisable ou combiner des effets sans explosion de classes.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'factory',
+    name: 'Factory Method',
+    type: 'CREATIONAL',
+    description: 'Centralise la creation d objets derriere une fabrique specialisee.',
+    useCase: 'Choisir dynamiquement le bon type de vehicule sans dupliquer des constructeurs.',
+    complexityLevel: 'BEGINNER',
+  },
+  {
+    code: 'observer',
+    name: 'Observer',
+    type: 'BEHAVIORAL',
+    description: 'Relie un sujet a plusieurs abonnes qui recoivent automatiquement chaque notification.',
+    useCase: 'Propager un evenement de publication a plusieurs consommateurs sans les coupler entre eux.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'strategy',
+    name: 'Strategy',
+    type: 'BEHAVIORAL',
+    description: "Permet de changer un algorithme a l execution sans modifier le contexte.",
+    useCase: 'Basculer entre plusieurs modes de paiement dans un meme workflow.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+]
+
+export const fallbackPatternsByCode = Object.fromEntries(
+  fallbackPatterns.map((pattern) => [pattern.code, pattern]),
+)
+
+export const patternPreviewTaglinesByCode = {
+  adapter: 'Une interface legacy entre, une interface compatible ressort.',
+  builder: 'L objet se construit piece par piece avant la livraison finale.',
+  chain: 'La requete traverse la chaine jusqu a etre acceptee ou stoppee.',
+  command: 'Chaque action devient un objet rejouable avec undo et redo.',
+  decorator: 'Les comportements s empilent comme des couches autour du composant.',
+  factory: 'La creation est delegatee a une fabrique au lieu d etre dispersee.',
+  flyweight: 'Des milliers d objets partagent le meme etat intrinseque.',
+  mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
+  observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
+  singleton: 'Tous les clients pointent vers la meme instance partagee.',
+  state: 'Le contexte change de comportement quand son etat evolue.',
+  strategy: 'Le contexte reste stable pendant que l algorithme change.',
+}
+
+export const specializedScenePatternCodes = [
+  'adapter',
+  'builder',
+  'chain',
+  'command',
+  'decorator',
+  'flyweight',
+  'mediator',
+  'singleton',
+  'state',
+]
+
+export function getPatternPreviewTagline(code) {
+  return patternPreviewTaglinesByCode[code] ?? null
+}
+
+export function hasSpecializedPatternScene(code) {
+  return specializedScenePatternCodes.includes(code)
+}
