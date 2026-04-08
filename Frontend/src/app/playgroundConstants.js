@@ -25,6 +25,15 @@ export const statusMap = {
 }
 
 export const patternFieldUi = {
+  composite: {
+    extraLeafCount: {
+      min: 0,
+      max: 8,
+      step: 1,
+      unitLabel: 'feuilles',
+      hint: "Ajoute des feuilles supplementaires pour densifier l arbre et verifier si le parcours couvre encore tous les descendants.",
+    },
+  },
   flyweight: {
     objectCount: {
       min: 100,

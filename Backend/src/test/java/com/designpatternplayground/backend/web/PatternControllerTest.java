@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(12)))
+			.andExpect(jsonPath("$", hasSize(13)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(12))
+			.andExpect(jsonPath("$.totalPatterns").value(13))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(12)));
+			.andExpect(jsonPath("$.patterns", hasSize(13)));
 	}
 
 	@Test
@@ -208,6 +208,32 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.challengeMet").value(true))
 			.andExpect(jsonPath("$.output.stages", hasSize(4)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(9)));
+	}
+
+	@Test
+	void shouldExecuteCompositePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "composite",
+				  "parameters": {
+				    "mode": "WITH_COMPOSITE",
+				    "rootName": "workspace",
+				    "blueprintCode": "GAME_ASSETS",
+				    "extraLeafCount": 3,
+				    "operationLabel": "Scan tree"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("composite"))
+			.andExpect(jsonPath("$.output.uniformTraversal").value(true))
+			.andExpect(jsonPath("$.output.missedCount").value(0))
+			.andExpect(jsonPath("$.output.fileCount").value(9))
+			.andExpect(jsonPath("$.output.stepCount").value(6))
+			.andExpect(jsonPath("$.output.treeNodes", hasSize(13)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(14)));
 	}
 
 	@Test
