@@ -316,6 +316,7 @@ npm run build
 - `state` : machine a etats interactive avec timeline, transitions et scene SVG dediee.
 - `flyweight` : simulation memoire avec mutualisation d instances et comparaison live.
 - `decorator` : empilement de power-ups sur un composant de base avec stats cumulees et pile de wrappers.
+- `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
