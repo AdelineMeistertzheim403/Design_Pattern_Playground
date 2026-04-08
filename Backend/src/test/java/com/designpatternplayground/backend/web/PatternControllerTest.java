@@ -32,6 +32,7 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$", hasSize(13)))
+			.andExpect(jsonPath("$", hasSize(13)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -208,6 +209,33 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.challengeMet").value(true))
 			.andExpect(jsonPath("$.output.stages", hasSize(4)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(9)));
+	}
+
+	@Test
+	void shouldExecutePrototypePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "prototype",
+				  "parameters": {
+				    "mode": "WITHOUT_PROTOTYPE",
+				    "blueprintName": "Echo Forge",
+				    "archetype": "SCOUT_DRONE",
+				    "cloneCount": 4,
+				    "mutationTarget": "CLONE_2",
+				    "mutationPreset": "OVERCLOCK"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("prototype"))
+			.andExpect(jsonPath("$.output.cloneCount").value(4))
+			.andExpect(jsonPath("$.output.sharedNestedState").value(true))
+			.andExpect(jsonPath("$.output.propagationCount").value(4))
+			.andExpect(jsonPath("$.output.initialClones", hasSize(4)))
+			.andExpect(jsonPath("$.output.clones", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(7)));
 	}
 
 	@Test
