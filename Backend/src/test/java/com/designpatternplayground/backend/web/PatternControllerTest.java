@@ -31,7 +31,7 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(11)))
+			.andExpect(jsonPath("$", hasSize(12)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -152,11 +152,35 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(11))
+			.andExpect(jsonPath("$.totalPatterns").value(12))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(11)));
+			.andExpect(jsonPath("$.patterns", hasSize(12)));
+	}
+
+	@Test
+	void shouldExecuteAdapterPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "adapter",
+				  "parameters": {
+				    "mode": "WITH_ADAPTER",
+				    "scenario": "VGA_TO_HDMI",
+				    "payloadLabel": "Telemetry burst 42"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("adapter"))
+			.andExpect(jsonPath("$.output.compatible").value(true))
+			.andExpect(jsonPath("$.output.sourceSystem").value("LegacyConsole"))
+			.andExpect(jsonPath("$.output.targetSystem").value("SmartScreen"))
+			.andExpect(jsonPath("$.output.stepCount").value(3))
+			.andExpect(jsonPath("$.output.steps", hasSize(3)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
 	}
 
 	@Test
