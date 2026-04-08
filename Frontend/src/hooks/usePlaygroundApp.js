@@ -1,7 +1,4 @@
 import { startTransition, useDeferredValue, useEffect, useState } from 'react'
-import { executeFallbackPattern, fallbackPatterns, getFallbackSchema } from '../data/fallbackPatterns'
-import { getPatternLearningContent } from '../data/patternLearningContent'
-import { getPatternUmlDiagram } from '../data/patternUmlDiagrams'
 import {
   executePattern,
   getCurrentUser,
@@ -13,9 +10,16 @@ import {
   registerUser,
 } from '../lib/api'
 import { statusMap } from '../app/playgroundConstants'
+import { defaultPatternCode, fallbackPatterns, fallbackPatternsByCode } from '../patterns/catalog'
+import { defaultLearningContent, emptyPatternSchema } from '../patterns/defaults'
+import {
+  executeFallbackPattern,
+  loadFallbackSchema,
+  loadPatternLearningContent,
+  loadPatternUmlDiagram,
+} from '../patterns/loaders'
 import {
   buildInitialParameters,
-  buildPreviewExecution,
   clearPersistedSession,
   loadPersistedUser,
   normalizeParameters,
@@ -26,10 +30,8 @@ import {
 export default function usePlaygroundApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.pathname))
   const [patterns, setPatterns] = useState(fallbackPatterns)
-  const [schema, setSchema] = useState(getFallbackSchema(fallbackPatterns[0].code))
-  const [formValues, setFormValues] = useState(
-    buildInitialParameters(getFallbackSchema(fallbackPatterns[0].code)),
-  )
+  const [schema, setSchema] = useState(emptyPatternSchema)
+  const [formValues, setFormValues] = useState({})
   const [execution, setExecution] = useState(null)
   const [executionError, setExecutionError] = useState('')
   const [lastExecutedPayload, setLastExecutedPayload] = useState(null)
@@ -43,6 +45,9 @@ export default function usePlaygroundApp() {
   const [authPending, setAuthPending] = useState(false)
   const [currentUser, setCurrentUser] = useState(() => loadPersistedUser())
   const [activeVisualModal, setActiveVisualModal] = useState(null)
+  const [learningContent, setLearningContent] = useState(defaultLearningContent)
+  const [umlDiagram, setUmlDiagram] = useState(null)
+  const [previewExecution, setPreviewExecution] = useState(null)
   const deferredSearch = useDeferredValue(search)
 
   useEffect(() => {
@@ -128,12 +133,13 @@ export default function usePlaygroundApp() {
   const selectedPattern = route.name === 'pattern' || route.name === 'quiz'
     ? (
       patterns.find((pattern) => pattern.code === route.code)
-      ?? fallbackPatterns.find((pattern) => pattern.code === route.code)
+      ?? fallbackPatternsByCode[route.code]
       ?? null
     )
     : null
 
-  const activePatternCode = selectedPattern?.code ?? fallbackPatterns[0].code
+  const activePatternCode = selectedPattern?.code ?? defaultPatternCode
+  const shouldLoadPatternDetail = route.name === 'pattern' && Boolean(selectedPattern)
 
   useEffect(() => {
     setActiveVisualModal(null)
@@ -142,26 +148,43 @@ export default function usePlaygroundApp() {
   useEffect(() => {
     let ignore = false
 
-    const fallbackSchema = getFallbackSchema(activePatternCode)
-    setSchema(fallbackSchema)
-    setFormValues(buildInitialParameters(fallbackSchema))
+    if (!shouldLoadPatternDetail) {
+      return () => {
+        ignore = true
+      }
+    }
+
     setExecution(null)
     setExecutionError('')
     setLastExecutedPayload(null)
+    setPreviewExecution(null)
 
-    const loadSchema = async () => {
+    const loadPatternDetail = async () => {
+      const [localSchema, localLearningContent, localUmlDiagram] = await Promise.all([
+        loadFallbackSchema(activePatternCode),
+        loadPatternLearningContent(activePatternCode),
+        loadPatternUmlDiagram(activePatternCode),
+      ])
+
+      if (ignore) {
+        return
+      }
+
+      setSchema(localSchema)
+      setFormValues(buildInitialParameters(localSchema))
+      setLearningContent(localLearningContent)
+      setUmlDiagram(localUmlDiagram)
+
       if (backendStatus !== 'connected' || !selectedPattern) {
         return
       }
 
       try {
         const apiSchema = await getPatternSchema(activePatternCode)
-        if (ignore) {
-          return
+        if (!ignore) {
+          setSchema(apiSchema)
+          setFormValues(buildInitialParameters(apiSchema))
         }
-
-        setSchema(apiSchema)
-        setFormValues(buildInitialParameters(apiSchema))
       } catch {
         if (!ignore) {
           setBackendStatus('fallback')
@@ -169,12 +192,46 @@ export default function usePlaygroundApp() {
       }
     }
 
-    loadSchema()
+    loadPatternDetail()
 
     return () => {
       ignore = true
     }
-  }, [activePatternCode, backendStatus, selectedPattern])
+  }, [activePatternCode, backendStatus, selectedPattern, shouldLoadPatternDetail])
+
+  useEffect(() => {
+    let ignore = false
+
+    if (!shouldLoadPatternDetail || !schema?.fields?.length) {
+      setPreviewExecution(null)
+      return () => {
+        ignore = true
+      }
+    }
+
+    const loadPreview = async () => {
+      try {
+        const nextPreviewExecution = await executeFallbackPattern(
+          activePatternCode,
+          normalizeParameters(schema, formValues),
+        )
+
+        if (!ignore) {
+          setPreviewExecution(nextPreviewExecution)
+        }
+      } catch {
+        if (!ignore) {
+          setPreviewExecution(null)
+        }
+      }
+    }
+
+    loadPreview()
+
+    return () => {
+      ignore = true
+    }
+  }, [activePatternCode, formValues, schema, shouldLoadPatternDetail])
 
   const visiblePatterns = patterns.filter((pattern) => {
     const haystack = `${pattern.name} ${pattern.type} ${pattern.description} ${pattern.useCase}`.toLowerCase()
@@ -182,17 +239,11 @@ export default function usePlaygroundApp() {
   })
 
   const status = statusMap[backendStatus] ?? statusMap.fallback
-  const learningContent = getPatternLearningContent(activePatternCode)
-  const umlDiagram = getPatternUmlDiagram(activePatternCode)
 
   const draftPayload = {
     patternCode: activePatternCode,
     parameters: normalizeParameters(schema, formValues),
   }
-
-  const previewExecution = selectedPattern
-    ? buildPreviewExecution(activePatternCode, schema, formValues)
-    : null
 
   const hasDraftChanges = Boolean(
     lastExecutedPayload
@@ -246,7 +297,7 @@ export default function usePlaygroundApp() {
     try {
       const result = backendStatus === 'connected'
         ? await executePattern(payload)
-        : executeFallbackPattern(activePatternCode, payload.parameters)
+        : await executeFallbackPattern(activePatternCode, payload.parameters)
 
       setExecution(result)
       setLastExecutedPayload(payload)
@@ -255,7 +306,7 @@ export default function usePlaygroundApp() {
         setBackendStatus('fallback')
 
         try {
-          setExecution(executeFallbackPattern(activePatternCode, payload.parameters))
+          setExecution(await executeFallbackPattern(activePatternCode, payload.parameters))
           setLastExecutedPayload(payload)
         } catch {
           setExecution(null)
