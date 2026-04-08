@@ -1,15 +1,27 @@
-import AuthDialog from './components/AuthDialog'
-import ExecutionScene from './components/ExecutionScene'
+import { Suspense, lazy } from 'react'
 import SiteHeader from './components/SiteHeader'
-import UmlDiagram from './components/UmlDiagram'
-import VisualizationModal from './components/VisualizationModal'
 import usePlaygroundApp from './hooks/usePlaygroundApp'
-import HomePage from './pages/HomePage'
-import NotFoundPage from './pages/NotFoundPage'
-import PatternPage from './pages/PatternPage'
-import PatternQuizPage from './pages/PatternQuizPage'
-import QuizDashboardPage from './pages/QuizDashboardPage'
 import { buildPatternPath, buildPatternQuizPath, buildProgressPath } from './app/playgroundUtils'
+
+const AuthDialog = lazy(() => import('./components/AuthDialog'))
+const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
+const HomePage = lazy(() => import('./pages/HomePage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+const PatternPage = lazy(() => import('./pages/PatternPage'))
+const PatternQuizPage = lazy(() => import('./pages/PatternQuizPage'))
+const QuizDashboardPage = lazy(() => import('./pages/QuizDashboardPage'))
+const UmlDiagram = lazy(() => import('./components/UmlDiagram'))
+const VisualizationModal = lazy(() => import('./components/VisualizationModal'))
+
+function PageLoadingFallback() {
+  return (
+    <div className="mx-auto flex w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full rounded-[28px] border border-black/10 bg-white/80 px-5 py-10 text-sm leading-7 text-stone-600 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
+        Chargement de la page...
+      </div>
+    </div>
+  )
+}
 
 function PatternModals({
   route,
@@ -28,31 +40,35 @@ function PatternModals({
   return (
     <>
       {isSceneModalOpen ? (
-        <VisualizationModal
-          title={`Scene SVG ${selectedPattern.name}`}
-          onClose={() => setActiveVisualModal(null)}
-        >
-          <ExecutionScene
-            execution={visualExecution}
-            isExpanded
-            patternCode={selectedPattern.code}
-            sourceLabel={visualSourceLabel}
-          />
-        </VisualizationModal>
+        <Suspense fallback={null}>
+          <VisualizationModal
+            title={`Scene SVG ${selectedPattern.name}`}
+            onClose={() => setActiveVisualModal(null)}
+          >
+            <ExecutionScene
+              execution={visualExecution}
+              isExpanded
+              patternCode={selectedPattern.code}
+              sourceLabel={visualSourceLabel}
+            />
+          </VisualizationModal>
+        </Suspense>
       ) : null}
 
       {isUmlModalOpen ? (
-        <VisualizationModal
-          title={`Diagramme UML ${selectedPattern.name}`}
-          onClose={() => setActiveVisualModal(null)}
-        >
-          <UmlDiagram
-            diagram={umlDiagram}
-            isExpanded
-            patternCode={selectedPattern.code}
-            patternName={selectedPattern.name}
-          />
-        </VisualizationModal>
+        <Suspense fallback={null}>
+          <VisualizationModal
+            title={`Diagramme UML ${selectedPattern.name}`}
+            onClose={() => setActiveVisualModal(null)}
+          >
+            <UmlDiagram
+              diagram={umlDiagram}
+              isExpanded
+              patternCode={selectedPattern.code}
+              patternName={selectedPattern.name}
+            />
+          </VisualizationModal>
+        </Suspense>
       ) : null}
     </>
   )
@@ -111,71 +127,73 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      {route.name === 'home' ? (
-        <HomePage
-          currentUser={currentUser}
-          patterns={patterns}
-          visiblePatterns={visiblePatterns}
-          search={search}
-          status={status}
-          onOpenAuth={openAuth}
-          onOpenPattern={(code) => navigate(buildPatternPath(code))}
-          onSearchChange={handleSearchChange}
-        />
-      ) : route.name === 'pattern' && selectedPattern ? (
-        <PatternPage
-          currentUser={currentUser}
-          execution={execution}
-          executionError={executionError}
-          formValues={formValues}
-          hasDraftChanges={hasDraftChanges}
-          isExecuting={isExecuting}
-          learningContent={learningContent}
-          onOpenSceneModal={() => setActiveVisualModal('scene')}
-          onOpenUmlModal={() => setActiveVisualModal('uml')}
-          patterns={patterns}
-          schema={schema}
-          selectedPattern={selectedPattern}
-          status={status}
-          umlDiagram={umlDiagram}
-          visualExecution={visualExecution}
-          visualSourceLabel={visualSourceLabel}
-          onFieldValueChange={updateFieldValue}
-          onNavigateHome={() => navigate('/')}
-          onNavigatePattern={(code) => navigate(buildPatternPath(code))}
-          onNavigateQuiz={() => {
-            if (currentUser) {
-              navigate(buildPatternQuizPath(selectedPattern.code))
-              return
-            }
+      <Suspense fallback={<PageLoadingFallback />}>
+        {route.name === 'home' ? (
+          <HomePage
+            currentUser={currentUser}
+            patterns={patterns}
+            visiblePatterns={visiblePatterns}
+            search={search}
+            status={status}
+            onOpenAuth={openAuth}
+            onOpenPattern={(code) => navigate(buildPatternPath(code))}
+            onSearchChange={handleSearchChange}
+          />
+        ) : route.name === 'pattern' && selectedPattern ? (
+          <PatternPage
+            currentUser={currentUser}
+            execution={execution}
+            executionError={executionError}
+            formValues={formValues}
+            hasDraftChanges={hasDraftChanges}
+            isExecuting={isExecuting}
+            learningContent={learningContent}
+            onOpenSceneModal={() => setActiveVisualModal('scene')}
+            onOpenUmlModal={() => setActiveVisualModal('uml')}
+            patterns={patterns}
+            schema={schema}
+            selectedPattern={selectedPattern}
+            status={status}
+            umlDiagram={umlDiagram}
+            visualExecution={visualExecution}
+            visualSourceLabel={visualSourceLabel}
+            onFieldValueChange={updateFieldValue}
+            onNavigateHome={() => navigate('/')}
+            onNavigatePattern={(code) => navigate(buildPatternPath(code))}
+            onNavigateQuiz={() => {
+              if (currentUser) {
+                navigate(buildPatternQuizPath(selectedPattern.code))
+                return
+              }
 
-            openAuth('login')
-          }}
-          onOpenAuth={openAuth}
-          onSubmit={handleExecute}
-        />
-      ) : route.name === 'quiz' && selectedPattern ? (
-        <PatternQuizPage
-          backendStatus={backendStatus}
-          currentUser={currentUser}
-          selectedPattern={selectedPattern}
-          status={status}
-          onNavigateHome={() => navigate('/')}
-          onNavigatePattern={() => navigate(buildPatternPath(selectedPattern.code))}
-          onOpenAuth={openAuth}
-        />
-      ) : route.name === 'progress' ? (
-        <QuizDashboardPage
-          backendStatus={backendStatus}
-          currentUser={currentUser}
-          onNavigateHome={() => navigate('/')}
-          onOpenAuth={openAuth}
-          onOpenPattern={(code) => navigate(buildPatternPath(code))}
-          onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
-        />
-      ) : (
-        <NotFoundPage onNavigateHome={() => navigate('/')} />
-      )}
+              openAuth('login')
+            }}
+            onOpenAuth={openAuth}
+            onSubmit={handleExecute}
+          />
+        ) : route.name === 'quiz' && selectedPattern ? (
+          <PatternQuizPage
+            backendStatus={backendStatus}
+            currentUser={currentUser}
+            selectedPattern={selectedPattern}
+            status={status}
+            onNavigateHome={() => navigate('/')}
+            onNavigatePattern={() => navigate(buildPatternPath(selectedPattern.code))}
+            onOpenAuth={openAuth}
+          />
+        ) : route.name === 'progress' ? (
+          <QuizDashboardPage
+            backendStatus={backendStatus}
+            currentUser={currentUser}
+            onNavigateHome={() => navigate('/')}
+            onOpenAuth={openAuth}
+            onOpenPattern={(code) => navigate(buildPatternPath(code))}
+            onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
+          />
+        ) : (
+          <NotFoundPage onNavigateHome={() => navigate('/')} />
+        )}
+      </Suspense>
 
       <PatternModals
         isSceneModalOpen={isSceneModalOpen}
@@ -188,23 +206,27 @@ export default function App() {
         visualSourceLabel={visualSourceLabel}
       />
 
-      <AuthDialog
-        backendStatus={backendStatus}
-        currentUser={currentUser}
-        error={authError}
-        formValues={authFormValues}
-        isOpen={isAuthOpen}
-        mode={authMode}
-        pending={authPending}
-        onClose={() => setIsAuthOpen(false)}
-        onFieldChange={updateAuthField}
-        onLogout={handleLogout}
-        onModeChange={(nextMode) => {
-          setAuthMode(nextMode)
-          setAuthError('')
-        }}
-        onSubmit={handleAuthSubmit}
-      />
+      {isAuthOpen ? (
+        <Suspense fallback={null}>
+          <AuthDialog
+            backendStatus={backendStatus}
+            currentUser={currentUser}
+            error={authError}
+            formValues={authFormValues}
+            isOpen={isAuthOpen}
+            mode={authMode}
+            pending={authPending}
+            onClose={() => setIsAuthOpen(false)}
+            onFieldChange={updateAuthField}
+            onLogout={handleLogout}
+            onModeChange={(nextMode) => {
+              setAuthMode(nextMode)
+              setAuthError('')
+            }}
+            onSubmit={handleAuthSubmit}
+          />
+        </Suspense>
+      ) : null}
     </>
   )
 }

@@ -1,6 +1,5 @@
-import { fallbackPatterns } from '../data/fallbackPatterns'
-import { getPatternLearningContent } from '../data/patternLearningContent'
 import { typeLabels } from '../app/playgroundConstants'
+import { fallbackPatterns, getPatternPreviewTagline } from '../patterns/catalog'
 
 export default function HomePage({
   patterns,
@@ -95,7 +94,7 @@ export default function HomePage({
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {visiblePatterns.length > 0 ? (
             visiblePatterns.map((pattern) => {
-              const learning = getPatternLearningContent(pattern.code)
+              const previewTagline = getPatternPreviewTagline(pattern.code) ?? pattern.useCase
 
               return (
                 <article
@@ -116,7 +115,7 @@ export default function HomePage({
 
                   <p className="mt-4 text-sm leading-7 text-stone-700">{pattern.description}</p>
                   <p className="mt-4 rounded-[22px] bg-[var(--teal-soft)]/72 px-4 py-4 text-sm leading-7 text-stone-700">
-                    {learning.strapline}
+                    {previewTagline}
                   </p>
                   <p className="mt-4 text-sm leading-7 text-stone-700">
                     Cas d usage : {pattern.useCase}

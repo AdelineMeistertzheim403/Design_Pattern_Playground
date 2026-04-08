@@ -2,9 +2,8 @@ import {
   buildFlyweightVisualization,
   distributeObjects,
   flyweightProfiles,
-  normalizeInteger,
-  roundToSingleDecimal,
-} from '../shared/executorShared'
+} from '../shared/flyweightExecutorSupport'
+import { normalizeInteger, roundToSingleDecimal } from '../shared/executorCommon'
 
 export default function executeFlyweightPattern(parameters) {
   const assetType = `${parameters.assetType ?? 'TREE'}`.toUpperCase()

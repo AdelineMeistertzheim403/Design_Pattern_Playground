@@ -7,10 +7,10 @@ import {
   createCommandBoard,
   createCommandEntry,
   createCommandStep,
-  normalizeOrderedList,
   restoreCommandBoard,
   snapshotCommandBoard,
-} from '../shared/executorShared'
+} from '../shared/commandExecutorSupport'
+import { normalizeOrderedList } from '../shared/executorCommon'
 
 export default function executeCommandPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_COMMAND'}`.toUpperCase()

@@ -20,6 +20,9 @@ Points d entree principaux :
 - `src/hooks/usePlaygroundApp.js`
 - `src/app/playgroundUtils.js`
 - `src/lib/api.js`
+- `src/patterns/catalog.js`
+- `src/patterns/loaders.js`
+- `src/patterns/defaults.js`
 
 Ces fichiers gerent :
 
@@ -27,6 +30,7 @@ Ces fichiers gerent :
 - l authentification
 - le chargement backend
 - le fallback local
+- le code splitting par route et par pattern
 - la composition globale des pages
 
 ### Pages et composants generiques
@@ -35,6 +39,7 @@ Pages :
 
 - `src/pages/HomePage.jsx`
 - `src/pages/PatternPage.jsx`
+- `src/pages/pattern-page/`
 - `src/pages/PatternQuizPage.jsx`
 - `src/pages/QuizDashboardPage.jsx`
 - `src/pages/NotFoundPage.jsx`
@@ -51,8 +56,11 @@ Composants transverses :
 Important :
 
 - `ExecutionScene.jsx` n est plus un monolithe
-- il route vers des scenes par pattern
+- il charge les scenes specialisees a la demande
 - `UmlDiagram.jsx` reste le renderer UML generique
+- `PatternPage.jsx` n est plus qu un assembleur
+- les blocs de page vivent dans `src/pages/pattern-page/`
+- `App.jsx` charge les pages en lazy loading
 
 ### Modules par pattern
 
@@ -70,26 +78,56 @@ Selon le niveau de finition du pattern, on y trouve :
 - `data.js`
 - `executor.js`
 - `scene.jsx`
+- `index.js`
 
 Roles :
 
 - `data.js` : metadata locales du pattern
 - `executor.js` : execution fallback locale
 - `scene.jsx` : rendu SVG specialise
+- `index.js` : point d entree agrege charge dynamiquement par `src/patterns/loaders.js`
 
 Fichiers partages :
 
-- `src/patterns/dataRegistry.js`
-- `src/patterns/executorRegistry.js`
+- `src/patterns/catalog.js`
+- `src/patterns/loaders.js`
+- `src/patterns/defaults.js`
 - `src/patterns/shared/sceneShared.jsx`
-- `src/patterns/shared/executorShared.js`
+- `src/patterns/shared/executorCommon.js`
+- `src/patterns/shared/adapterExecutorSupport.js`
+- `src/patterns/shared/mediatorChainExecutorSupport.js`
+- `src/patterns/shared/commandExecutorSupport.js`
+- `src/patterns/shared/stateExecutorSupport.js`
+- `src/patterns/shared/flyweightExecutorSupport.js`
+- `src/patterns/shared/decoratorExecutorSupport.js`
+- `src/patterns/shared/builderExecutorSupport.js`
 
-Les fichiers de `src/data/` existent encore, mais ce sont maintenant de fines facades :
+Les anciennes facades `src/data/*` et les registres statiques `dataRegistry.js` / `executorRegistry.js` ont ete retires.
+Il n y a plus qu une seule source de verite :
 
-- `src/data/fallbackPatterns.js`
-- `src/data/fallbackQuizzes.js`
-- `src/data/patternLearningContent.js`
-- `src/data/patternUmlDiagrams.js`
+- `src/patterns/catalog.js` pour le catalogue leger
+- `src/patterns/<code>/data.js` pour les donnees locales
+- `src/patterns/<code>/executor.js` pour les fallbacks d execution
+- `src/patterns/<code>/scene.jsx` pour les scenes specialisees
+- `src/patterns/loaders.js` pour le chargement dynamique
+
+## Code splitting
+
+Le frontend ne charge plus tout le monde au demarrage.
+
+Il est maintenant coupe sur deux axes :
+
+- par route, avec `React.lazy` dans `src/App.jsx`
+- par pattern, avec `import.meta.glob` dans `src/patterns/loaders.js`
+
+Concretement :
+
+- l accueil, la page pattern, le quiz, la progression et les modales partent en chunks separes
+- `data.js`, `executor.js` et `scene.jsx` sont charges uniquement quand un pattern en a besoin
+- le catalogue reste synchrone via `src/patterns/catalog.js`, donc la home reste rapide
+- la sortie Vite est nommee par usage avec `manualChunks` dans `vite.config.js` : `page-quiz`, `page-pattern`, `modal-auth`, `pattern-state`, `pattern-builder`, etc.
+- la page pattern elle-meme est decoupee en sous-chunks : `page-pattern-visualization`, `page-pattern-result` et `page-pattern-learning`
+- la page quiz suit le meme principe avec `page-quiz-question` et `page-quiz-summary`
 
 ## Principe general pour un nouveau pattern
 
@@ -113,6 +151,7 @@ Exemple avec un pattern `builder` :
 
 ```text
 src/patterns/builder/
+├── index.js
 ├── data.js
 ├── executor.js
 └── scene.jsx
@@ -179,24 +218,16 @@ export const fallbackQuiz = {
 }
 ```
 
-## 2. Declarer le pattern dans le registre de donnees
+## 2. Declarer le pattern dans le catalogue leger
 
-Mettre a jour `src/patterns/dataRegistry.js`.
+Mettre a jour `src/patterns/catalog.js`.
 
-Tu dois y brancher :
+Tu dois y ajouter au minimum :
 
-- `patternDefinition`
-- `fallbackSchema`
-- `patternLearningContent`
-- `patternUmlDiagram`
-- `fallbackQuiz`
+- une entree dans `fallbackPatterns`
+- une entree dans `patternPreviewTaglinesByCode`
 
-Ce registre alimente automatiquement :
-
-- `src/data/fallbackPatterns.js`
-- `src/data/patternLearningContent.js`
-- `src/data/patternUmlDiagrams.js`
-- `src/data/fallbackQuizzes.js`
+Le reste sera resolu automatiquement a partir du dossier `src/patterns/<code>/` par `src/patterns/loaders.js`.
 
 ## 3. Ajouter l execution fallback
 
@@ -219,9 +250,7 @@ export default function executeBuilderPattern(parameters) {
 }
 ```
 
-Puis brancher ce fichier dans `src/patterns/executorRegistry.js`.
-
-Ce registre alimente automatiquement `src/data/fallbackPatterns.js`.
+Tu n as rien d autre a declarer : `src/patterns/loaders.js` detecte automatiquement les `executor.js` disponibles.
 
 ## 4. Ajouter une scene SVG specialisee si necessaire
 
@@ -237,7 +266,8 @@ Le composant recoit :
 - `sourceLabel`
 - `onOpenModal`
 
-Ensuite, brancher la scene dans `src/components/ExecutionScene.jsx`.
+Tu n as pas besoin de brancher la scene manuellement dans `src/components/ExecutionScene.jsx`.
+Si `src/patterns/<code>/scene.jsx` existe, elle sera chargee automatiquement a la demande.
 
 Si tu n ajoutes pas de scene dediee :
 
@@ -300,13 +330,12 @@ Le fallback local sert surtout :
 ## Checklist courte pour ajouter un pattern
 
 1. Creer `src/patterns/<code>/data.js`
-2. Brancher `src/patterns/dataRegistry.js`
+2. Declarer le metadata leger dans `src/patterns/catalog.js`
 3. Creer `src/patterns/<code>/executor.js`
-4. Brancher `src/patterns/executorRegistry.js`
+4. Creer `src/patterns/<code>/index.js` pour reexporter `data`, `fallbackExecutor` et eventuellement `SceneComponent`
 5. Ajouter `src/patterns/<code>/scene.jsx` si le pattern merite une scene dediee
-6. Brancher `src/components/ExecutionScene.jsx` si scene specialisee
-7. Verifier la page pattern et le quiz
-8. Lancer `npm run build`
+6. Verifier la page pattern et le quiz
+7. Lancer `npm run build`
 
 ## Verification
 

@@ -1,4 +1,3 @@
-import { executeFallbackPattern } from '../data/fallbackPatterns'
 import { AUTH_USER_STORAGE_KEY, patternFieldUi } from './playgroundConstants'
 
 export function buildPatternPath(code) {
@@ -119,14 +118,6 @@ export function getBooleanStateLabel(patternCode, fieldName, value) {
   }
 
   return value ? 'Actif' : 'Inactif'
-}
-
-export function buildPreviewExecution(code, schema, formValues) {
-  try {
-    return executeFallbackPattern(code, normalizeParameters(schema, formValues))
-  } catch {
-    return null
-  }
 }
 
 export function persistSession(user) {

@@ -1,9 +1,9 @@
 import {
-  normalizeOrderedList,
   simulateStateTransition,
   stateActionLabels,
   stateDefinitions,
-} from '../shared/executorShared'
+} from '../shared/stateExecutorSupport'
+import { normalizeOrderedList } from '../shared/executorCommon'
 
 export default function executeStatePattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_STATE'}`.toUpperCase()

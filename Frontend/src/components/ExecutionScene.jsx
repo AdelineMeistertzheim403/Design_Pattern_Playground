@@ -1,14 +1,8 @@
+import { useEffect, useState } from 'react'
 import ZoomableViewport from './ZoomableViewport'
 
-import AdapterScene from '../patterns/adapter/scene'
-import BuilderScene from '../patterns/builder/scene'
-import ChainScene from '../patterns/chain/scene'
-import CommandScene from '../patterns/command/scene'
-import DecoratorScene from '../patterns/decorator/scene'
-import FlyweightScene from '../patterns/flyweight/scene'
-import MediatorScene from '../patterns/mediator/scene'
-import SingletonScene from '../patterns/singleton/scene'
-import StateScene from '../patterns/state/scene'
+import { hasSpecializedPatternScene } from '../patterns/catalog'
+import { loadPatternSceneComponent } from '../patterns/loaders'
 import {
   EmptyScenePlaceholder,
   SceneMetaBadges,
@@ -21,16 +15,14 @@ import {
   getTone,
 } from '../patterns/shared/sceneShared'
 
-const PATTERN_SCENES = {
-  adapter: AdapterScene,
-  builder: BuilderScene,
-  chain: ChainScene,
-  command: CommandScene,
-  decorator: DecoratorScene,
-  flyweight: FlyweightScene,
-  mediator: MediatorScene,
-  singleton: SingletonScene,
-  state: StateScene,
+function SceneLoadingPlaceholder({ panelClassName }) {
+  return (
+    <div className={panelClassName}>
+      <div className="flex min-h-[280px] items-center justify-center rounded-[24px] border border-dashed border-black/10 bg-white/70 px-6 py-10 text-sm leading-7 text-stone-600">
+        Chargement de la scene specialisee...
+      </div>
+    </div>
+  )
 }
 
 export default function ExecutionScene({
@@ -41,6 +33,55 @@ export default function ExecutionScene({
   onOpenModal,
 }) {
   const visualization = execution?.visualization
+  const shouldLoadPatternScene = Boolean(visualization?.nodes?.length) && hasSpecializedPatternScene(patternCode)
+  const [sceneModuleState, setSceneModuleState] = useState({
+    status: 'idle',
+    component: null,
+  })
+
+  useEffect(() => {
+    let ignore = false
+
+    if (!shouldLoadPatternScene) {
+      setSceneModuleState({
+        status: 'ready',
+        component: null,
+      })
+      return () => {
+        ignore = true
+      }
+    }
+
+    setSceneModuleState({
+      status: 'loading',
+      component: null,
+    })
+
+    const loadScene = async () => {
+      try {
+        const component = await loadPatternSceneComponent(patternCode)
+        if (!ignore) {
+          setSceneModuleState({
+            status: 'ready',
+            component,
+          })
+        }
+      } catch {
+        if (!ignore) {
+          setSceneModuleState({
+            status: 'error',
+            component: null,
+          })
+        }
+      }
+    }
+
+    loadScene()
+
+    return () => {
+      ignore = true
+    }
+  }, [patternCode, shouldLoadPatternScene])
 
   if (!visualization?.nodes?.length) {
     return <EmptyScenePlaceholder />
@@ -53,8 +94,11 @@ export default function ExecutionScene({
     ? 'h-auto min-h-[420px] w-full'
     : 'h-auto w-full'
   const TitleTag = isExpanded ? 'h2' : 'h3'
+  const SceneComponent = sceneModuleState.component
 
-  const SceneComponent = PATTERN_SCENES[patternCode]
+  if (shouldLoadPatternScene && sceneModuleState.status === 'loading' && !SceneComponent) {
+    return <SceneLoadingPlaceholder panelClassName={panelClassName} />
+  }
 
   if (SceneComponent && execution?.output) {
     return (

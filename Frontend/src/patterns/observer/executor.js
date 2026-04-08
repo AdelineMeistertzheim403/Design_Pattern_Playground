@@ -1,4 +1,4 @@
-import { normalizeUniqueList } from '../shared/executorShared'
+import { normalizeUniqueList } from '../shared/executorCommon'
 
 export default function executeObserverPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_OBSERVER'}`.toUpperCase()

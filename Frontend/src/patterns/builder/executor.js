@@ -6,7 +6,7 @@ import {
   builderProductTypes,
   builderSilhouettes,
   createBuilderStage,
-} from '../shared/executorShared'
+} from '../shared/builderExecutorSupport'
 
 export default function executeBuilderPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_BUILDER'}`.trim().toUpperCase()

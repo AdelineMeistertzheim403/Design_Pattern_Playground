@@ -4,7 +4,7 @@ import {
   chainProcessingTargets,
   chainTokenStates,
   createChainStep,
-} from '../shared/executorShared'
+} from '../shared/mediatorChainExecutorSupport'
 
 export default function executeChainPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_CHAIN'}`.trim().toUpperCase()

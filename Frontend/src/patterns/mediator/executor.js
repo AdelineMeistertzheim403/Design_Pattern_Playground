@@ -1,7 +1,7 @@
 import {
   createMediatorVisualization,
   normalizeMediatorParticipants,
-} from '../shared/executorShared'
+} from '../shared/mediatorChainExecutorSupport'
 
 export default function executeMediatorPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_MEDIATOR'}`.trim().toUpperCase()

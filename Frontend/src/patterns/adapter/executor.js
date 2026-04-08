@@ -3,7 +3,7 @@ import {
   buildAdapterVisualization,
   createAdapterStep,
   formatAdapterSignal,
-} from '../shared/executorShared'
+} from '../shared/adapterExecutorSupport'
 
 export default function executeAdapterPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_ADAPTER'}`.trim().toUpperCase()

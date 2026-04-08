@@ -1,6 +1,8 @@
-import { patternLearningContentByCode } from '../patterns/dataRegistry'
+export const emptyPatternSchema = {
+  fields: [],
+}
 
-const defaultLearningContent = {
+export const defaultLearningContent = {
   strapline: 'Observe le contrat commun, le role de chaque objet et ce qui change a l execution.',
   intuition:
     "Le pattern deplace une responsabilite cle dans un point de variation stable. L enjeu n est pas de memoriser un nom, mais de comprendre ce qu on rend flexible.",
@@ -28,10 +30,4 @@ const defaultLearningContent = {
       definition: "L interface ou l abstraction sur laquelle le reste du code s appuie.",
     },
   ],
-}
-
-export const patternLearningContent = patternLearningContentByCode
-
-export function getPatternLearningContent(code) {
-  return patternLearningContent[code] ?? defaultLearningContent
 }

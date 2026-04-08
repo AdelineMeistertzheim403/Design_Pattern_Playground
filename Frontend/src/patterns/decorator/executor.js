@@ -3,8 +3,8 @@ import {
   buildDecoratorVisualization,
   decoratorBaseProfiles,
   decoratorDefinitions,
-  normalizeOrderedUniqueList,
-} from '../shared/executorShared'
+} from '../shared/decoratorExecutorSupport'
+import { normalizeOrderedUniqueList } from '../shared/executorCommon'
 
 export default function executeDecoratorPattern(parameters) {
   const mode = `${parameters.mode ?? 'WITH_DECORATOR'}`.toUpperCase()
