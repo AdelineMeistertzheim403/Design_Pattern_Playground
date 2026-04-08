@@ -50,4 +50,13 @@ export const patternFieldUi = {
       hint: "Ces variantes representent les etats intrinsiques que le moteur peut partager.",
     },
   },
+  prototype: {
+    cloneCount: {
+      min: 2,
+      max: 6,
+      step: 1,
+      unitLabel: 'clones',
+      hint: "Monte le nombre de clones pour rendre la difference entre copie profonde et copie superficielle encore plus visible.",
+    },
+  },
 }

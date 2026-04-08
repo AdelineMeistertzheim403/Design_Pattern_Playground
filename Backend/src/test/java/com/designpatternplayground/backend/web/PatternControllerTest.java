@@ -211,6 +211,82 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecutePrototypePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "prototype",
+				  "parameters": {
+				    "mode": "WITHOUT_PROTOTYPE",
+				    "blueprintName": "Echo Forge",
+				    "archetype": "SCOUT_DRONE",
+				    "cloneCount": 4,
+				    "mutationTarget": "CLONE_2",
+				    "mutationPreset": "OVERCLOCK"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("prototype"))
+			.andExpect(jsonPath("$.output.cloneCount").value(4))
+			.andExpect(jsonPath("$.output.sharedNestedState").value(true))
+			.andExpect(jsonPath("$.output.propagationCount").value(4))
+			.andExpect(jsonPath("$.output.initialClones", hasSize(4)))
+			.andExpect(jsonPath("$.output.clones", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(7)));
+	}
+
+	@Test
+	void shouldExecuteProxyPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "proxy",
+				  "parameters": {
+				    "mode": "WITH_PROXY",
+				    "requestLabel": "Open premium vault",
+				    "requesterRole": "MEMBER",
+				    "resourceCode": "VAULT_VIDEO",
+				    "cacheState": "COLD"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("proxy"))
+			.andExpect(jsonPath("$.output.accessGranted").value(true))
+			.andExpect(jsonPath("$.output.lazyLoadTriggered").value(true))
+			.andExpect(jsonPath("$.output.securityLeak").value(false))
+			.andExpect(jsonPath("$.output.stepCount").value(4))
+			.andExpect(jsonPath("$.output.steps", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
+	}
+
+	@Test
+	void shouldExecuteFacadePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "facade",
+				  "parameters": {
+				    "mode": "WITH_FACADE",
+				    "routineCode": "CINEMA_MODE",
+				    "triggerLabel": "Start"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("facade"))
+			.andExpect(jsonPath("$.output.systemsReady").value(true))
+			.andExpect(jsonPath("$.output.manualTouchCount").value(1))
+			.andExpect(jsonPath("$.output.stepCount").value(6))
+			.andExpect(jsonPath("$.output.steps", hasSize(6)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
 	void shouldExecuteCompositePattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)

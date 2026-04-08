@@ -2,6 +2,14 @@ export const defaultPatternCode = 'strategy'
 
 export const fallbackPatterns = [
   {
+    code: 'prototype',
+    name: 'Prototype',
+    type: 'CREATIONAL',
+    description: 'Duplique un objet deja configure pour creer rapidement de nouvelles variantes sans repasser par toute la construction.',
+    useCase: 'Cloner un robot, un drone ou un avatar puis observer la difference entre copie superficielle et copie profonde.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'mediator',
     name: 'Mediator',
     type: 'BEHAVIORAL',
@@ -32,6 +40,22 @@ export const fallbackPatterns = [
     description: 'Traduit une interface incompatible vers le contrat attendu par le client sans modifier le composant legacy.',
     useCase: 'Connecter une source historique a une cible moderne en convertissant connecteur, protocole ou format de message.',
     complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'proxy',
+    name: 'Proxy',
+    type: 'STRUCTURAL',
+    description: 'Place un intermediaire devant une ressource pour controler l acces, retarder son chargement ou masquer sa nature reelle.',
+    useCase: 'Filtrer l acces a une ressource sensible, cacher un appel reseau lourd ou activer un lazy loading avant la vraie ressource.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'facade',
+    name: 'Facade',
+    type: 'STRUCTURAL',
+    description: 'Expose une entree simple vers plusieurs sous-systemes et masque la choregraphie detaillee.',
+    useCase: 'Declencher une routine domotique audio + lumiere + securite en un clic au lieu de piloter chaque module manuellement.',
+    complexityLevel: 'BEGINNER',
   },
   {
     code: 'composite',
@@ -118,10 +142,13 @@ export const patternPreviewTaglinesByCode = {
   command: 'Chaque action devient un objet rejouable avec undo et redo.',
   composite: 'Un root, des dossiers et des fichiers repondent au meme contrat dans tout l arbre.',
   decorator: 'Les comportements s empilent comme des couches autour du composant.',
+  facade: 'Un seul bouton orchestre plusieurs sous-systemes et cache la choregraphie.',
   factory: 'La creation est delegatee a une fabrique au lieu d etre dispersee.',
   flyweight: 'Des milliers d objets partagent le meme etat intrinseque.',
   mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
   observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
+  prototype: 'Un blueprint source genere des clones qui partagent ou non leur etat profond.',
+  proxy: 'Une ressource reste derriere un gardien qui autorise, bloque ou charge plus tard.',
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
@@ -134,8 +161,11 @@ export const specializedScenePatternCodes = [
   'command',
   'composite',
   'decorator',
+  'facade',
   'flyweight',
   'mediator',
+  'prototype',
+  'proxy',
   'singleton',
   'state',
 ]
