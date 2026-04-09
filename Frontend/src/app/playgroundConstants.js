@@ -6,6 +6,21 @@ export const typeLabels = {
   BEHAVIORAL: 'Comportement',
 }
 
+export const complexityLabels = {
+  BEGINNER: 'Debutant',
+  INTERMEDIATE: 'Intermediaire',
+  ADVANCED: 'Avance',
+}
+
+export const useCaseCategoryLabels = {
+  CREATION: 'Creation & assemblage',
+  COMMUNICATION: 'Communication & orchestration',
+  FLOW: 'Flux, etat & commandes',
+  COMPOSITION: 'Adaptation & composition',
+  OPTIMISATION: 'Analyse & optimisation',
+  INFRA: 'Acces & services globaux',
+}
+
 export const statusMap = {
   loading: {
     label: 'Connexion en cours',
@@ -39,6 +54,15 @@ export const patternFieldUi = {
       step: 1,
       unitLabel: 'variantes',
       hint: "Ces variantes representent les etats intrinsiques que le moteur peut partager.",
+    },
+  },
+  prototype: {
+    cloneCount: {
+      min: 2,
+      max: 6,
+      step: 1,
+      unitLabel: 'clones',
+      hint: "Monte le nombre de clones pour rendre la difference entre copie profonde et copie superficielle encore plus visible.",
     },
   },
 }

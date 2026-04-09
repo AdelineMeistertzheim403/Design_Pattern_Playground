@@ -1,13 +1,18 @@
-import { typeLabels } from '../app/playgroundConstants'
+import { complexityLabels, typeLabels, useCaseCategoryLabels } from '../app/playgroundConstants'
 import { fallbackPatterns, getPatternPreviewTagline } from '../patterns/catalog'
 
 export default function HomePage({
   patterns,
   visiblePatterns,
-  search,
+  filteredPatternsCount,
+  catalogFilters,
+  catalogFilterOptions,
+  catalogPage,
+  totalPatternPages,
   status,
   currentUser,
-  onSearchChange,
+  onCatalogFilterChange,
+  onCatalogPageChange,
   onOpenAuth,
   onOpenPattern,
 }) {
@@ -17,9 +22,6 @@ export default function HomePage({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(36,107,94,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(194,87,55,0.2),transparent_35%)]" />
         <div className="relative grid gap-8 xl:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
-            <div className="inline-flex rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-stone-700">
-              Plateforme pedagogique et ludique
-            </div>
             <div className="space-y-4">
               <p className="max-w-xl text-sm uppercase tracking-[0.22em] text-stone-600">
                 Comprendre les design patterns en les voyant fonctionner
@@ -32,13 +34,6 @@ export default function HomePage({
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button
-                className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                type="button"
-                onClick={() => onOpenPattern(patterns[0]?.code ?? fallbackPatterns[0].code)}
-              >
-                Ouvrir une premiere demo
-              </button>
               {!currentUser ? (
                 <button
                   className="rounded-full border border-black/10 bg-white/84 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-black/20"
@@ -49,16 +44,6 @@ export default function HomePage({
                 </button>
               ) : null}
             </div>
-          </div>
-
-          <div className="grid gap-4 self-end">
-            <article className="rounded-[26px] border border-black/10 bg-white/82 p-5 backdrop-blur-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Etat de l app</p>
-              <div className={`mt-4 inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
-                {status.label}
-              </div>
-              <p className="mt-4 text-sm leading-7 text-stone-700">{status.message}</p>
-            </article>
           </div>
         </div>
       </section>
@@ -73,24 +58,54 @@ export default function HomePage({
               sa demo visuelle, ses logs, son UML et son contenu pedagogique.
             </p>
           </div>
-
-          <div className="rounded-[24px] border border-black/10 bg-[var(--panel)] px-5 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Patterns actifs</p>
-            <p className="mt-2 text-3xl font-semibold text-stone-950">{patterns.length}</p>
-          </div>
         </div>
 
-        <label className="mt-6 block">
-          <span className="sr-only">Filtrer les patterns</span>
-          <input
-            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-black/20"
-            placeholder="Filtrer par nom, type ou cas d usage"
-            type="search"
-            value={search}
-            onChange={onSearchChange}
-          />
-        </label>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <label className="block">
+            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Type</span>
+            <select
+              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-black/20"
+              value={catalogFilters.type}
+              onChange={(event) => onCatalogFilterChange('type', event.target.value)}
+            >
+              {catalogFilterOptions.type.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.value === 'ALL' ? option.label : (typeLabels[option.label] ?? option.label)}
+                </option>
+              ))}
+            </select>
+          </label>
 
+          <label className="block">
+            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Niveau</span>
+            <select
+              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-black/20"
+              value={catalogFilters.level}
+              onChange={(event) => onCatalogFilterChange('level', event.target.value)}
+            >
+              {catalogFilterOptions.level.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.value === 'ALL' ? option.label : (complexityLabels[option.label] ?? option.label)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Cas d usage</span>
+            <select
+              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-black/20"
+              value={catalogFilters.useCase}
+              onChange={(event) => onCatalogFilterChange('useCase', event.target.value)}
+            >
+              {catalogFilterOptions.useCase.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.value === 'ALL' ? option.label : (useCaseCategoryLabels[option.label] ?? option.label)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {visiblePatterns.length > 0 ? (
             visiblePatterns.map((pattern) => {
@@ -109,7 +124,7 @@ export default function HomePage({
                       <h3 className="mt-3 text-2xl text-stone-950">{pattern.name}</h3>
                     </div>
                     <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-900">
-                      {pattern.complexityLevel}
+                      {complexityLabels[pattern.complexityLevel] ?? pattern.complexityLevel}
                     </span>
                   </div>
 
@@ -137,6 +152,43 @@ export default function HomePage({
             </div>
           )}
         </div>
+
+        {filteredPatternsCount > 0 ? (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <button
+              className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition disabled:cursor-not-allowed disabled:opacity-45"
+              type="button"
+              disabled={catalogPage === 1}
+              onClick={() => onCatalogPageChange(catalogPage - 1)}
+            >
+              Page precedente
+            </button>
+
+            {Array.from({ length: totalPatternPages }, (_, index) => index + 1).map((pageNumber) => (
+              <button
+                key={pageNumber}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  pageNumber === catalogPage
+                    ? 'bg-stone-950 text-white'
+                    : 'border border-black/10 bg-white text-stone-700'
+                }`}
+                type="button"
+                onClick={() => onCatalogPageChange(pageNumber)}
+              >
+                {pageNumber}
+              </button>
+            ))}
+
+            <button
+              className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition disabled:cursor-not-allowed disabled:opacity-45"
+              type="button"
+              disabled={catalogPage === totalPatternPages}
+              onClick={() => onCatalogPageChange(catalogPage + 1)}
+            >
+              Page suivante
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   )

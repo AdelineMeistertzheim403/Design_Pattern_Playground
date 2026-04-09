@@ -316,6 +316,11 @@ npm run build
 - `state` : machine a etats interactive avec timeline, transitions et scene SVG dediee.
 - `flyweight` : simulation memoire avec mutualisation d instances et comparaison live.
 - `decorator` : empilement de power-ups sur un composant de base avec stats cumulees et pile de wrappers.
+- `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
+- `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
+- `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
+- `interpreter` : mini langage interactif avec parsing, arbre d expressions et execution ligne par ligne sur une mission.
+- `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
@@ -363,6 +368,6 @@ Exemple `factory` :
 
 ## Suite logique
 
-- Ajouter `builder`, `command` et d autres patterns tres visuels comme `adapter` ou `command`.
+- Ajouter d autres patterns tres visuels comme `bridge`, `composite`, `interpreter` ou `memento`.
 - Continuer a enrichir les scenes SVG et les quiz par pattern.
 - Ajouter un mode apprentissage et un mode developpeur avec code Java genere.

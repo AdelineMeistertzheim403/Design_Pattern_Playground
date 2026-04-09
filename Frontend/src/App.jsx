@@ -79,7 +79,11 @@ export default function App() {
     route,
     patterns,
     visiblePatterns,
-    search,
+    filteredPatternsCount,
+    catalogFilters,
+    catalogFilterOptions,
+    catalogPage,
+    totalPatternPages,
     status,
     backendStatus,
     currentUser,
@@ -108,7 +112,8 @@ export default function App() {
     handleExecute,
     handleAuthSubmit,
     handleLogout,
-    handleSearchChange,
+    handleCatalogFilterChange,
+    handleCatalogPageChange,
     setActiveVisualModal,
     setIsAuthOpen,
     setAuthMode,
@@ -133,11 +138,16 @@ export default function App() {
             currentUser={currentUser}
             patterns={patterns}
             visiblePatterns={visiblePatterns}
-            search={search}
+            filteredPatternsCount={filteredPatternsCount}
+            catalogFilters={catalogFilters}
+            catalogFilterOptions={catalogFilterOptions}
+            catalogPage={catalogPage}
+            totalPatternPages={totalPatternPages}
             status={status}
             onOpenAuth={openAuth}
             onOpenPattern={(code) => navigate(buildPatternPath(code))}
-            onSearchChange={handleSearchChange}
+            onCatalogFilterChange={handleCatalogFilterChange}
+            onCatalogPageChange={handleCatalogPageChange}
           />
         ) : route.name === 'pattern' && selectedPattern ? (
           <PatternPage
