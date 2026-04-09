@@ -1,5 +1,24 @@
 import { AUTH_USER_STORAGE_KEY, patternFieldUi } from './playgroundConstants'
 
+const patternUseCaseCategoriesByCode = {
+  adapter: 'COMPOSITION',
+  builder: 'CREATION',
+  chain: 'FLOW',
+  command: 'FLOW',
+  decorator: 'COMPOSITION',
+  facade: 'COMPOSITION',
+  factory: 'CREATION',
+  flyweight: 'OPTIMISATION',
+  mediator: 'COMMUNICATION',
+  observer: 'COMMUNICATION',
+  prototype: 'CREATION',
+  proxy: 'INFRA',
+  singleton: 'INFRA',
+  state: 'FLOW',
+  strategy: 'FLOW',
+  visitor: 'OPTIMISATION',
+}
+
 function splitListValue(rawValue) {
   return `${rawValue ?? ''}`
     .replace(/\r/g, '')
@@ -120,6 +139,37 @@ export function getBooleanStateLabel(patternCode, fieldName, value) {
   }
 
   return value ? 'Actif' : 'Inactif'
+}
+
+export function inferPatternUseCaseCategory(pattern) {
+  const code = `${pattern?.code ?? ''}`.trim().toLowerCase()
+  if (patternUseCaseCategoriesByCode[code]) {
+    return patternUseCaseCategoriesByCode[code]
+  }
+
+  const haystack = `${pattern?.description ?? ''} ${pattern?.useCase ?? ''}`.toLowerCase()
+
+  if (/(clon|assembl|creation|constructeur|fabriq)/.test(haystack)) {
+    return 'CREATION'
+  }
+
+  if (/(notif|chat|message|abonn|orchestr)/.test(haystack)) {
+    return 'COMMUNICATION'
+  }
+
+  if (/(etat|transition|commande|undo|workflow|pipeline|algorithme|requete)/.test(haystack)) {
+    return 'FLOW'
+  }
+
+  if (/(adapter|decorat|facade|interface|sous-systeme|couche|compose)/.test(haystack)) {
+    return 'COMPOSITION'
+  }
+
+  if (/(memoire|optimis|scanner|analyse|parcour|arbre|visitor)/.test(haystack)) {
+    return 'OPTIMISATION'
+  }
+
+  return 'INFRA'
 }
 
 export function persistSession(user) {

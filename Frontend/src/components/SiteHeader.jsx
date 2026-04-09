@@ -23,10 +23,6 @@ export default function SiteHeader({
         </button>
 
         <div className="flex flex-wrap items-center justify-end gap-3">
-          <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
-            {status.label}
-          </div>
-
           <button
             className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
               routeName === 'progress'
