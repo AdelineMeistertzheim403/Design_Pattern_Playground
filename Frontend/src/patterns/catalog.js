@@ -10,6 +10,14 @@ export const fallbackPatterns = [
     complexityLevel: 'ADVANCED',
   },
   {
+    code: 'visitor',
+    name: 'Visitor',
+    type: 'BEHAVIORAL',
+    description: 'Ajoute des operations sur une structure existante sans modifier les classes des elements parcourus.',
+    useCase: 'Analyser un arbre de dossiers et de fichiers avec plusieurs visiteurs : compter, valoriser, rechercher ou scanner.',
+    complexityLevel: 'ADVANCED',
+  },
+  {
     code: 'prototype',
     name: 'Prototype',
     type: 'CREATIONAL',
@@ -152,6 +160,7 @@ export const patternPreviewTaglinesByCode = {
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
+  visitor: 'Le meme arbre accueille plusieurs analyses sans modifier les classes des noeuds.',
 }
 
 export const specializedScenePatternCodes = [
@@ -168,6 +177,7 @@ export const specializedScenePatternCodes = [
   'proxy',
   'singleton',
   'state',
+  'visitor',
 ]
 
 export function getPatternPreviewTagline(code) {

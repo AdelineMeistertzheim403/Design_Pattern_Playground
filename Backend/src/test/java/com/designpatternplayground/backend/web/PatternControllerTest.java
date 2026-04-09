@@ -541,6 +541,31 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
 	}
 
+	@Test
+	void shouldExecuteVisitorPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "visitor",
+				  "parameters": {
+				    "mode": "WITH_VISITOR",
+				    "treePreset": "ASSET_PACK",
+				    "visitorType": "COUNT_ELEMENTS",
+				    "searchTerm": "virus"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("visitor"))
+			.andExpect(jsonPath("$.output.folderCount").value(4))
+			.andExpect(jsonPath("$.output.fileCount").value(6))
+			.andExpect(jsonPath("$.output.visitedCount").value(10))
+			.andExpect(jsonPath("$.output.traversalSteps", hasSize(10)))
+			.andExpect(jsonPath("$.output.treeNodes", hasSize(10)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(4)));
+	}
+
 	private Cookie registerAndExtractAccessCookie(String username, String password) throws Exception {
 		MvcResult registerResult = mockMvc.perform(post("/api/auth/register")
 			.contentType(MediaType.APPLICATION_JSON)
