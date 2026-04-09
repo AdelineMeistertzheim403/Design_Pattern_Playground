@@ -31,8 +31,8 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(13)))
-			.andExpect(jsonPath("$", hasSize(13)))
+			.andExpect(jsonPath("$", hasSize(16)))
+			.andExpect(jsonPath("$", hasSize(16)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -153,11 +153,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(13))
+			.andExpect(jsonPath("$.totalPatterns").value(16))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(13)));
+			.andExpect(jsonPath("$.patterns", hasSize(16)));
 	}
 
 	@Test
@@ -503,6 +503,31 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.deliveredCount").value(2))
 			.andExpect(jsonPath("$.output.senderCouplingCount").value(1))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
+	}
+
+	@Test
+	void shouldExecuteVisitorPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "visitor",
+				  "parameters": {
+				    "mode": "WITH_VISITOR",
+				    "treePreset": "ASSET_PACK",
+				    "visitorType": "COUNT_ELEMENTS",
+				    "searchTerm": "virus"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("visitor"))
+			.andExpect(jsonPath("$.output.folderCount").value(4))
+			.andExpect(jsonPath("$.output.fileCount").value(6))
+			.andExpect(jsonPath("$.output.visitedCount").value(10))
+			.andExpect(jsonPath("$.output.traversalSteps", hasSize(10)))
+			.andExpect(jsonPath("$.output.treeNodes", hasSize(10)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(4)));
 	}
 
 	private Cookie registerAndExtractAccessCookie(String username, String password) throws Exception {

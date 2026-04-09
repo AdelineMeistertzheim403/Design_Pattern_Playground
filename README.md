@@ -319,6 +319,7 @@ npm run build
 - `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
 - `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
 - `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
+- `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
@@ -366,6 +367,6 @@ Exemple `factory` :
 
 ## Suite logique
 
-- Ajouter d autres patterns tres visuels comme `bridge`, `visitor`, `proxy` ou `facade`.
+- Ajouter d autres patterns tres visuels comme `bridge`, `composite`, `interpreter` ou `memento`.
 - Continuer a enrichir les scenes SVG et les quiz par pattern.
 - Ajouter un mode apprentissage et un mode developpeur avec code Java genere.
