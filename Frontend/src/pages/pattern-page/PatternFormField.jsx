@@ -4,9 +4,13 @@ import {
 } from '../../app/playgroundUtils'
 
 function normalizeListFieldValue(value) {
-  return (Array.isArray(value) ? value : `${value ?? ''}`.split(','))
+  return (Array.isArray(value) ? value : `${value ?? ''}`.replace(/\r/g, '').split(/\n|,/))
     .map((item) => `${item}`.trim())
     .filter(Boolean)
+}
+
+function isInterpreterScriptField(patternCode, field) {
+  return patternCode === 'interpreter' && field.type === 'LIST' && field.name === 'scriptLines'
 }
 
 function getListFieldOrderLabel(patternCode, field) {
@@ -22,7 +26,7 @@ function getListFieldEmptyMessage(patternCode, field) {
     return "Aucune action selectionnee. La demo ne pourra pas illustrer la pile de commandes."
   }
 
-  return 'Aucun decorator selectionne. La demo montrera alors uniquement le composant de base.'
+  return 'Aucun element selectionne pour cette liste.'
 }
 
 function getListFieldHint(patternCode, field) {
@@ -30,7 +34,7 @@ function getListFieldHint(patternCode, field) {
     return "Clique pour ajouter une action a la sequence. Tu peux repeter plusieurs fois la meme action, puis retirer chaque etape individuellement."
   }
 
-  return "Clique pour ajouter ou retirer une couche. L ordre affiche correspond a l ordre d empilement des wrappers."
+  return "Clique pour ajouter ou retirer des elements. L ordre affiche correspond a l ordre courant de la liste."
 }
 
 function moveListValue(values, fromIndex, toIndex) {
@@ -247,10 +251,22 @@ export default function PatternFormField({
             {getListFieldHint(patternCode, field)}
           </p>
         </div>
+      ) : isInterpreterScriptField(patternCode, field) ? (
+        <div className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
+          <textarea
+            className="min-h-52 rounded-2xl border border-black/10 bg-white px-4 py-3 font-mono text-sm leading-7 text-stone-900 outline-none focus:border-black/20"
+            spellCheck={false}
+            value={Array.isArray(formValues[field.name]) ? formValues[field.name].join('\n') : formValues[field.name] ?? ''}
+            onChange={(event) => onFieldValueChange(field, event.target.value)}
+          />
+          <p className="text-sm leading-7 text-stone-600">
+            Ecris une instruction par ligne. Le mini langage accepte `MOVE n`, `TURN LEFT`, `TURN RIGHT`, `ATTACK`, `WAIT` et les blocs `REPEAT n {'{'} ... {'}'}`.
+          </p>
+        </div>
       ) : field.type === 'LIST' ? (
         <textarea
           className="min-h-28 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
-          value={Array.isArray(formValues[field.name]) ? formValues[field.name].join(', ') : formValues[field.name] ?? ''}
+          value={Array.isArray(formValues[field.name]) ? formValues[field.name].join('\n') : formValues[field.name] ?? ''}
           onChange={(event) => onFieldValueChange(field, event.target.value)}
         />
       ) : (

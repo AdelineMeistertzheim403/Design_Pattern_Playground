@@ -288,6 +288,42 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecuteInterpreterPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "interpreter",
+				  "parameters": {
+				    "mode": "WITH_INTERPRETER",
+				    "missionName": "Target Dummy Drill",
+				    "objective": "TARGET_DUMMY",
+				    "scriptLines": [
+				      "MOVE 1",
+				      "TURN RIGHT",
+				      "MOVE 1",
+				      "TURN LEFT",
+				      "REPEAT 2 {",
+				      "MOVE 1",
+				      "}",
+				      "ATTACK"
+				    ]
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("interpreter"))
+			.andExpect(jsonPath("$.output.parserUsed").value(true))
+			.andExpect(jsonPath("$.output.targetReached").value(true))
+			.andExpect(jsonPath("$.output.targetHit").value(true))
+			.andExpect(jsonPath("$.output.objectiveCompleted").value(true))
+			.andExpect(jsonPath("$.output.stepCount").value(7))
+			.andExpect(jsonPath("$.output.steps", hasSize(7)))
+			.andExpect(jsonPath("$.output.treeNodes", hasSize(8)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
 	void shouldExecuteStrategyPattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)
