@@ -1,4 +1,4 @@
-import { startTransition, useDeferredValue, useEffect, useState } from 'react'
+import { startTransition, useEffect, useMemo, useState } from 'react'
 import {
   executePattern,
   getCurrentUser,
@@ -21,6 +21,7 @@ import {
 import {
   buildInitialParameters,
   clearPersistedSession,
+  inferPatternUseCaseCategory,
   loadPersistedUser,
   normalizeParameters,
   parseRoute,
@@ -36,7 +37,12 @@ export default function usePlaygroundApp() {
   const [executionError, setExecutionError] = useState('')
   const [lastExecutedPayload, setLastExecutedPayload] = useState(null)
   const [backendStatus, setBackendStatus] = useState('loading')
-  const [search, setSearch] = useState('')
+  const [catalogFilters, setCatalogFilters] = useState({
+    type: 'ALL',
+    level: 'ALL',
+    useCase: 'ALL',
+  })
+  const [catalogPage, setCatalogPage] = useState(1)
   const [isExecuting, setIsExecuting] = useState(false)
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
@@ -48,7 +54,6 @@ export default function usePlaygroundApp() {
   const [learningContent, setLearningContent] = useState(defaultLearningContent)
   const [umlDiagram, setUmlDiagram] = useState(null)
   const [previewExecution, setPreviewExecution] = useState(null)
-  const deferredSearch = useDeferredValue(search)
 
   useEffect(() => {
     const handlePopState = () => {
@@ -233,10 +238,57 @@ export default function usePlaygroundApp() {
     }
   }, [activePatternCode, formValues, schema, shouldLoadPatternDetail])
 
-  const visiblePatterns = patterns.filter((pattern) => {
-    const haystack = `${pattern.name} ${pattern.type} ${pattern.description} ${pattern.useCase}`.toLowerCase()
-    return haystack.includes(deferredSearch.trim().toLowerCase())
-  })
+  const catalogFilterOptions = useMemo(() => {
+    const typeOptions = [
+      { value: 'ALL', label: 'Tous les types' },
+      ...Array.from(new Set(patterns.map((pattern) => pattern.type)))
+        .filter(Boolean)
+        .map((value) => ({ value, label: value })),
+    ]
+    const levelOptions = [
+      { value: 'ALL', label: 'Tous les niveaux' },
+      ...Array.from(new Set(patterns.map((pattern) => pattern.complexityLevel)))
+        .filter(Boolean)
+        .map((value) => ({ value, label: value })),
+    ]
+    const useCaseOptions = [
+      { value: 'ALL', label: 'Tous les cas d usage' },
+      ...Array.from(new Set(patterns.map((pattern) => inferPatternUseCaseCategory(pattern))))
+        .filter(Boolean)
+        .map((value) => ({ value, label: value })),
+    ]
+
+    return {
+      type: typeOptions,
+      level: levelOptions,
+      useCase: useCaseOptions,
+    }
+  }, [patterns])
+
+  const filteredPatterns = useMemo(() => (
+    patterns.filter((pattern) => {
+      if (catalogFilters.type !== 'ALL' && pattern.type !== catalogFilters.type) {
+        return false
+      }
+
+      if (catalogFilters.level !== 'ALL' && pattern.complexityLevel !== catalogFilters.level) {
+        return false
+      }
+
+      if (catalogFilters.useCase !== 'ALL' && inferPatternUseCaseCategory(pattern) !== catalogFilters.useCase) {
+        return false
+      }
+
+      return true
+    })
+  ), [catalogFilters.level, catalogFilters.type, catalogFilters.useCase, patterns])
+
+  const totalPatternPages = Math.max(1, Math.ceil(filteredPatterns.length / 3))
+  const visiblePatterns = filteredPatterns.slice((catalogPage - 1) * 3, catalogPage * 3)
+
+  useEffect(() => {
+    setCatalogPage((currentPage) => Math.min(currentPage, totalPatternPages))
+  }, [totalPatternPages])
 
   const status = statusMap[backendStatus] ?? statusMap.fallback
 
@@ -364,16 +416,29 @@ export default function usePlaygroundApp() {
     setIsAuthOpen(false)
   }
 
-  function handleSearchChange(event) {
-    const nextValue = event.target.value
-    startTransition(() => setSearch(nextValue))
+  function handleCatalogFilterChange(filterName, nextValue) {
+    startTransition(() => {
+      setCatalogFilters((currentFilters) => ({
+        ...currentFilters,
+        [filterName]: nextValue,
+      }))
+      setCatalogPage(1)
+    })
+  }
+
+  function handleCatalogPageChange(nextPage) {
+    setCatalogPage(Math.max(1, Math.min(nextPage, totalPatternPages)))
   }
 
   return {
     route,
     patterns,
     visiblePatterns,
-    search,
+    filteredPatternsCount: filteredPatterns.length,
+    catalogFilters,
+    catalogFilterOptions,
+    catalogPage,
+    totalPatternPages,
     status,
     backendStatus,
     currentUser,
@@ -402,7 +467,8 @@ export default function usePlaygroundApp() {
     handleExecute,
     handleAuthSubmit,
     handleLogout,
-    handleSearchChange,
+    handleCatalogFilterChange,
+    handleCatalogPageChange,
     setActiveVisualModal,
     setIsAuthOpen,
     setAuthMode,
