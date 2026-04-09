@@ -31,8 +31,8 @@ class PatternControllerTest {
 	void shouldExposeAvailablePatterns() throws Exception {
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(16)))
-			.andExpect(jsonPath("$", hasSize(16)))
+			.andExpect(jsonPath("$", hasSize(17)))
+			.andExpect(jsonPath("$", hasSize(17)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -153,11 +153,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(16))
+			.andExpect(jsonPath("$.totalPatterns").value(17))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(16)));
+			.andExpect(jsonPath("$.patterns", hasSize(17)));
 	}
 
 	@Test
