@@ -1,5 +1,7 @@
 import { complexityLabels, typeLabels, useCaseCategoryLabels } from '../app/playgroundConstants'
-import { fallbackPatterns, getPatternPreviewTagline } from '../patterns/catalog'
+import SpaLink from '../components/SpaLink'
+import { buildPatternPath } from '../app/playgroundUtils'
+import { getPatternPreviewTagline } from '../patterns/catalog'
 
 export default function HomePage({
   patterns,
@@ -26,6 +28,9 @@ export default function HomePage({
               <p className="max-w-xl text-sm uppercase tracking-[0.22em] text-stone-600">
                 Comprendre les design patterns en les voyant fonctionner
               </p>
+              <h1 className="max-w-4xl text-4xl text-stone-950 sm:text-5xl">
+                Apprendre les design patterns avec des demos interactives
+              </h1>
               <p className="max-w-3xl text-base leading-7 text-stone-700 sm:text-lg">
                 Le but du site est simple : aider les etudiants, les developpeurs et les formateurs a relier
                 la theorie, le diagramme UML et le comportement runtime. Choisis un pattern, ouvre sa page et
@@ -121,7 +126,15 @@ export default function HomePage({
                       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
                         {typeLabels[pattern.type] ?? pattern.type}
                       </p>
-                      <h3 className="mt-3 text-2xl text-stone-950">{pattern.name}</h3>
+                      <h3 className="mt-3 text-2xl text-stone-950">
+                        <SpaLink
+                          className="transition hover:text-[var(--accent)]"
+                          href={buildPatternPath(pattern.code)}
+                          onNavigate={() => onOpenPattern(pattern.code)}
+                        >
+                          {pattern.name}
+                        </SpaLink>
+                      </h3>
                     </div>
                     <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-900">
                       {complexityLabels[pattern.complexityLevel] ?? pattern.complexityLevel}
@@ -136,13 +149,13 @@ export default function HomePage({
                     Cas d usage : {pattern.useCase}
                   </p>
 
-                  <button
+                  <SpaLink
                     className="mt-5 inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                    type="button"
-                    onClick={() => onOpenPattern(pattern.code)}
+                    href={buildPatternPath(pattern.code)}
+                    onNavigate={() => onOpenPattern(pattern.code)}
                   >
                     Ouvrir la page du pattern
-                  </button>
+                  </SpaLink>
                 </article>
               )
             })

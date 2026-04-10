@@ -39,6 +39,10 @@ export function buildProgressPath() {
   return '/progression'
 }
 
+export function buildLegalNoticePath() {
+  return '/mentions-legales'
+}
+
 export function parseRoute(pathname) {
   const normalized = pathname.replace(/\/+$/, '') || '/'
 
@@ -48,6 +52,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/progression') {
     return { name: 'progress' }
+  }
+
+  if (normalized === '/mentions-legales') {
+    return { name: 'legalNotice' }
   }
 
   const quizMatch = normalized.match(/^\/patterns\/([a-z0-9-]+)\/quiz$/)
