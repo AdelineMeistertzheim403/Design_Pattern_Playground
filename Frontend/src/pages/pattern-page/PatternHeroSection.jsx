@@ -1,4 +1,6 @@
 import { typeLabels } from '../../app/playgroundConstants'
+import { buildPatternPath } from '../../app/playgroundUtils'
+import SpaLink from '../../components/SpaLink'
 
 export default function PatternHeroSection({
   selectedPattern,
@@ -16,13 +18,13 @@ export default function PatternHeroSection({
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <div className="flex flex-wrap gap-3">
-            <button
+            <SpaLink
               className="rounded-full border border-black/10 bg-white/84 px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
-              type="button"
-              onClick={onNavigateHome}
+              href="/"
+              onNavigate={onNavigateHome}
             >
               Retour a l accueil
-            </button>
+            </SpaLink>
             <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
               {status.label}
             </div>
@@ -42,7 +44,7 @@ export default function PatternHeroSection({
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
               {typeLabels[selectedPattern.type] ?? selectedPattern.type} · {selectedPattern.complexityLevel}
             </p>
-            <h2 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{selectedPattern.name}</h2>
+            <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{selectedPattern.name}</h1>
           </div>
 
           <p className="max-w-3xl text-base leading-7 text-stone-700">{selectedPattern.description}</p>
@@ -94,14 +96,14 @@ export default function PatternHeroSection({
               {patterns
                 .filter((pattern) => pattern.code !== selectedPattern.code)
                 .map((pattern) => (
-                  <button
+                  <SpaLink
                     key={pattern.code}
                     className="rounded-full border border-black/10 bg-[var(--panel)] px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
-                    type="button"
-                    onClick={() => onNavigatePattern(pattern.code)}
+                    href={buildPatternPath(pattern.code)}
+                    onNavigate={() => onNavigatePattern(pattern.code)}
                   >
                     {pattern.name}
-                  </button>
+                  </SpaLink>
                 ))}
             </div>
           </article>

@@ -1,11 +1,19 @@
 import { Suspense, lazy } from 'react'
 import SiteHeader from './components/SiteHeader'
 import usePlaygroundApp from './hooks/usePlaygroundApp'
-import { buildPatternPath, buildPatternQuizPath, buildProgressPath } from './app/playgroundUtils'
+import SiteFooter from './components/SiteFooter'
+import SeoHead from './components/SeoHead'
+import {
+  buildLegalNoticePath,
+  buildPatternPath,
+  buildPatternQuizPath,
+  buildProgressPath,
+} from './app/playgroundUtils'
 
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const PatternPage = lazy(() => import('./pages/PatternPage'))
 const PatternQuizPage = lazy(() => import('./pages/PatternQuizPage'))
@@ -120,8 +128,25 @@ export default function App() {
     setAuthError,
   } = usePlaygroundApp()
 
+  const pageKind = route.name === 'home'
+    ? 'home'
+    : route.name === 'pattern' && selectedPattern
+      ? 'pattern'
+      : route.name === 'quiz' && selectedPattern
+        ? 'quiz'
+        : route.name === 'progress'
+          ? 'progress'
+          : route.name === 'legalNotice'
+            ? 'legalNotice'
+            : 'notFound'
+
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
+      <SeoHead
+        pageKind={pageKind}
+        selectedPattern={selectedPattern}
+      />
+
       <SiteHeader
         currentUser={currentUser}
         routeName={route.name}
@@ -132,78 +157,84 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      <Suspense fallback={<PageLoadingFallback />}>
-        {route.name === 'home' ? (
-          <HomePage
-            currentUser={currentUser}
-            patterns={patterns}
-            visiblePatterns={visiblePatterns}
-            filteredPatternsCount={filteredPatternsCount}
-            catalogFilters={catalogFilters}
-            catalogFilterOptions={catalogFilterOptions}
-            catalogPage={catalogPage}
-            totalPatternPages={totalPatternPages}
-            status={status}
-            onOpenAuth={openAuth}
-            onOpenPattern={(code) => navigate(buildPatternPath(code))}
-            onCatalogFilterChange={handleCatalogFilterChange}
-            onCatalogPageChange={handleCatalogPageChange}
-          />
-        ) : route.name === 'pattern' && selectedPattern ? (
-          <PatternPage
-            currentUser={currentUser}
-            execution={execution}
-            executionError={executionError}
-            formValues={formValues}
-            hasDraftChanges={hasDraftChanges}
-            isExecuting={isExecuting}
-            learningContent={learningContent}
-            onOpenSceneModal={() => setActiveVisualModal('scene')}
-            onOpenUmlModal={() => setActiveVisualModal('uml')}
-            patterns={patterns}
-            schema={schema}
-            selectedPattern={selectedPattern}
-            status={status}
-            umlDiagram={umlDiagram}
-            visualExecution={visualExecution}
-            visualSourceLabel={visualSourceLabel}
-            onFieldValueChange={updateFieldValue}
-            onNavigateHome={() => navigate('/')}
-            onNavigatePattern={(code) => navigate(buildPatternPath(code))}
-            onNavigateQuiz={() => {
-              if (currentUser) {
-                navigate(buildPatternQuizPath(selectedPattern.code))
-                return
-              }
+      <main className="flex-1">
+        <Suspense fallback={<PageLoadingFallback />}>
+          {route.name === 'home' ? (
+            <HomePage
+              currentUser={currentUser}
+              patterns={patterns}
+              visiblePatterns={visiblePatterns}
+              filteredPatternsCount={filteredPatternsCount}
+              catalogFilters={catalogFilters}
+              catalogFilterOptions={catalogFilterOptions}
+              catalogPage={catalogPage}
+              totalPatternPages={totalPatternPages}
+              status={status}
+              onOpenAuth={openAuth}
+              onOpenPattern={(code) => navigate(buildPatternPath(code))}
+              onCatalogFilterChange={handleCatalogFilterChange}
+              onCatalogPageChange={handleCatalogPageChange}
+            />
+          ) : route.name === 'pattern' && selectedPattern ? (
+            <PatternPage
+              currentUser={currentUser}
+              execution={execution}
+              executionError={executionError}
+              formValues={formValues}
+              hasDraftChanges={hasDraftChanges}
+              isExecuting={isExecuting}
+              learningContent={learningContent}
+              onOpenSceneModal={() => setActiveVisualModal('scene')}
+              onOpenUmlModal={() => setActiveVisualModal('uml')}
+              patterns={patterns}
+              schema={schema}
+              selectedPattern={selectedPattern}
+              status={status}
+              umlDiagram={umlDiagram}
+              visualExecution={visualExecution}
+              visualSourceLabel={visualSourceLabel}
+              onFieldValueChange={updateFieldValue}
+              onNavigateHome={() => navigate('/')}
+              onNavigatePattern={(code) => navigate(buildPatternPath(code))}
+              onNavigateQuiz={() => {
+                if (currentUser) {
+                  navigate(buildPatternQuizPath(selectedPattern.code))
+                  return
+                }
 
-              openAuth('login')
-            }}
-            onOpenAuth={openAuth}
-            onSubmit={handleExecute}
-          />
-        ) : route.name === 'quiz' && selectedPattern ? (
-          <PatternQuizPage
-            backendStatus={backendStatus}
-            currentUser={currentUser}
-            selectedPattern={selectedPattern}
-            status={status}
-            onNavigateHome={() => navigate('/')}
-            onNavigatePattern={() => navigate(buildPatternPath(selectedPattern.code))}
-            onOpenAuth={openAuth}
-          />
-        ) : route.name === 'progress' ? (
-          <QuizDashboardPage
-            backendStatus={backendStatus}
-            currentUser={currentUser}
-            onNavigateHome={() => navigate('/')}
-            onOpenAuth={openAuth}
-            onOpenPattern={(code) => navigate(buildPatternPath(code))}
-            onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
-          />
-        ) : (
-          <NotFoundPage onNavigateHome={() => navigate('/')} />
-        )}
-      </Suspense>
+                openAuth('login')
+              }}
+              onOpenAuth={openAuth}
+              onSubmit={handleExecute}
+            />
+          ) : route.name === 'quiz' && selectedPattern ? (
+            <PatternQuizPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              selectedPattern={selectedPattern}
+              status={status}
+              onNavigateHome={() => navigate('/')}
+              onNavigatePattern={() => navigate(buildPatternPath(selectedPattern.code))}
+              onOpenAuth={openAuth}
+            />
+          ) : route.name === 'progress' ? (
+            <QuizDashboardPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              onNavigateHome={() => navigate('/')}
+              onOpenAuth={openAuth}
+              onOpenPattern={(code) => navigate(buildPatternPath(code))}
+              onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
+            />
+          ) : route.name === 'legalNotice' ? (
+            <LegalNoticePage onNavigateHome={() => navigate('/')} />
+          ) : (
+            <NotFoundPage onNavigateHome={() => navigate('/')} />
+          )}
+        </Suspense>
+      </main>
+
+      <SiteFooter onNavigateLegalNotice={() => navigate(buildLegalNoticePath())} />
 
       <PatternModals
         isSceneModalOpen={isSceneModalOpen}
@@ -237,6 +268,6 @@ export default function App() {
           />
         </Suspense>
       ) : null}
-    </>
+    </div>
   )
 }
