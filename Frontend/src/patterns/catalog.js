@@ -2,6 +2,22 @@ export const defaultPatternCode = 'strategy'
 
 export const fallbackPatterns = [
   {
+    code: 'interpreter',
+    name: 'Interpreter',
+    type: 'BEHAVIORAL',
+    description: 'Interprete un mini langage en transformant chaque instruction en expression executable sur un contexte.',
+    useCase: 'Ecrire un script MOVE / TURN / ATTACK / REPEAT puis visualiser son parsing, son execution et ses limites sans interprete complet.',
+    complexityLevel: 'ADVANCED',
+  },
+  {
+    code: 'visitor',
+    name: 'Visitor',
+    type: 'BEHAVIORAL',
+    description: 'Ajoute des operations sur une structure existante sans modifier les classes des elements parcourus.',
+    useCase: 'Analyser un arbre de dossiers et de fichiers avec plusieurs visiteurs : compter, valoriser, rechercher ou scanner.',
+    complexityLevel: 'ADVANCED',
+  },
+  {
     code: 'prototype',
     name: 'Prototype',
     type: 'CREATIONAL',
@@ -145,6 +161,7 @@ export const patternPreviewTaglinesByCode = {
   facade: 'Un seul bouton orchestre plusieurs sous-systemes et cache la choregraphie.',
   factory: 'La creation est delegatee a une fabrique au lieu d etre dispersee.',
   flyweight: 'Des milliers d objets partagent le meme etat intrinseque.',
+  interpreter: 'Le script devient un arbre d expressions qui pilote la mission.',
   mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
   observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
   prototype: 'Un blueprint source genere des clones qui partagent ou non leur etat profond.',
@@ -152,6 +169,7 @@ export const patternPreviewTaglinesByCode = {
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
+  visitor: 'Le meme arbre accueille plusieurs analyses sans modifier les classes des noeuds.',
 }
 
 export const specializedScenePatternCodes = [
@@ -163,11 +181,13 @@ export const specializedScenePatternCodes = [
   'decorator',
   'facade',
   'flyweight',
+  'interpreter',
   'mediator',
   'prototype',
   'proxy',
   'singleton',
   'state',
+  'visitor',
 ]
 
 export function getPatternPreviewTagline(code) {

@@ -1,5 +1,32 @@
 import { AUTH_USER_STORAGE_KEY, patternFieldUi } from './playgroundConstants'
 
+const patternUseCaseCategoriesByCode = {
+  adapter: 'COMPOSITION',
+  builder: 'CREATION',
+  chain: 'FLOW',
+  command: 'FLOW',
+  decorator: 'COMPOSITION',
+  facade: 'COMPOSITION',
+  factory: 'CREATION',
+  flyweight: 'OPTIMISATION',
+  mediator: 'COMMUNICATION',
+  observer: 'COMMUNICATION',
+  prototype: 'CREATION',
+  proxy: 'INFRA',
+  singleton: 'INFRA',
+  state: 'FLOW',
+  strategy: 'FLOW',
+  visitor: 'OPTIMISATION',
+}
+
+function splitListValue(rawValue) {
+  return `${rawValue ?? ''}`
+    .replace(/\r/g, '')
+    .split(/\n|,/)
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
 export function buildPatternPath(code) {
   return `/patterns/${code}`
 }
@@ -12,6 +39,10 @@ export function buildProgressPath() {
   return '/progression'
 }
 
+export function buildLegalNoticePath() {
+  return '/mentions-legales'
+}
+
 export function parseRoute(pathname) {
   const normalized = pathname.replace(/\/+$/, '') || '/'
 
@@ -21,6 +52,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/progression') {
     return { name: 'progress' }
+  }
+
+  if (normalized === '/mentions-legales') {
+    return { name: 'legalNotice' }
   }
 
   const quizMatch = normalized.match(/^\/patterns\/([a-z0-9-]+)\/quiz$/)
@@ -51,7 +86,7 @@ export function buildInitialParameters(schema) {
         }
 
         if (field.type === 'LIST') {
-          return [field.name, field.defaultValue.split(',').map((value) => value.trim()).filter(Boolean)]
+          return [field.name, splitListValue(field.defaultValue)]
         }
 
         return [field.name, field.defaultValue]
@@ -88,13 +123,7 @@ export function normalizeParameters(schema, formValues) {
           return [field.name, rawValue]
         }
 
-        return [
-          field.name,
-          `${rawValue ?? ''}`
-            .split(',')
-            .map((value) => value.trim())
-            .filter(Boolean),
-        ]
+        return [field.name, splitListValue(rawValue)]
       }
 
       return [field.name, rawValue]
@@ -118,6 +147,37 @@ export function getBooleanStateLabel(patternCode, fieldName, value) {
   }
 
   return value ? 'Actif' : 'Inactif'
+}
+
+export function inferPatternUseCaseCategory(pattern) {
+  const code = `${pattern?.code ?? ''}`.trim().toLowerCase()
+  if (patternUseCaseCategoriesByCode[code]) {
+    return patternUseCaseCategoriesByCode[code]
+  }
+
+  const haystack = `${pattern?.description ?? ''} ${pattern?.useCase ?? ''}`.toLowerCase()
+
+  if (/(clon|assembl|creation|constructeur|fabriq)/.test(haystack)) {
+    return 'CREATION'
+  }
+
+  if (/(notif|chat|message|abonn|orchestr)/.test(haystack)) {
+    return 'COMMUNICATION'
+  }
+
+  if (/(etat|transition|commande|undo|workflow|pipeline|algorithme|requete)/.test(haystack)) {
+    return 'FLOW'
+  }
+
+  if (/(adapter|decorat|facade|interface|sous-systeme|couche|compose)/.test(haystack)) {
+    return 'COMPOSITION'
+  }
+
+  if (/(memoire|optimis|scanner|analyse|parcour|arbre|visitor)/.test(haystack)) {
+    return 'OPTIMISATION'
+  }
+
+  return 'INFRA'
 }
 
 export function persistSession(user) {

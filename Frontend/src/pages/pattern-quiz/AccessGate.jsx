@@ -1,3 +1,6 @@
+import { buildPatternPath } from '../../app/playgroundUtils'
+import SpaLink from '../../components/SpaLink'
+
 export default function AccessGate({
   selectedPattern,
   onNavigateHome,
@@ -28,20 +31,20 @@ export default function AccessGate({
           >
             Creer un compte
           </button>
-          <button
+          <SpaLink
             className="rounded-full border border-black/10 bg-white/84 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-black/20"
-            type="button"
-            onClick={onNavigatePattern}
+            href={buildPatternPath(selectedPattern.code)}
+            onNavigate={onNavigatePattern}
           >
             Retour au playground
-          </button>
-          <button
+          </SpaLink>
+          <SpaLink
             className="rounded-full border border-black/10 bg-white/84 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-black/20"
-            type="button"
-            onClick={onNavigateHome}
+            href="/"
+            onNavigate={onNavigateHome}
           >
             Retour a l accueil
-          </button>
+          </SpaLink>
         </div>
       </section>
     </div>

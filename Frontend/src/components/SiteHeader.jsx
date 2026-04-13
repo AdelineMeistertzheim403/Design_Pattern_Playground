@@ -1,3 +1,6 @@
+import { buildProgressPath } from '../app/playgroundUtils'
+import SpaLink from './SpaLink'
+
 export default function SiteHeader({
   currentUser,
   routeName,
@@ -10,34 +13,30 @@ export default function SiteHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-black/8 bg-[rgba(243,234,217,0.82)] backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <button
+        <SpaLink
           className="flex items-center gap-4 text-left"
-          type="button"
-          onClick={onNavigateHome}
+          href="/"
+          onNavigate={onNavigateHome}
         >
           <img
             alt="Logo Design Pattern Playground"
             className="w-70 rounded-[1.75rem] object-contain"
             src="/logo.png"
           />
-        </button>
+        </SpaLink>
 
         <div className="flex flex-wrap items-center justify-end gap-3">
-          <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
-            {status.label}
-          </div>
-
-          <button
+          <SpaLink
             className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
               routeName === 'progress'
                 ? 'border-stone-950 bg-stone-950 text-white'
                 : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
             }`}
-            type="button"
-            onClick={onNavigateProgress}
+            href={buildProgressPath()}
+            onNavigate={onNavigateProgress}
           >
             Ma progression
-          </button>
+          </SpaLink>
 
           {currentUser ? (
             <>

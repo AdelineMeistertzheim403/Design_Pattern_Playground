@@ -6,6 +6,21 @@ export const typeLabels = {
   BEHAVIORAL: 'Comportement',
 }
 
+export const complexityLabels = {
+  BEGINNER: 'Debutant',
+  INTERMEDIATE: 'Intermediaire',
+  ADVANCED: 'Avance',
+}
+
+export const useCaseCategoryLabels = {
+  CREATION: 'Creation & assemblage',
+  COMMUNICATION: 'Communication & orchestration',
+  FLOW: 'Flux, etat & commandes',
+  COMPOSITION: 'Adaptation & composition',
+  OPTIMISATION: 'Analyse & optimisation',
+  INFRA: 'Acces & services globaux',
+}
+
 export const statusMap = {
   loading: {
     label: 'Connexion en cours',

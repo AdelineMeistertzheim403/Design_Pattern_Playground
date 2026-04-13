@@ -319,6 +319,8 @@ npm run build
 - `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
 - `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
 - `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
+- `interpreter` : mini langage interactif avec parsing, arbre d expressions et execution ligne par ligne sur une mission.
+- `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
 - `composite` : construction d un arbre dossiers/fichiers avec parcours complet ou partiel selon la presence du pattern.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
@@ -367,6 +369,6 @@ Exemple `factory` :
 
 ## Suite logique
 
-- Ajouter d autres patterns tres visuels comme `bridge`, `visitor`, `proxy` ou `facade`.
+- Ajouter d autres patterns tres visuels comme `bridge`, `composite`, `interpreter` ou `memento`.
 - Continuer a enrichir les scenes SVG et les quiz par pattern.
 - Ajouter un mode apprentissage et un mode developpeur avec code Java genere.
