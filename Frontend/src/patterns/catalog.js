@@ -2,6 +2,38 @@ export const defaultPatternCode = 'strategy'
 
 export const fallbackPatterns = [
   {
+    code: 'abstract-factory',
+    name: 'Abstract Factory',
+    type: 'CREATIONAL',
+    description: 'Fabrique des familles d objets coherentes sans exposer les classes concretes ni melanger les themes au niveau du client.',
+    useCase: 'Choisir un theme sci-fi ou medieval puis generer un hero, un transport et une relique parfaitement alignes.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'bridge',
+    name: 'Bridge',
+    type: 'STRUCTURAL',
+    description: 'Separe une abstraction de son implementation pour les faire varier independamment sans explosion de sous-classes.',
+    useCase: 'Piloter la meme forme avec plusieurs moteurs de rendu comme Shape + RenderEngine dans une UI ou un moteur graphique.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'memento',
+    name: 'Memento',
+    type: 'BEHAVIORAL',
+    description: 'Capture et restaure un etat interne sans exposer directement les details de cet etat au client.',
+    useCase: 'Sauvegarder une scene, appliquer des mutations risquees puis restaurer proprement un checkpoint comme dans un jeu ou un editeur.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
+    code: 'iterator',
+    name: 'Iterator',
+    type: 'BEHAVIORAL',
+    description: 'Expose un parcours sequentiel sur une collection sans reveler sa structure interne ni dupliquer la logique de navigation.',
+    useCase: 'Parcourir une liste ou un arbre avec un curseur next / previous stable, meme quand la structure sous-jacente change.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'template',
     name: 'Template Method',
     type: 'BEHAVIORAL',
@@ -160,8 +192,10 @@ export const fallbackPatternsByCode = Object.fromEntries(
 )
 
 export const patternPreviewTaglinesByCode = {
+  'abstract-factory': 'Un theme unique cree toute une famille d objets coherents d un seul coup.',
   adapter: 'Une interface legacy entre, une interface compatible ressort.',
   builder: 'L objet se construit piece par piece avant la livraison finale.',
+  bridge: 'La forme reste stable pendant que le moteur de rendu change librement.',
   chain: 'La requete traverse la chaine jusqu a etre acceptee ou stoppee.',
   command: 'Chaque action devient un objet rejouable avec undo et redo.',
   composite: 'Un root, des dossiers et des fichiers repondent au meme contrat dans tout l arbre.',
@@ -170,6 +204,8 @@ export const patternPreviewTaglinesByCode = {
   factory: 'La creation est delegatee a une fabrique au lieu d etre dispersee.',
   flyweight: 'Des milliers d objets partagent le meme etat intrinseque.',
   interpreter: 'Le script devient un arbre d expressions qui pilote la mission.',
+  iterator: 'Le curseur avance et recule sans exposer la structure reelle de la collection.',
+  memento: 'Les savepoints capturent un etat complet avant un rewind exact ou partiel.',
   mediator: 'Les echanges passent par un hub central plutot que par du couplage direct.',
   observer: 'Un sujet diffuse un evenement, plusieurs abonnes reagissent.',
   prototype: 'Un blueprint source genere des clones qui partagent ou non leur etat profond.',
@@ -182,8 +218,10 @@ export const patternPreviewTaglinesByCode = {
 }
 
 export const specializedScenePatternCodes = [
+  'abstract-factory',
   'adapter',
   'builder',
+  'bridge',
   'chain',
   'command',
   'composite',
@@ -191,6 +229,8 @@ export const specializedScenePatternCodes = [
   'facade',
   'flyweight',
   'interpreter',
+  'iterator',
+  'memento',
   'mediator',
   'prototype',
   'proxy',

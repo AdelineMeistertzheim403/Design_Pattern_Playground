@@ -169,6 +169,29 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecuteAbstractFactoryPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "abstract-factory",
+				  "parameters": {
+				    "mode": "WITHOUT_ABSTRACT_FACTORY",
+				    "themeCode": "MEDIEVAL",
+				    "generatorLabel": "Theme Generator"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("abstract-factory"))
+			.andExpect(jsonPath("$.output.themeCode").value("MEDIEVAL"))
+			.andExpect(jsonPath("$.output.coherentFamily").value(false))
+			.andExpect(jsonPath("$.output.familySize").value(3))
+			.andExpect(jsonPath("$.output.steps", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
 	void shouldExecuteAdapterPattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -317,6 +340,79 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.output.stepCount").value(5))
 			.andExpect(jsonPath("$.output.steps", hasSize(5)))
 			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
+	void shouldExecuteIteratorPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "iterator",
+				  "parameters": {
+				    "mode": "WITH_ITERATOR",
+				    "collectionCode": "ASSET_TREE",
+				    "explorerName": "Traversal Explorer"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("iterator"))
+			.andExpect(jsonPath("$.output.previousSupported").value(true))
+			.andExpect(jsonPath("$.output.collectionCode").value("ASSET_TREE"))
+			.andExpect(jsonPath("$.output.stepCount").value(6))
+			.andExpect(jsonPath("$.output.items", hasSize(7)))
+			.andExpect(jsonPath("$.output.steps", hasSize(6)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
+	}
+
+	@Test
+	void shouldExecuteMementoPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "memento",
+				  "parameters": {
+				    "mode": "WITHOUT_MEMENTO",
+				    "presetCode": "PIXEL_GARDEN",
+				    "workspaceName": "Save & Restore",
+				    "restoreTarget": "SNAPSHOT_BETA"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("memento"))
+			.andExpect(jsonPath("$.output.exactRestore").value(false))
+			.andExpect(jsonPath("$.output.snapshotCount").value(2))
+			.andExpect(jsonPath("$.output.restoreTarget").value("SNAPSHOT_BETA"))
+			.andExpect(jsonPath("$.output.checkpoints", hasSize(2)))
+			.andExpect(jsonPath("$.output.steps", hasSize(7)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
+	void shouldExecuteBridgePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "bridge",
+				  "parameters": {
+				    "mode": "WITH_BRIDGE",
+				    "shapeCode": "TRIANGLE",
+				    "renderCode": "PIXEL_ENGINE",
+				    "objectName": "Switch Engine"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("bridge"))
+			.andExpect(jsonPath("$.output.shapeLabel").value("Triangle"))
+			.andExpect(jsonPath("$.output.renderLabel").value("Pixel Engine"))
+			.andExpect(jsonPath("$.output.abstractionStable").value(true))
+			.andExpect(jsonPath("$.output.steps", hasSize(4)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(5)));
 	}
 
 	@Test

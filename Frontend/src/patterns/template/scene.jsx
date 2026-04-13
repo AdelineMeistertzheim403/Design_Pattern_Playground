@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react'
+
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
   EmptyScenePlaceholder,
@@ -50,6 +52,41 @@ function extractTemplateModel(execution) {
   }
 }
 
+function buildTemplateFrames(model) {
+  if (!model) {
+    return []
+  }
+
+  const introDetail = model.templateUsed
+    ? `Le client declenche ${model.skeletonLabel} puis le squelette verrouille prepare -> execute -> finalize.`
+    : `Le client enchaine le workflow a la main. Chaque etape doit etre recodee et la cloture peut deriver.`
+
+  return [
+    {
+      id: 'template-initial',
+      index: 0,
+      stageCode: 'START',
+      stageLabel: 'Workflow ready',
+      actorLabel: model.clientLabel,
+      status: 'READY',
+      detail: introDetail,
+      variableStage: false,
+      visibleStepCount: 0,
+      currentStageCode: null,
+      currentStageLabel: model.workflowLabel,
+      resultLabel: 'Workflow ready',
+    },
+    ...model.steps.map((step, index) => ({
+      ...step,
+      id: `template-step-${step.index}`,
+      visibleStepCount: index + 1,
+      currentStageCode: step.stageCode,
+      currentStageLabel: step.stageLabel,
+      resultLabel: step.stageLabel,
+    })),
+  ]
+}
+
 function StageCard({
   card,
   label,
@@ -76,6 +113,19 @@ function StageCard({
 
   return (
     <g>
+      {status === 'ACTIVE' ? (
+        <rect
+          x={card.x - 8}
+          y={card.y - 8}
+          width={card.width + 16}
+          height={card.height + 16}
+          rx="32"
+          fill="rgba(36,31,24,0.06)"
+          stroke="rgba(36,31,24,0.18)"
+          strokeWidth="2"
+          className="state-active-halo"
+        />
+      ) : null}
       <rect x={card.x} y={card.y} width={card.width} height={card.height} rx="28" fill={fill} stroke={stroke} strokeWidth="2" className="scene-node-shadow" />
       <text x={card.x + 16} y={card.y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill={subtle}>
         {label}
@@ -101,11 +151,19 @@ function StageCard({
           HOOK
         </text>
       ) : null}
+      {status === 'ACTIVE' ? (
+        <rect x={card.x + 16} y={card.y + card.height - 28} width="54" height="18" rx="9" fill={isCustom ? 'rgba(255,248,238,0.16)' : '#241f18'} />
+      ) : null}
+      {status === 'ACTIVE' ? (
+        <text x={card.x + 43} y={card.y + card.height - 15} textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="0.18em" fill="#fff8ee">
+          NOW
+        </text>
+      ) : null}
     </g>
   )
 }
 
-function TimelineCard({ card, step }) {
+function TimelineCard({ card, step, isCurrent }) {
   const statusTone = step.status === 'FRAGILE' || step.status === 'WARNING'
     ? 'rgba(245,227,210,0.98)'
     : step.variableStage
@@ -122,7 +180,15 @@ function TimelineCard({ card, step }) {
 
   return (
     <g>
-      <rect x={card.x} y={card.y} width={card.width} height={card.height} rx="24" fill={statusTone} stroke="rgba(36,31,24,0.12)" strokeWidth="1.5" />
+      <rect x={card.x} y={card.y} width={card.width} height={card.height} rx="24" fill={statusTone} stroke={isCurrent ? '#241f18' : 'rgba(36,31,24,0.12)'} strokeWidth={isCurrent ? '2.5' : '1.5'} />
+      {isCurrent ? (
+        <rect x={card.x + card.width - 72} y={card.y + 14} width="54" height="18" rx="9" fill="#241f18" />
+      ) : null}
+      {isCurrent ? (
+        <text x={card.x + card.width - 45} y={card.y + 27} textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="0.18em" fill="#fff8ee">
+          NOW
+        </text>
+      ) : null}
       <circle cx={card.x + 22} cy={card.y + 22} r="12" fill="#241f18" />
       <text x={card.x + 22} y={card.y + 26} textAnchor="middle" fontSize="10" fontWeight="700" fill="#fff8ee">
         {step.index}
@@ -156,10 +222,67 @@ export default function TemplateScene({
   sourceLabel,
   onOpenModal,
 }) {
-  const model = extractTemplateModel(execution)
+  const model = useMemo(() => extractTemplateModel(execution), [execution])
+  const frames = useMemo(() => buildTemplateFrames(model), [model])
+  const [playMode, setPlayMode] = useState('AUTO')
+  const [delayMs, setDelayMs] = useState(900)
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(Math.max(0, frames.length - 1))
+  const [isPlaying, setIsPlaying] = useState(false)
 
   if (!model) {
     return <EmptyScenePlaceholder />
+  }
+
+  useEffect(() => {
+    setCurrentFrameIndex(Math.max(0, frames.length - 1))
+    setIsPlaying(false)
+  }, [frames.length, model.mode, model.workflowCode, model.workflowName, model.executeLabel])
+
+  useEffect(() => {
+    if (playMode === 'STEP') {
+      setIsPlaying(false)
+    }
+  }, [playMode])
+
+  useEffect(() => {
+    if (!isPlaying || playMode !== 'AUTO' || currentFrameIndex >= frames.length - 1) {
+      if (currentFrameIndex >= frames.length - 1) {
+        setIsPlaying(false)
+      }
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setCurrentFrameIndex((index) => Math.min(index + 1, frames.length - 1))
+    }, delayMs)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [currentFrameIndex, delayMs, frames.length, isPlaying, playMode])
+
+  const currentFrame = frames[currentFrameIndex] ?? frames[frames.length - 1]
+  const visibleSteps = model.steps.slice(0, currentFrame.visibleStepCount)
+  const activeStep = currentFrameIndex > 0 ? visibleSteps[visibleSteps.length - 1] ?? null : null
+  const activeStageCode = currentFrame.currentStageCode
+  const currentResultLabel = currentFrameIndex > 0 ? currentFrame.resultLabel : model.resultLabel
+
+  function handleLaunchDemo() {
+    setCurrentFrameIndex(0)
+    setIsPlaying(playMode === 'AUTO')
+  }
+
+  function handleReset() {
+    setCurrentFrameIndex(Math.max(0, frames.length - 1))
+    setIsPlaying(false)
+  }
+
+  function handlePrevious() {
+    setIsPlaying(false)
+    setCurrentFrameIndex((index) => Math.max(0, index - 1))
+  }
+
+  function handleNext() {
+    setIsPlaying(false)
+    setCurrentFrameIndex((index) => Math.min(index + 1, frames.length - 1))
   }
 
   const viewBoxWidth = 1260
@@ -207,6 +330,64 @@ export default function TemplateScene({
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-black/10 bg-white/72 px-4 py-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Lecture</span>
+          <button
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              playMode === 'AUTO'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white text-stone-700'
+            }`}
+            type="button"
+            onClick={() => setPlayMode('AUTO')}
+          >
+            Auto
+          </button>
+          <button
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              playMode === 'STEP'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white text-stone-700'
+            }`}
+            type="button"
+            onClick={() => setPlayMode('STEP')}
+          >
+            Pas a pas
+          </button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {playMode === 'AUTO' ? (
+            <label className="flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-2 text-sm text-stone-700">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">Tempo</span>
+              <select
+                className="bg-transparent font-semibold outline-none"
+                value={delayMs}
+                onChange={(event) => setDelayMs(Number(event.target.value))}
+              >
+                <option value={700}>700 ms</option>
+                <option value={900}>900 ms</option>
+                <option value={1200}>1200 ms</option>
+              </select>
+            </label>
+          ) : null}
+
+          <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>
+            Lancer la demo
+          </button>
+          <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>
+            Precedent
+          </button>
+          <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleNext} disabled={currentFrameIndex >= frames.length - 1}>
+            Suivant
+          </button>
+          <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleReset}>
+            Reset
+          </button>
+        </div>
+      </div>
+
       <ZoomableViewport enabled={false} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
         <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
           <defs>
@@ -230,10 +411,10 @@ export default function TemplateScene({
             {model.workflowLabel}
           </text>
           <text x={metrics.x + 28} y={metrics.y + 92} fontSize="13" fill="#5f5548">
-            {model.modeLabel} · {model.ambianceLabel} · {model.fixedStageCount} etapes fixes
+            {model.modeLabel} · {model.ambianceLabel} · {visibleSteps.length}/{model.fixedStageCount} etapes jouees
           </text>
           <text x={metrics.x + metrics.width - 28} y={metrics.y + 60} textAnchor="end" fontSize="24" fontWeight="700" fill={model.stableWorkflow ? '#153f38' : '#c25737'}>
-            {model.resultLabel}
+            {currentResultLabel}
           </text>
           <text x={metrics.x + metrics.width - 28} y={metrics.y + 88} textAnchor="end" fontSize="13" fill="#5f5548">
             {model.duplicateBoilerplateCount} bloc(s) commun(s) · {model.latencyMs} ms
@@ -299,18 +480,37 @@ export default function TemplateScene({
               </text>
             ))}
             <text x={resultCard.x + 18} y={resultCard.y + 94 + (resultLabelLines.length - 1) * 22} fontSize="12" fill={model.stableWorkflow ? '#215247' : '#7a4634'}>
-              {model.finalizationGuaranteed ? 'finalization guaranteed' : 'cleanup drift'}
+              {activeStep?.detail ?? (model.finalizationGuaranteed ? 'finalization guaranteed' : 'cleanup drift')}
             </text>
           </g>
 
-          <StageCard card={prepareCard} label="STAGE 1" title={model.prepareLabel} detail={model.prepareDetail} status="READY" />
-          <StageCard card={executeCard} label="STAGE 2" title={model.executeLabel} detail={model.executeDetail} status="CUSTOM" variableStage />
+          <StageCard
+            card={prepareCard}
+            label="STAGE 1"
+            title={model.prepareLabel}
+            detail={activeStageCode === 'PREPARE' && activeStep ? activeStep.detail : model.prepareDetail}
+            status={activeStageCode === 'PREPARE' ? 'ACTIVE' : 'READY'}
+          />
+          <StageCard
+            card={executeCard}
+            label="STAGE 2"
+            title={model.executeLabel}
+            detail={activeStageCode === 'EXECUTE' && activeStep ? activeStep.detail : model.executeDetail}
+            status={activeStageCode === 'EXECUTE' ? 'ACTIVE' : 'CUSTOM'}
+            variableStage
+          />
           <StageCard
             card={finalizeCard}
             label="STAGE 3"
             title={model.finalizeLabel}
-            detail={model.finalizationGuaranteed ? model.finalizeDetail : model.manualDriftDetail}
-            status={model.finalizationGuaranteed ? 'READY' : 'FRAGILE'}
+            detail={
+              activeStageCode === 'FINALIZE'
+                ? activeStep?.detail ?? (model.finalizationGuaranteed ? model.finalizeDetail : model.manualDriftDetail)
+                : model.finalizationGuaranteed
+                  ? model.finalizeDetail
+                  : model.manualDriftDetail
+            }
+            status={activeStageCode === 'FINALIZE' ? 'ACTIVE' : model.finalizationGuaranteed ? 'READY' : 'FRAGILE'}
           />
 
           <path d={clientToSkeleton} fill="none" stroke="#246b5e" strokeWidth="3" strokeDasharray="14 8" markerEnd={`url(#${defsId}-success-arrow)`} className="scene-flow-line" />
@@ -328,6 +528,15 @@ export default function TemplateScene({
           <circle r="5" fill={model.finalizationGuaranteed ? '#246b5e' : '#c25737'} opacity="0.96">
             <animateMotion dur="1.9s" repeatCount="indefinite" path={finalizeToResult} begin="0.35s" />
           </circle>
+          {activeStageCode === 'PREPARE' ? (
+            <circle cx={prepareCard.x + prepareCard.width - 18} cy={prepareCard.y + 18} r="10" fill="#246b5e" className="state-active-halo" />
+          ) : null}
+          {activeStageCode === 'EXECUTE' ? (
+            <circle cx={executeCard.x + executeCard.width - 18} cy={executeCard.y + 18} r="10" fill="#426c8d" className="state-active-halo" />
+          ) : null}
+          {activeStageCode === 'FINALIZE' ? (
+            <circle cx={finalizeCard.x + finalizeCard.width - 18} cy={finalizeCard.y + 18} r="10" fill={model.finalizationGuaranteed ? '#246b5e' : '#c25737'} className="state-active-halo" />
+          ) : null}
 
           <rect x={timelineX} y={timelineY} width={timelineWidth} height={timelineHeight} rx="30" fill="rgba(255,249,239,0.98)" stroke="rgba(36,31,24,0.1)" strokeWidth="2" />
           <text x={timelineX + 24} y={timelineY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
@@ -337,7 +546,7 @@ export default function TemplateScene({
             Timeline du workflow
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
-            {model.steps.length} etapes · {model.templateUsed ? 'squelette stable' : 'workflow manuel fragile'}
+            {visibleSteps.length}/{model.steps.length} etapes · {model.templateUsed ? 'squelette stable' : 'workflow manuel fragile'}
           </text>
 
           {model.steps.map((step, index) => {
@@ -351,7 +560,7 @@ export default function TemplateScene({
               height: timelineCardHeight,
             }
 
-            return <TimelineCard key={`${step.stageCode}-${step.index}`} card={card} step={step} />
+            return <TimelineCard key={`${step.stageCode}-${step.index}`} card={card} step={step} isCurrent={index === currentFrameIndex - 1} />
           })}
         </svg>
       </ZoomableViewport>

@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+
+import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
   EmptyScenePlaceholder,
@@ -64,6 +67,13 @@ export default function ProxyScene({
     return <EmptyScenePlaceholder />
   }
 
+  const playback = useScenePlayback(
+    useMemo(() => buildPlaybackFrames(model.steps, 'Proxy ready'), [model.steps]),
+    900,
+  )
+  const visibleStepCount = playback.currentFrame.visibleStepCount
+  const currentStepIndex = playback.currentFrame.currentStepIndex
+
   const viewBoxWidth = 1160
   const metrics = { x: 36, y: 40, width: 1088, height: 104 }
   const graph = { x: 36, y: 166, width: 1088, height: 404 }
@@ -112,6 +122,8 @@ export default function ProxyScene({
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
+
+      <ScenePlaybackControls playback={playback} />
 
       <ZoomableViewport enabled={false} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
         <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
@@ -317,7 +329,7 @@ export default function ProxyScene({
           <foreignObject x={timelineX + 16} y={timelineY + 102} width={timelineWidth - 32} height={timelineHeight - 118}>
             <div className="h-full" xmlns="http://www.w3.org/1999/xhtml">
               <div className="grid gap-3 pb-2" style={{ gridTemplateColumns: `repeat(${timelineColumns}, minmax(0, 1fr))` }}>
-                {model.steps.map((step) => {
+                {model.steps.map((step, index) => {
                   const tone = step.status === 'BLOCKED' || step.status === 'EXPOSED'
                     ? {
                         card: 'border-[#c25737]/30 bg-[rgba(245,227,210,0.94)]',
@@ -342,7 +354,8 @@ export default function ProxyScene({
                   return (
                     <article
                       key={`${step.index}-${step.stageCode}`}
-                      className={`rounded-[24px] border px-4 py-4 shadow-[0_8px_22px_rgba(36,31,24,0.05)] ${tone.card}`}
+                      className={`rounded-[24px] border px-4 py-4 shadow-[0_8px_22px_rgba(36,31,24,0.05)] transition ${tone.card} ${index > currentStepIndex ? 'opacity-30' : ''} ${index === currentStepIndex ? 'ring-2 ring-black/20' : ''}`}
+                      style={{ visibility: index < visibleStepCount || index === currentStepIndex ? 'visible' : 'hidden' }}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
