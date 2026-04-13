@@ -340,6 +340,23 @@ function getAutoSides(fromBox, toBox) {
     : { fromSide: 'top', toSide: 'bottom' }
 }
 
+function inferAnchorSideFromWaypoint(box, waypoint) {
+  if (!box || !waypoint) {
+    return null
+  }
+
+  const centerX = box.x + box.width / 2
+  const centerY = box.y + box.height / 2
+  const dx = waypoint.x - centerX
+  const dy = waypoint.y - centerY
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return dx >= 0 ? 'right' : 'left'
+  }
+
+  return dy >= 0 ? 'bottom' : 'top'
+}
+
 function offsetStraightLine(start, end, offset) {
   if (offset === 0) {
     return [start, end]
@@ -379,17 +396,43 @@ function buildRelationMeta(relations) {
   })
 }
 
-function buildRelationPoints(relation, classesById, relationMeta) {
+function normalizeWaypoint(point) {
+  const x = Number(point?.x)
+  const y = Number(point?.y)
+
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return null
+  }
+
+  return { x, y }
+}
+
+function buildRelationPoints(relation, classesById, relationMeta, options = {}) {
   const fromBox = classesById[relation.from]
   const toBox = classesById[relation.to]
+  const useRelationWaypoints = options.useRelationWaypoints === true
 
   if (!fromBox || !toBox) {
     return null
   }
 
-  const sides = getAutoSides(fromBox, toBox)
-  const start = getAnchor(fromBox, sides.fromSide)
-  const end = getAnchor(toBox, sides.toSide)
+  const autoSides = getAutoSides(fromBox, toBox)
+  const customWaypoints = useRelationWaypoints
+    ? (relation.points ?? []).map(normalizeWaypoint).filter(Boolean)
+    : []
+  const fromSide = relation.fromSide
+    ?? inferAnchorSideFromWaypoint(fromBox, customWaypoints[0])
+    ?? autoSides.fromSide
+  const toSide = relation.toSide
+    ?? inferAnchorSideFromWaypoint(toBox, customWaypoints[customWaypoints.length - 1])
+    ?? autoSides.toSide
+  const start = getAnchor(fromBox, fromSide)
+  const end = getAnchor(toBox, toSide)
+
+  if (customWaypoints.length > 0) {
+    return [start, ...customWaypoints, end]
+  }
+
   const offset = relationMeta.total > 1
     ? (relationMeta.index - (relationMeta.total - 1) / 2) * 22
     : 0
@@ -441,6 +484,40 @@ function getPolylinePointAt(points, ratio = 0.5) {
   }
 
   return points[points.length - 1]
+}
+
+function getRelationLabelPosition(relation, points, options = {}) {
+  if (options.useExplicitPosition === true) {
+    const x = Number(relation.labelX)
+    const y = Number(relation.labelY)
+
+    if (Number.isFinite(x) && Number.isFinite(y)) {
+      return { x, y }
+    }
+  }
+
+  return getPolylinePointAt(points, 0.5)
+}
+
+function getRelationMarkers(defsId, relation) {
+  if (relation.marker === 'triangle') {
+    return {
+      markerEnd: `url(#${defsId}-triangle)`,
+      markerStart: undefined,
+    }
+  }
+
+  if (relation.marker === 'diamond') {
+    return {
+      markerEnd: undefined,
+      markerStart: `url(#${defsId}-diamond)`,
+    }
+  }
+
+  return {
+    markerEnd: `url(#${defsId}-arrow)`,
+    markerStart: undefined,
+  }
 }
 
 function withPosition(box, x, y) {
@@ -784,9 +861,15 @@ export default function UmlDiagram({
 
   const defsId = `uml-${patternName?.toLowerCase?.() ?? 'pattern'}`
   const boxLayouts = diagram.classes.map((box) => getBoxLayout(box))
-  const arrangedLayout = buildPatternLayout(patternCode, boxLayouts)
-  const classesById = Object.fromEntries(arrangedLayout.boxes.map((box) => [box.id, box]))
   const baseViewBox = parseViewBox(diagram.viewBox)
+  const useAbsoluteLayout = diagram.layout === 'absolute'
+  const arrangedLayout = useAbsoluteLayout
+    ? {
+        boxes: boxLayouts,
+        viewBox: `${baseViewBox.minX} ${baseViewBox.minY} ${baseViewBox.width} ${baseViewBox.height}`,
+      }
+    : buildPatternLayout(patternCode, boxLayouts)
+  const classesById = Object.fromEntries(arrangedLayout.boxes.map((box) => [box.id, box]))
   const computedViewBox = arrangedLayout.viewBox ?? `${baseViewBox.minX} ${baseViewBox.minY} ${baseViewBox.width} ${baseViewBox.height}`
   const relationMetaList = buildRelationMeta(diagram.relations)
   const panelClassName = isExpanded
@@ -844,18 +927,33 @@ export default function UmlDiagram({
           >
             <path d="M 0 6 L 10 0 L 10 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
           </marker>
+          <marker
+            id={`${defsId}-diamond`}
+            markerWidth="12"
+            markerHeight="12"
+            refX="0"
+            refY="6"
+            orient="auto"
+          >
+            <path d="M 0 6 L 6 0 L 12 6 L 6 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
+          </marker>
         </defs>
 
         {diagram.relations.map((relation, index) => {
-          const points = buildRelationPoints(relation, classesById, relationMetaList[index])
+          const points = buildRelationPoints(relation, classesById, relationMetaList[index], {
+            useRelationWaypoints: useAbsoluteLayout,
+          })
           if (!points) {
             return null
           }
 
           const path = buildPath(points)
-          const labelPosition = getPolylinePointAt(points, 0.5)
+          const labelPosition = getRelationLabelPosition(relation, points, {
+            useExplicitPosition: useAbsoluteLayout,
+          })
           const label = relation.label.toUpperCase()
           const labelWidth = Math.max(88, Math.ceil(estimateTextWidth(label, 11) + 28))
+          const markers = getRelationMarkers(defsId, relation)
 
           return (
             <g key={`${relation.from}-${relation.to}-${index}`} className="uml-relation">
@@ -866,7 +964,8 @@ export default function UmlDiagram({
                 stroke="#7a5a3f"
                 strokeWidth="2.2"
                 strokeDasharray={relation.dashed ? '10 8' : '0'}
-                markerEnd={`url(#${defsId}-${relation.marker === 'triangle' ? 'triangle' : 'arrow'})`}
+                markerEnd={markers.markerEnd}
+                markerStart={markers.markerStart}
               />
               <rect
                 className="uml-relation-label-bg"
