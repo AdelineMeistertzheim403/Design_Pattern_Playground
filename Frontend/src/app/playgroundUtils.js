@@ -1,21 +1,26 @@
 import { AUTH_USER_STORAGE_KEY, patternFieldUi } from './playgroundConstants'
 
 const patternUseCaseCategoriesByCode = {
+  'abstract-factory': 'CREATION',
   adapter: 'COMPOSITION',
   builder: 'CREATION',
+  bridge: 'COMPOSITION',
   chain: 'FLOW',
   command: 'FLOW',
   decorator: 'COMPOSITION',
   facade: 'COMPOSITION',
   factory: 'CREATION',
   flyweight: 'OPTIMISATION',
+  iterator: 'FLOW',
   mediator: 'COMMUNICATION',
+  memento: 'FLOW',
   observer: 'COMMUNICATION',
   prototype: 'CREATION',
   proxy: 'INFRA',
   singleton: 'INFRA',
   state: 'FLOW',
   strategy: 'FLOW',
+  template: 'FLOW',
   visitor: 'OPTIMISATION',
 }
 

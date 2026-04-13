@@ -6,6 +6,8 @@
 
 Ce depot contient un backend Spring Boot et un frontend React pour simuler et visualiser des design patterns de maniere interactive.
 
+Le playground couvre maintenant 23 patterns avec demo interactive, scene SVG, pedagogie et quiz par pattern.
+
 ## Structure
 
 - `Backend/` : API Spring Boot 4 avec un registre de patterns, des schemas dynamiques, une authentification JWT via cookies `HttpOnly` et une persistance PostgreSQL.
@@ -319,6 +321,8 @@ npm run build
 - `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
 - `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
 - `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
+- `template` : workflow builder visuel avec squelette fixe prepare -> execute -> finalise et variation sur l etape centrale.
+- `iterator` : traversal explorer visuel avec curseur next / previous sur liste ou arbre aplati.
 - `interpreter` : mini langage interactif avec parsing, arbre d expressions et execution ligne par ligne sur une mission.
 - `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
 - `composite` : construction d un arbre dossiers/fichiers avec parcours complet ou partiel selon la presence du pattern.

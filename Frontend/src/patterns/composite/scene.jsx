@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+
+import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
   EmptyScenePlaceholder,
@@ -162,6 +165,13 @@ export default function CompositeScene({
     return <EmptyScenePlaceholder />
   }
 
+  const playback = useScenePlayback(
+    useMemo(() => buildPlaybackFrames(model.steps, 'Tree ready'), [model.steps]),
+    900,
+  )
+  const visibleStepCount = playback.currentFrame.visibleStepCount
+  const currentStepIndex = playback.currentFrame.currentStepIndex
+
   const nodesByDepth = Object.groupBy(model.treeNodes, (node) => node.depth)
   const maxDepth = Math.max(...model.treeNodes.map((node) => node.depth), 0)
   const viewBoxWidth = 1220
@@ -195,6 +205,8 @@ export default function CompositeScene({
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
+
+      <ScenePlaybackControls playback={playback} />
 
       <ZoomableViewport enabled={false} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
         <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
@@ -303,16 +315,17 @@ export default function CompositeScene({
           <foreignObject x={timelineX + 16} y={timelineY + 102} width={timelineWidth - 32} height={timelineHeight - 118}>
             <div className="h-full" xmlns="http://www.w3.org/1999/xhtml">
               <div className="grid gap-3 pb-2" style={{ gridTemplateColumns: `repeat(${timelineColumns}, minmax(0, 1fr))` }}>
-                {model.steps.map((step) => (
+                {model.steps.map((step, index) => (
                   <div
                     key={`${step.index}-${step.stageCode}`}
-                    className={`min-h-[118px] rounded-[18px] border px-3 py-3 shadow-[0_12px_24px_rgba(48,39,24,0.08)] ${
+                    className={`min-h-[118px] rounded-[18px] border px-3 py-3 shadow-[0_12px_24px_rgba(48,39,24,0.08)] transition ${
                       step.status === 'MISSED' || step.status === 'PARTIAL'
                         ? 'border-orange-200 bg-orange-50/92'
                         : step.stageCode === 'COMPONENT_CALL'
                           ? 'border-sky-200 bg-sky-50/92'
                           : 'border-emerald-200 bg-emerald-50/90'
-                    }`}
+                    } ${index > currentStepIndex ? 'opacity-30' : ''} ${index === currentStepIndex ? 'ring-2 ring-black/20' : ''}`}
+                    style={{ visibility: index < visibleStepCount || index === currentStepIndex ? 'visible' : 'hidden' }}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
