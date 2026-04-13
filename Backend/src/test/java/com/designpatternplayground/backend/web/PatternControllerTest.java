@@ -324,6 +324,32 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecuteCompositePattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "composite",
+				  "parameters": {
+				    "mode": "WITH_COMPOSITE",
+				    "rootName": "workspace",
+				    "blueprintCode": "GAME_ASSETS",
+				    "extraLeafCount": 3,
+				    "operationLabel": "Scan tree"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("composite"))
+			.andExpect(jsonPath("$.output.uniformTraversal").value(true))
+			.andExpect(jsonPath("$.output.missedCount").value(0))
+			.andExpect(jsonPath("$.output.fileCount").value(9))
+			.andExpect(jsonPath("$.output.stepCount").value(6))
+			.andExpect(jsonPath("$.output.treeNodes", hasSize(13)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(14)));
+	}
+
+	@Test
 	void shouldExecuteStrategyPattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)

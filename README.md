@@ -321,6 +321,7 @@ npm run build
 - `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
 - `interpreter` : mini langage interactif avec parsing, arbre d expressions et execution ligne par ligne sur une mission.
 - `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
+- `composite` : construction d un arbre dossiers/fichiers avec parcours complet ou partiel selon la presence du pattern.
 - UI frontend composee de :
   - page d accueil qui presente le projet et permet de choisir un pattern
   - page dediee par pattern avec formulaire, resultat, scene SVG et UML
