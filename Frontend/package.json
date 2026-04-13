@@ -8,6 +8,7 @@
     "generate:seo": "node scripts/generate-seo-files.mjs",
     "prebuild": "node scripts/generate-seo-files.mjs",
     "build": "vite build",
+    "postbuild": "node scripts/prerender-routes.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

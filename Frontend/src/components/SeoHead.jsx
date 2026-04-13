@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
-
-const SITE_NAME = 'Design Pattern Playground'
-const DEFAULT_DESCRIPTION = 'Comprendre les design patterns grace a des demonstrations interactives, des schemas UML et des quiz.'
-const DEFAULT_IMAGE_PATH = '/logo.png'
-
-function normalizeOrigin(rawValue) {
-  return `${rawValue ?? ''}`.trim().replace(/\/$/, '')
-}
+import {
+  buildPageSeoPayload,
+  buildStructuredData,
+  normalizeOrigin,
+  SITE_NAME,
+} from '../seo/pageSeo'
 
 function upsertMeta(selector, attributes, content) {
   let element = document.head.querySelector(selector)
@@ -34,71 +32,50 @@ function upsertLink(rel, href) {
   element.setAttribute('href', href)
 }
 
-function buildSeoPayload(pageKind, selectedPattern) {
-  if (pageKind === 'pattern' && selectedPattern) {
-    return {
-      description: `Decouvre le pattern ${selectedPattern.name} : definition, cas d usage, schema UML et demonstration interactive pour mieux comprendre son fonctionnement.`,
-      robots: 'index,follow',
-      title: `${selectedPattern.name} : UML, explication et demo interactive | ${SITE_NAME}`,
-      type: 'article',
-    }
+function upsertStructuredData(payloads) {
+  let element = document.head.querySelector('script[data-seo-id="structured-data"]')
+
+  if (!payloads.length) {
+    element?.remove()
+    return
   }
 
-  if (pageKind === 'quiz' && selectedPattern) {
-    return {
-      description: `Quiz de validation consacre au pattern ${selectedPattern.name}.`,
-      robots: 'noindex,follow',
-      title: `Quiz ${selectedPattern.name} | ${SITE_NAME}`,
-      type: 'website',
-    }
+  if (!element) {
+    element = document.createElement('script')
+    element.setAttribute('type', 'application/ld+json')
+    element.setAttribute('data-seo-id', 'structured-data')
+    document.head.appendChild(element)
   }
 
-  if (pageKind === 'progress') {
-    return {
-      description: 'Tableau de bord personnel de progression et de resultats sur les quiz.',
-      robots: 'noindex,follow',
-      title: `Ma progression | ${SITE_NAME}`,
-      type: 'website',
-    }
-  }
-
-  if (pageKind === 'legalNotice') {
-    return {
-      description: 'Mentions legales, hebergement, politique de confidentialite et informations sur les donnees personnelles du site.',
-      robots: 'index,follow',
-      title: `Mentions legales et confidentialite | ${SITE_NAME}`,
-      type: 'website',
-    }
-  }
-
-  if (pageKind === 'notFound') {
-    return {
-      description: 'La page demandee est introuvable.',
-      robots: 'noindex,follow',
-      title: `Page introuvable | ${SITE_NAME}`,
-      type: 'website',
-    }
-  }
-
-  return {
-    description: DEFAULT_DESCRIPTION,
-    robots: 'index,follow',
-    title: `${SITE_NAME} | Apprendre les design patterns avec des demos interactives`,
-    type: 'website',
-  }
+  element.textContent = JSON.stringify(payloads.length === 1 ? payloads[0] : payloads)
 }
 
 export default function SeoHead({
+  learningContent,
   pageKind,
+  patterns,
   selectedPattern,
 }) {
   useEffect(() => {
-    const payload = buildSeoPayload(pageKind, selectedPattern)
     const configuredSiteUrl = normalizeOrigin(import.meta.env.VITE_SITE_URL)
     const currentOrigin = normalizeOrigin(window.location.origin)
     const siteOrigin = configuredSiteUrl || currentOrigin
-    const canonicalUrl = `${siteOrigin}${window.location.pathname}`
-    const imageUrl = `${siteOrigin}${DEFAULT_IMAGE_PATH}`
+    const pathname = window.location.pathname
+    const payload = buildPageSeoPayload({
+      learningContent,
+      pageKind,
+      pathname,
+      selectedPattern,
+      siteOrigin,
+    })
+    const structuredData = buildStructuredData({
+      learningContent,
+      pageKind,
+      pathname,
+      patterns,
+      selectedPattern,
+      siteOrigin,
+    })
 
     document.title = payload.title
 
@@ -107,17 +84,18 @@ export default function SeoHead({
     upsertMeta('meta[property="og:title"]', { property: 'og:title' }, payload.title)
     upsertMeta('meta[property="og:description"]', { property: 'og:description' }, payload.description)
     upsertMeta('meta[property="og:type"]', { property: 'og:type' }, payload.type)
-    upsertMeta('meta[property="og:url"]', { property: 'og:url' }, canonicalUrl)
-    upsertMeta('meta[property="og:image"]', { property: 'og:image' }, imageUrl)
+    upsertMeta('meta[property="og:url"]', { property: 'og:url' }, payload.canonicalUrl)
+    upsertMeta('meta[property="og:image"]', { property: 'og:image' }, payload.imageUrl)
     upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt' }, 'Logo Design Pattern Playground')
     upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name' }, SITE_NAME)
     upsertMeta('meta[property="og:locale"]', { property: 'og:locale' }, 'fr_FR')
     upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card' }, 'summary_large_image')
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title' }, payload.title)
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description' }, payload.description)
-    upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image' }, imageUrl)
-    upsertLink('canonical', canonicalUrl)
-  }, [pageKind, selectedPattern])
+    upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image' }, payload.imageUrl)
+    upsertLink('canonical', payload.canonicalUrl)
+    upsertStructuredData(structuredData)
+  }, [learningContent, pageKind, patterns, selectedPattern])
 
   return null
 }
