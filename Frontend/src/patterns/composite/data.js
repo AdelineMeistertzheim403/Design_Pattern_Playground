@@ -85,6 +85,7 @@ export const patternLearningContent = {
 }
 
 export const patternUmlDiagram = {
+  layout: 'absolute',
   viewBox: '0 0 1240 720',
   classes: [
     {
