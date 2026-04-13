@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.designpatternplayground.backend.pattern.registry.PatternRegistry;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class PatternControllerTest {
@@ -27,12 +29,16 @@ class PatternControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
+	@Autowired
+	private PatternRegistry patternRegistry;
+
 	@Test
 	void shouldExposeAvailablePatterns() throws Exception {
+		int expectedPatternCount = patternRegistry.getAllMetadata().size();
+
 		mockMvc.perform(get("/api/patterns"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(17)))
-			.andExpect(jsonPath("$", hasSize(17)))
+			.andExpect(jsonPath("$", hasSize(expectedPatternCount)))
 			.andExpect(jsonPath("$[0].code", notNullValue()))
 			.andExpect(jsonPath("$[0].description", notNullValue()));
 	}
@@ -120,6 +126,8 @@ class PatternControllerTest {
 
 	@Test
 	void shouldExposeQuizDashboardForAuthenticatedUser() throws Exception {
+		int expectedPatternCount = patternRegistry.getAllMetadata().size();
+
 		Cookie accessCookie = registerAndExtractAccessCookie("quiz_dashboard", "secret123");
 
 		mockMvc.perform(post("/api/patterns/factory/quiz/submissions")
@@ -153,11 +161,11 @@ class PatternControllerTest {
 		mockMvc.perform(get("/api/quiz/dashboard")
 			.cookie(accessCookie))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.totalPatterns").value(17))
+			.andExpect(jsonPath("$.totalPatterns").value(expectedPatternCount))
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
-			.andExpect(jsonPath("$.patterns", hasSize(17)));
+			.andExpect(jsonPath("$.patterns", hasSize(expectedPatternCount)));
 	}
 
 	@Test
