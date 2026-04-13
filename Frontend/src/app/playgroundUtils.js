@@ -16,6 +16,7 @@ const patternUseCaseCategoriesByCode = {
   singleton: 'INFRA',
   state: 'FLOW',
   strategy: 'FLOW',
+  template: 'FLOW',
   visitor: 'OPTIMISATION',
 }
 

@@ -296,6 +296,30 @@ class PatternControllerTest {
 	}
 
 	@Test
+	void shouldExecuteTemplateMethodPattern() throws Exception {
+		mockMvc.perform(post("/api/patterns/execute")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "patternCode": "template",
+				  "parameters": {
+				    "mode": "WITH_TEMPLATE_METHOD",
+				    "workflowCode": "SECURITY_AUDIT",
+				    "workflowName": "Workflow Builder"
+				  }
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.patternCode").value("template"))
+			.andExpect(jsonPath("$.output.templateUsed").value(true))
+			.andExpect(jsonPath("$.output.workflowCode").value("SECURITY_AUDIT"))
+			.andExpect(jsonPath("$.output.finalizationGuaranteed").value(true))
+			.andExpect(jsonPath("$.output.stepCount").value(5))
+			.andExpect(jsonPath("$.output.steps", hasSize(5)))
+			.andExpect(jsonPath("$.visualization.nodes", hasSize(6)));
+	}
+
+	@Test
 	void shouldExecuteInterpreterPattern() throws Exception {
 		mockMvc.perform(post("/api/patterns/execute")
 			.contentType(MediaType.APPLICATION_JSON)

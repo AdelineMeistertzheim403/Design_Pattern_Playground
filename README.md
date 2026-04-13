@@ -319,6 +319,7 @@ npm run build
 - `prototype` : clone factory visuelle pour comparer copie superficielle et copie profonde sur un etat imbrique.
 - `proxy` : controle d acces, lazy loading et mediation visuelle entre client et ressource reelle.
 - `facade` : demarrage one-click d un systeme audio + lumiere + securite avec comparaison direct / simplifie.
+- `template` : workflow builder visuel avec squelette fixe prepare -> execute -> finalise et variation sur l etape centrale.
 - `interpreter` : mini langage interactif avec parsing, arbre d expressions et execution ligne par ligne sur une mission.
 - `visitor` : structure analyzer sur arbre de dossiers avec parcours anime, visitors interchangeables et highlights de chemin.
 - `composite` : construction d un arbre dossiers/fichiers avec parcours complet ou partiel selon la presence du pattern.

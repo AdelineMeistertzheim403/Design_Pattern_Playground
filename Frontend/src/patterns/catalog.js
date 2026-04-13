@@ -2,6 +2,14 @@ export const defaultPatternCode = 'strategy'
 
 export const fallbackPatterns = [
   {
+    code: 'template',
+    name: 'Template Method',
+    type: 'BEHAVIORAL',
+    description: 'Definit le squelette stable d un algorithme puis laisse certaines etapes varier dans les sous-classes.',
+    useCase: 'Construire un workflow prepare -> execute -> finalise dans lequel seule l etape centrale change selon le scenario choisi.',
+    complexityLevel: 'INTERMEDIATE',
+  },
+  {
     code: 'interpreter',
     name: 'Interpreter',
     type: 'BEHAVIORAL',
@@ -169,6 +177,7 @@ export const patternPreviewTaglinesByCode = {
   singleton: 'Tous les clients pointent vers la meme instance partagee.',
   state: 'Le contexte change de comportement quand son etat evolue.',
   strategy: 'Le contexte reste stable pendant que l algorithme change.',
+  template: 'Le squelette du workflow reste fixe pendant que l etape Execute varie.',
   visitor: 'Le meme arbre accueille plusieurs analyses sans modifier les classes des noeuds.',
 }
 
@@ -187,6 +196,7 @@ export const specializedScenePatternCodes = [
   'proxy',
   'singleton',
   'state',
+  'template',
   'visitor',
 ]
 
