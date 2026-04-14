@@ -4,20 +4,26 @@ import usePlaygroundApp from './hooks/usePlaygroundApp'
 import SiteFooter from './components/SiteFooter'
 import SeoHead from './components/SeoHead'
 import {
+  buildBadgesPath,
   buildLegalNoticePath,
+  buildMissionPath,
   buildPatternPath,
   buildPatternQuizPath,
   buildProgressPath,
+  buildRecentActivityPath,
 } from './app/playgroundUtils'
 
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
+const BadgesPage = lazy(() => import('./pages/BadgesPage'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
 const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
+const MissionPage = lazy(() => import('./pages/MissionPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const PatternPage = lazy(() => import('./pages/PatternPage'))
 const PatternQuizPage = lazy(() => import('./pages/PatternQuizPage'))
 const QuizDashboardPage = lazy(() => import('./pages/QuizDashboardPage'))
+const RecentActivityPage = lazy(() => import('./pages/RecentActivityPage'))
 const UmlDiagram = lazy(() => import('./components/UmlDiagram'))
 const VisualizationModal = lazy(() => import('./components/VisualizationModal'))
 
@@ -134,7 +140,9 @@ export default function App() {
       ? 'pattern'
       : route.name === 'quiz' && selectedPattern
         ? 'quiz'
-        : route.name === 'progress'
+        : route.name === 'missions'
+          ? 'missions'
+        : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
           ? 'progress'
           : route.name === 'legalNotice'
             ? 'legalNotice'
@@ -155,6 +163,7 @@ export default function App() {
         status={status}
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
+        onNavigateMissions={() => navigate(buildMissionPath())}
         onOpenAuth={openAuth}
         onLogout={handleLogout}
       />
@@ -223,10 +232,37 @@ export default function App() {
             <QuizDashboardPage
               backendStatus={backendStatus}
               currentUser={currentUser}
+              onOpenBadges={() => navigate(buildBadgesPath())}
+              onOpenActivity={() => navigate(buildRecentActivityPath())}
               onNavigateHome={() => navigate('/')}
               onOpenAuth={openAuth}
               onOpenPattern={(code) => navigate(buildPatternPath(code))}
               onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
+            />
+          ) : route.name === 'activity' ? (
+            <RecentActivityPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              onNavigateHome={() => navigate('/')}
+              onNavigateProgress={() => navigate(buildProgressPath())}
+              onOpenAuth={openAuth}
+            />
+          ) : route.name === 'badges' ? (
+            <BadgesPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              onNavigateHome={() => navigate('/')}
+              onNavigateProgress={() => navigate(buildProgressPath())}
+              onOpenAuth={openAuth}
+            />
+          ) : route.name === 'missions' ? (
+            <MissionPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              initialMissionId={route.missionId ?? null}
+              patterns={patterns}
+              onNavigateMission={(missionId) => navigate(buildMissionPath(missionId))}
+              onNavigatePattern={(code) => navigate(buildPatternPath(code))}
             />
           ) : route.name === 'legalNotice' ? (
             <LegalNoticePage onNavigateHome={() => navigate('/')} />

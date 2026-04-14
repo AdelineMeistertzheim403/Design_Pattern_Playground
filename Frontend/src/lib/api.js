@@ -56,8 +56,34 @@ export function getQuizDashboard() {
   return request('/api/quiz/dashboard')
 }
 
+export function getRecentActivity(limit = 30) {
+  return request(`/api/progress/activity?limit=${limit}`)
+}
+
 export function executePattern(payload) {
   return request('/api/patterns/execute', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getMissions() {
+  return request('/api/missions')
+}
+
+export function getMission(missionId) {
+  return request(`/api/missions/${missionId}`)
+}
+
+export function executeMission(payload) {
+  return request('/api/missions/execute', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function submitMissionResult(payload) {
+  return request('/api/missions/submissions', {
     method: 'POST',
     body: JSON.stringify(payload),
   })

@@ -50,6 +50,34 @@ function getNamedFacadeChunk(id) {
     return 'page-progress'
   }
 
+  if (normalizedId.includes('/src/pages/BadgesPage.jsx')) {
+    return 'page-badges'
+  }
+
+  if (normalizedId.includes('/src/pages/RecentActivityPage.jsx')) {
+    return 'page-activity'
+  }
+
+  if (normalizedId.includes('/src/pages/missions/MissionCatalogPage.jsx')) {
+    return 'page-missions-catalog'
+  }
+
+  if (normalizedId.includes('/src/pages/missions/MissionDetailPage.jsx')) {
+    return 'page-missions-detail'
+  }
+
+  if (normalizedId.includes('/src/pages/missions/MissionConfigSection.jsx')) {
+    return 'page-missions-config'
+  }
+
+  if (normalizedId.includes('/src/pages/missions/MissionResultSection.jsx')) {
+    return 'page-missions-result'
+  }
+
+  if (normalizedId.includes('/src/pages/missions/MissionExecutionScene.jsx')) {
+    return 'page-missions-scene'
+  }
+
   if (normalizedId.includes('/src/pages/NotFoundPage.jsx')) {
     return 'page-not-found'
   }

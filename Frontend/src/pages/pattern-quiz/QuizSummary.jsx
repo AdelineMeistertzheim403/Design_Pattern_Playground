@@ -1,4 +1,6 @@
 import CollapsiblePanel from '../../components/CollapsiblePanel'
+import RewardToast from '../../components/RewardToast'
+import useRewardToast from '../../hooks/useRewardToast'
 import { summarizeCompletedQuiz } from '../../quiz/quizUtils'
 import ProgressCard from './ProgressCard'
 import { getMasteryLabel } from './quizUiUtils'
@@ -15,9 +17,15 @@ export default function QuizSummary({
 }) {
   const summary = submissionResult ?? summarizeCompletedQuiz(quiz, completedQuestions)
   const persistedProgress = submissionResult?.progress ?? progress
+  const {
+    rewardToast,
+    dismissRewardToast,
+  } = useRewardToast(submissionResult?.progression ?? null)
 
   return (
     <div className="grid gap-6">
+      <RewardToast reward={rewardToast} onDismiss={dismissRewardToast} />
+
       <section className="reveal rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
         <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
           <div>
@@ -65,6 +73,38 @@ export default function QuizSummary({
           </div>
         </div>
       </section>
+
+      {submissionResult?.progression ? (
+        <section className="rounded-[26px] border border-emerald-200 bg-emerald-50 px-5 py-5 shadow-[0_18px_45px_rgba(36,107,94,0.12)]">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Recompenses</p>
+              <h2 className="mt-2 text-2xl text-stone-950">Progression mise a jour</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-900">
+                +{submissionResult.progression.xpGained} XP
+              </span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-900">
+                Niveau {submissionResult.progression.level}
+              </span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-900">
+                {submissionResult.progression.rank}
+              </span>
+            </div>
+          </div>
+
+          {submissionResult.progression.newlyUnlockedBadges?.length ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {submissionResult.progression.newlyUnlockedBadges.map((badge) => (
+                <span key={badge.code} className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-900">
+                  Nouveau badge: {badge.name}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {isSubmitting ? (
         <div className="rounded-[24px] border border-black/10 bg-white/84 px-5 py-5 text-sm leading-7 text-stone-700">

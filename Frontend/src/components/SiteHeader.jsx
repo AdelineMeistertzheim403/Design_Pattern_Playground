@@ -1,12 +1,12 @@
-import { buildProgressPath } from '../app/playgroundUtils'
+import { buildMissionPath, buildProgressPath } from '../app/playgroundUtils'
 import SpaLink from './SpaLink'
 
 export default function SiteHeader({
   currentUser,
   routeName,
-  status,
   onNavigateHome,
   onNavigateProgress,
+  onNavigateMissions,
   onOpenAuth,
   onLogout,
 }) {
@@ -28,7 +28,19 @@ export default function SiteHeader({
         <div className="flex flex-wrap items-center justify-end gap-3">
           <SpaLink
             className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              routeName === 'progress'
+              routeName === 'missions'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
+            }`}
+            href={buildMissionPath()}
+            onNavigate={onNavigateMissions}
+          >
+            Mode mission
+          </SpaLink>
+
+          <SpaLink
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              routeName === 'progress' || routeName === 'badges' || routeName === 'activity'
                 ? 'border-stone-950 bg-stone-950 text-white'
                 : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
             }`}

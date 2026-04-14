@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.designpatternplayground.backend.auth.domain.UserAccount;
 import com.designpatternplayground.backend.auth.domain.UserAccountRepository;
 import com.designpatternplayground.backend.auth.security.AuthenticatedUser;
+import com.designpatternplayground.backend.progress.application.ProgressTrackingService;
 import com.designpatternplayground.backend.quiz.domain.PatternQuiz;
-import com.designpatternplayground.backend.quiz.domain.QuestionType;
 import com.designpatternplayground.backend.quiz.domain.QuizAnswerSubmission;
 import com.designpatternplayground.backend.quiz.domain.QuizProgressResponse;
 import com.designpatternplayground.backend.quiz.domain.QuizQuestion;
@@ -31,15 +31,18 @@ public class PatternQuizProgressService {
 	private final PatternQuizService patternQuizService;
 	private final UserAccountRepository userAccountRepository;
 	private final UserQuizProgressRepository userQuizProgressRepository;
+	private final ProgressTrackingService progressTrackingService;
 
 	public PatternQuizProgressService(
 		PatternQuizService patternQuizService,
 		UserAccountRepository userAccountRepository,
-		UserQuizProgressRepository userQuizProgressRepository
+		UserQuizProgressRepository userQuizProgressRepository,
+		ProgressTrackingService progressTrackingService
 	) {
 		this.patternQuizService = patternQuizService;
 		this.userAccountRepository = userAccountRepository;
 		this.userQuizProgressRepository = userQuizProgressRepository;
+		this.progressTrackingService = progressTrackingService;
 	}
 
 	@Transactional(readOnly = true)
@@ -105,6 +108,7 @@ public class PatternQuizProgressService {
 		);
 
 		UserQuizProgress savedProgress = userQuizProgressRepository.save(progress);
+		var progressionUpdate = progressTrackingService.recordQuizSubmitted(authenticatedUser, quiz, correctPercent);
 
 		return new QuizSubmissionResult(
 			quiz.patternCode(),
@@ -117,7 +121,8 @@ public class PatternQuizProgressService {
 			badgeUnlocked,
 			quiz.badgeLabel(),
 			questionResults,
-			toResponse(savedProgress, quiz)
+			toResponse(savedProgress, quiz),
+			progressionUpdate
 		);
 	}
 

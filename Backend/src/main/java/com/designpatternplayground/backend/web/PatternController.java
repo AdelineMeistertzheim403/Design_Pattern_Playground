@@ -18,6 +18,7 @@ import com.designpatternplayground.backend.pattern.domain.PatternExecutionReques
 import com.designpatternplayground.backend.pattern.domain.PatternExecutionResult;
 import com.designpatternplayground.backend.pattern.domain.PatternMetadata;
 import com.designpatternplayground.backend.pattern.domain.PatternSchema;
+import com.designpatternplayground.backend.progress.application.ProgressTrackingService;
 import com.designpatternplayground.backend.quiz.application.PatternQuizProgressService;
 import com.designpatternplayground.backend.quiz.application.PatternQuizService;
 import com.designpatternplayground.backend.quiz.domain.PatternQuiz;
@@ -32,15 +33,18 @@ public class PatternController {
 	private final PatternService patternService;
 	private final PatternQuizService patternQuizService;
 	private final PatternQuizProgressService patternQuizProgressService;
+	private final ProgressTrackingService progressTrackingService;
 
 	public PatternController(
 		PatternService patternService,
 		PatternQuizService patternQuizService,
-		PatternQuizProgressService patternQuizProgressService
+		PatternQuizProgressService patternQuizProgressService,
+		ProgressTrackingService progressTrackingService
 	) {
 		this.patternService = patternService;
 		this.patternQuizService = patternQuizService;
 		this.patternQuizProgressService = patternQuizProgressService;
+		this.progressTrackingService = progressTrackingService;
 	}
 
 	@GetMapping
@@ -78,7 +82,11 @@ public class PatternController {
 	}
 
 	@PostMapping("/execute")
-	public PatternExecutionResult execute(@Valid @RequestBody PatternExecutionRequest request) {
-		return patternService.execute(request);
+	public PatternExecutionResult execute(@Valid @RequestBody PatternExecutionRequest request, Authentication authentication) {
+		PatternExecutionResult result = patternService.execute(request);
+		if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser authenticatedUser) {
+			progressTrackingService.recordDemoCompleted(authenticatedUser, request.patternCode());
+		}
+		return result;
 	}
 }
