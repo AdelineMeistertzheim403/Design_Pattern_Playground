@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { buildBadgesPath, buildMissionPath, buildPatternPath } from '../app/playgroundUtils'
+import SpaLink from '../components/SpaLink'
 import useRecentActivity from '../hooks/useRecentActivity'
 
 function formatDate(value) {
@@ -42,6 +44,22 @@ function getActivityLabel(type) {
   }
 }
 
+function getActivityLink(item) {
+  if (!item?.relatedCode) {
+    return null
+  }
+
+  if (item.type === 'BADGE_UNLOCKED') {
+    return buildBadgesPath()
+  }
+
+  if (item.type === 'MISSION_SUCCESS' || item.type === 'MISSION_ATTEMPT') {
+    return buildMissionPath(item.relatedCode)
+  }
+
+  return buildPatternPath(item.relatedCode)
+}
+
 function DashboardGate({
   onNavigateHome,
   onOpenAuth,
@@ -80,6 +98,7 @@ export default function RecentActivityPage({
   currentUser,
   onNavigateHome,
   onNavigateProgress,
+  onNavigateLink,
   onOpenAuth,
 }) {
   const [typeFilter, setTypeFilter] = useState('ALL')
@@ -197,6 +216,17 @@ export default function RecentActivityPage({
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">{getActivityLabel(item.type)}</p>
                   <h2 className="mt-2 text-xl text-stone-950">{item.title}</h2>
                   <p className="mt-2 text-sm leading-7 text-stone-700">{item.detail}</p>
+                  {getActivityLink(item) ? (
+                    <div className="mt-4">
+                      <SpaLink
+                        className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:border-black/20"
+                        href={getActivityLink(item)}
+                        onNavigate={onNavigateLink}
+                      >
+                        Ouvrir
+                      </SpaLink>
+                    </div>
+                  ) : null}
                 </div>
                 <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700">
                   {formatDate(item.occurredAt)}

@@ -245,6 +245,7 @@ export default function App() {
               currentUser={currentUser}
               onNavigateHome={() => navigate('/')}
               onNavigateProgress={() => navigate(buildProgressPath())}
+              onNavigateLink={(href) => navigate(href)}
               onOpenAuth={openAuth}
             />
           ) : route.name === 'badges' ? (

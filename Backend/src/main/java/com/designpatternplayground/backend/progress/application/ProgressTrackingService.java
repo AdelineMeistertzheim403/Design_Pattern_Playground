@@ -138,7 +138,6 @@ public class ProgressTrackingService {
 		UserMissionProgress missionProgress = userMissionProgressRepository.findByUser_IdAndMissionId(authenticatedUser.id(), definition.id())
 			.orElseGet(() -> new UserMissionProgress(user, definition.id()));
 
-		int failureCountBeforeAttempt = missionProgress.getConsecutiveFailures();
 		boolean firstMissionSuccess = missionProgress.recordAttempt(request.success(), request.score(), request.durationSeconds(), now);
 		int xpGained = 0;
 

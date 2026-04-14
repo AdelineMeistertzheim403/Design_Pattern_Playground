@@ -1,6 +1,5 @@
 package com.designpatternplayground.backend.progress.application;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,13 +19,10 @@ import com.designpatternplayground.backend.progress.domain.MissionProgressDefini
 import com.designpatternplayground.backend.progress.domain.ProgressBadgeCatalog;
 import com.designpatternplayground.backend.progress.domain.RecentActivityItemResponse;
 import com.designpatternplayground.backend.progress.domain.RecentActivityResponse;
-import com.designpatternplayground.backend.progress.domain.UserBadgeUnlock;
 import com.designpatternplayground.backend.progress.domain.UserBadgeUnlockRepository;
 import com.designpatternplayground.backend.progress.domain.UserMissionProgress;
 import com.designpatternplayground.backend.progress.domain.UserMissionProgressRepository;
-import com.designpatternplayground.backend.progress.domain.UserPatternProgress;
 import com.designpatternplayground.backend.progress.domain.UserPatternProgressRepository;
-import com.designpatternplayground.backend.quiz.domain.UserQuizProgress;
 import com.designpatternplayground.backend.quiz.domain.UserQuizProgressRepository;
 
 @Service
