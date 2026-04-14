@@ -13,6 +13,36 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/abstract-factory</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/bridge</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/memento</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/iterator</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/template</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/interpreter</loc>
     <lastmod>2026-04-13</lastmod>
     <changefreq>monthly</changefreq>

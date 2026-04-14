@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+
+import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
   EmptyScenePlaceholder,
@@ -65,6 +68,22 @@ export default function StateScene({
     return <EmptyScenePlaceholder />
   }
 
+  const playback = useScenePlayback(
+    useMemo(
+      () => buildPlaybackFrames(model.timeline.map((step) => ({ title: step.actionCode })), 'State ready'),
+      [model.timeline],
+    ),
+    900,
+  )
+  const visibleTimeline = model.timeline.slice(0, playback.currentFrame.visibleStepCount)
+  const latestStep = visibleTimeline[visibleTimeline.length - 1] ?? null
+  const latestAcceptedStep = [...visibleTimeline].reverse().find((step) => step.accepted) ?? null
+  const acceptedTransitionsCount = visibleTimeline.filter((step) => step.accepted).length
+  const ignoredActionsCount = visibleTimeline.length - acceptedTransitionsCount
+  const currentFinalState = latestAcceptedStep?.toState ?? model.initialState
+  const currentStateLabel = STATE_LABELS[currentFinalState] ?? currentFinalState
+  const currentVisitedStates = [...new Set([model.initialState, ...visibleTimeline.flatMap((step) => [step.fromState, step.toState])])]
+
   const viewBoxWidth = 1120
   const graphX = 36
   const graphY = 170
@@ -90,9 +109,6 @@ export default function StateScene({
     `prochaines actions : ${model.availableActions.join(' · ') || 'aucune'}`,
     30,
   )
-  const latestStep = model.timeline[model.timeline.length - 1] ?? null
-  const latestAcceptedStep = [...model.timeline].reverse().find((step) => step.accepted) ?? null
-
   const stateNodes = {
     IDLE: { x: graphX + 110, y: graphY + 314, width: 230, height: 108 },
     RUNNING: { x: graphX + 412, y: graphY + 158, width: 238, height: 108 },
@@ -100,7 +116,7 @@ export default function StateScene({
     JUMPING: { x: graphX + 412, y: graphY + 520, width: 238, height: 108 },
   }
 
-  const activeStateNode = stateNodes[model.finalState]
+  const activeStateNode = stateNodes[currentFinalState]
   const contextCard = { x: graphX + 28, y: graphY + 28, width: 276, height: 118 }
   const summaryCard = { x: graphX + graphWidth - 318, y: graphY + 42, width: 286, height: 132 }
 
@@ -115,7 +131,7 @@ export default function StateScene({
     { key: 'attack-idle', from: 'ATTACKING', to: 'IDLE', action: 'FINISH_ATTACK', offset: 22, labelShiftY: 52, labelShiftX: 22 },
   ]
 
-  const transitionUsage = model.timeline.reduce((accumulator, step) => {
+  const transitionUsage = visibleTimeline.reduce((accumulator, step) => {
     if (!step.accepted) {
       return accumulator
     }
@@ -191,6 +207,8 @@ export default function StateScene({
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
 
+      <ScenePlaybackControls playback={playback} />
+
       <ZoomableViewport enabled={false} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
         <svg className={svgClassName} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} role="img">
           <defs>
@@ -211,19 +229,19 @@ export default function StateScene({
             {model.useState ? 'STATE MACHINE' : 'CONDITIONAL FLOW'}
           </text>
           <text x="64" y="112" fontSize="28" fontWeight="700" fill="#241f18">
-            {model.characterName} · {model.currentStateLabel}
+            {model.characterName} · {currentStateLabel}
           </text>
           <text x="392" y="86" fontSize="13" fontWeight="600" fill="#5f5548">
             Etat initial : {STATE_LABELS[model.initialState] ?? model.initialState}
           </text>
           <text x="392" y="112" fontSize="13" fontWeight="600" fill="#5f5548">
-            Etat final : {STATE_LABELS[model.finalState] ?? model.finalState}
+            Etat final : {currentStateLabel}
           </text>
           <text x="1056" y="82" textAnchor="end" fontSize="24" fontWeight="700" fill="#241f18">
-            {model.acceptedTransitions} transition(s)
+            {acceptedTransitionsCount} transition(s)
           </text>
           <text x="1056" y="108" textAnchor="end" fontSize="13" fill="#5f5548">
-            {model.ignoredActions} action(s) ignoree(s)
+            {ignoredActionsCount} action(s) ignoree(s)
           </text>
           {latestStep ? (
             <text x="1056" y="130" textAnchor="end" fontSize="12" fontWeight="600" fill="#5f5548">
@@ -254,7 +272,7 @@ export default function StateScene({
             ETAT ACTIF
           </text>
           <text x={summaryCard.x + 18} y={summaryCard.y + 52} fontSize="24" fontWeight="700" fill="#5f2d20">
-            {STATE_LABELS[model.finalState] ?? model.finalState}
+            {currentStateLabel}
           </text>
           {summaryActionLines.map((line, index) => (
             <text key={`summary-line-${index}`} x={summaryCard.x + 18} y={summaryCard.y + 80 + index * 16} fontSize="12" fill="#7a4634">
@@ -332,8 +350,8 @@ export default function StateScene({
           })}
 
           {Object.entries(stateNodes).map(([code, node]) => {
-            const isActive = model.finalState === code
-            const isVisited = model.visitedStates.includes(code)
+            const isActive = currentFinalState === code
+            const isVisited = currentVisitedStates.includes(code)
 
             return (
               <g key={code}>
@@ -393,10 +411,10 @@ export default function StateScene({
           <foreignObject x={timelineX + 16} y={timelineY + 106} width={timelineWidth - 32} height={timelineHeight - 130}>
             <div className="h-full" xmlns="http://www.w3.org/1999/xhtml">
               <div className="grid gap-3 pb-2" style={{ gridTemplateColumns: `repeat(${timelineColumns}, minmax(0, 1fr))` }}>
-                {model.timeline.map((step) => (
+                {model.timeline.map((step, index) => (
                   <div
                     key={`${step.index}-${step.actionCode}`}
-                    className={`min-h-[132px] rounded-[18px] border px-3 py-3 shadow-[0_12px_24px_rgba(48,39,24,0.08)] ${
+                    className={`min-h-[132px] rounded-[18px] border px-3 py-3 shadow-[0_12px_24px_rgba(48,39,24,0.08)] transition ${
                       latestStep && step.index === latestStep.index
                         ? step.accepted
                           ? 'state-recent-card border-orange-200 bg-orange-50/95'
@@ -404,7 +422,8 @@ export default function StateScene({
                         : step.accepted
                           ? 'border-emerald-200 bg-emerald-50/90'
                           : 'border-amber-200 bg-amber-50/92'
-                    }`}
+                    } ${index > playback.currentFrame.currentStepIndex ? 'opacity-30' : ''} ${index === playback.currentFrame.currentStepIndex ? 'ring-2 ring-black/20' : ''}`}
+                    style={{ visibility: index < playback.currentFrame.visibleStepCount || index === playback.currentFrame.currentStepIndex ? 'visible' : 'hidden' }}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
