@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 public record AuthUserResponse(
 	Long id,
 	String username,
-	LocalDateTime createdAt
+	LocalDateTime createdAt,
+	String role,
+	boolean forcePasswordChange
 ) {
 }

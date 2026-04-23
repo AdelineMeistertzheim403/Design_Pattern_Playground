@@ -45,6 +45,20 @@ public class AuthController {
 		return buildAuthenticatedResponse(authService.refresh(refreshToken));
 	}
 
+	@PostMapping("/change-password")
+	public ResponseEntity<AuthResponse> changePassword(
+		@Valid @RequestBody ChangePasswordRequest request,
+		Authentication authentication
+	) {
+		return buildAuthenticatedResponse(
+			authService.changePassword(
+				(AuthenticatedUser) authentication.getPrincipal(),
+				request.currentPassword(),
+				request.newPassword()
+			)
+		);
+	}
+
 	@GetMapping("/me")
 	public AuthUserResponse me(Authentication authentication) {
 		return authService.getCurrentUser((AuthenticatedUser) authentication.getPrincipal());

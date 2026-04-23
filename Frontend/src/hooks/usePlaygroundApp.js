@@ -1,7 +1,9 @@
 import { startTransition, useEffect, useMemo, useState } from 'react'
 import {
+  changeUserPassword,
   executePattern,
   getCurrentUser,
+  getPatternUml,
   getPatternSchema,
   getPatterns,
   loginUser,
@@ -47,8 +49,10 @@ export default function usePlaygroundApp() {
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [authFormValues, setAuthFormValues] = useState({ username: '', password: '' })
+  const [passwordChangeValues, setPasswordChangeValues] = useState({ currentPassword: '', newPassword: '' })
   const [authError, setAuthError] = useState('')
   const [authPending, setAuthPending] = useState(false)
+  const [passwordChangePending, setPasswordChangePending] = useState(false)
   const [currentUser, setCurrentUser] = useState(() => loadPersistedUser())
   const [activeVisualModal, setActiveVisualModal] = useState(null)
   const [learningContent, setLearningContent] = useState(defaultLearningContent)
@@ -195,6 +199,15 @@ export default function usePlaygroundApp() {
           setBackendStatus('fallback')
         }
       }
+
+      try {
+        const storedDiagram = await getPatternUml(activePatternCode)
+        if (!ignore && storedDiagram?.diagram) {
+          setUmlDiagram(storedDiagram.diagram)
+        }
+      } catch {
+        // Keep the local fallback diagram when no persisted version exists.
+      }
     }
 
     loadPatternDetail()
@@ -339,6 +352,13 @@ export default function usePlaygroundApp() {
     }))
   }
 
+  function updatePasswordChangeField(name, value) {
+    setPasswordChangeValues((currentValues) => ({
+      ...currentValues,
+      [name]: value,
+    }))
+  }
+
   async function handleExecute(event) {
     event.preventDefault()
     setIsExecuting(true)
@@ -392,11 +412,29 @@ export default function usePlaygroundApp() {
 
       applyAuthenticatedSession(response)
       setAuthFormValues({ username: '', password: '' })
-      setIsAuthOpen(false)
+      setPasswordChangeValues({ currentPassword: '', newPassword: '' })
+      setIsAuthOpen(Boolean(response.user?.forcePasswordChange))
     } catch (error) {
       setAuthError(error.message ?? "L authentification a echoue.")
     } finally {
       setAuthPending(false)
+    }
+  }
+
+  async function handlePasswordChangeSubmit(event) {
+    event.preventDefault()
+    setPasswordChangePending(true)
+    setAuthError('')
+
+    try {
+      const response = await changeUserPassword(passwordChangeValues)
+      applyAuthenticatedSession(response)
+      setPasswordChangeValues({ currentPassword: '', newPassword: '' })
+      setIsAuthOpen(false)
+    } catch (error) {
+      setAuthError(error.message ?? "La mise a jour du mot de passe a echoue.")
+    } finally {
+      setPasswordChangePending(false)
     }
   }
 
@@ -414,6 +452,7 @@ export default function usePlaygroundApp() {
     clearPersistedSession()
     setCurrentUser(null)
     setIsAuthOpen(false)
+    setPasswordChangeValues({ currentPassword: '', newPassword: '' })
   }
 
   function handleCatalogFilterChange(filterName, nextValue) {
@@ -456,16 +495,20 @@ export default function usePlaygroundApp() {
     isAuthOpen,
     authMode,
     authFormValues,
+    passwordChangeValues,
     authError,
     authPending,
+    passwordChangePending,
     isSceneModalOpen,
     isUmlModalOpen,
     navigate,
     openAuth,
     updateFieldValue,
     updateAuthField,
+    updatePasswordChangeField,
     handleExecute,
     handleAuthSubmit,
+    handlePasswordChangeSubmit,
     handleLogout,
     handleCatalogFilterChange,
     handleCatalogPageChange,

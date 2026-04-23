@@ -37,6 +37,10 @@ export function getPatternSchema(code) {
   return request(`/api/patterns/${code}/schema`)
 }
 
+export function getPatternUml(code) {
+  return request(`/api/patterns/${code}/uml`)
+}
+
 export function getPatternQuiz(code) {
   return request(`/api/patterns/${code}/quiz`)
 }
@@ -90,5 +94,23 @@ export function getCurrentUser() {
 export function logoutUser() {
   return request('/api/auth/logout', {
     method: 'POST',
+  })
+}
+
+export function changeUserPassword(payload) {
+  return request('/api/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function listAdminUmlDiagrams() {
+  return request('/api/admin/uml-diagrams')
+}
+
+export function saveAdminUmlDiagram(code, payload) {
+  return request(`/api/admin/uml-diagrams/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
   })
 }
