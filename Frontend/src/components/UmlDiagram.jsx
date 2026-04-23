@@ -446,6 +446,34 @@ function buildPath(points) {
     .join(' ')
 }
 
+function getCurvedPathData(relation, points) {
+  if (relation.style !== 'curved' || points.length !== 2) {
+    return null
+  }
+
+  const [start, end] = points
+  const midX = (start.x + end.x) / 2
+  const midY = (start.y + end.y) / 2
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const length = Math.hypot(dx, dy) || 1
+  const normalX = -dy / length
+  const normalY = dx / length
+  const curvature = Number(relation.curvature ?? 0)
+  const control = {
+    x: midX + normalX * curvature,
+    y: midY + normalY * curvature,
+  }
+
+  return {
+    path: `M ${start.x} ${start.y} Q ${control.x} ${control.y} ${end.x} ${end.y}`,
+    labelPosition: {
+      x: (start.x + end.x + control.x) / 3,
+      y: (start.y + end.y + control.y) / 3,
+    },
+  }
+}
+
 function getPolylinePointAt(points, ratio = 0.5) {
   if (!points || points.length === 0) {
     return { x: 0, y: 0 }
@@ -497,6 +525,18 @@ function getRelationLabelPosition(relation, points, options = {}) {
   }
 
   return getPolylinePointAt(points, 0.5)
+}
+
+function getRelationPathData(relation, points, options = {}) {
+  const curvedPathData = getCurvedPathData(relation, points)
+  if (curvedPathData) {
+    return curvedPathData
+  }
+
+  return {
+    path: buildPath(points),
+    labelPosition: getRelationLabelPosition(relation, points, options),
+  }
 }
 
 function getRelationMarkers(defsId, relation) {
@@ -947,8 +987,7 @@ export default function UmlDiagram({
             return null
           }
 
-          const path = buildPath(points)
-          const labelPosition = getRelationLabelPosition(relation, points, {
+          const pathData = getRelationPathData(relation, points, {
             useExplicitPosition: useAbsoluteLayout,
           })
           const label = relation.label.toUpperCase()
@@ -959,7 +998,7 @@ export default function UmlDiagram({
             <g key={`${relation.from}-${relation.to}-${index}`} className="uml-relation">
               <path
                 className="uml-relation-line"
-                d={path}
+                d={pathData.path}
                 fill="none"
                 stroke="#7a5a3f"
                 strokeWidth="2.2"
@@ -969,8 +1008,8 @@ export default function UmlDiagram({
               />
               <rect
                 className="uml-relation-label-bg"
-                x={labelPosition.x - labelWidth / 2}
-                y={labelPosition.y - 12}
+                x={pathData.labelPosition.x - labelWidth / 2}
+                y={pathData.labelPosition.y - 12}
                 width={labelWidth}
                 height="24"
                 rx="12"
@@ -979,8 +1018,8 @@ export default function UmlDiagram({
               />
               <text
                 className="uml-relation-label-text"
-                x={labelPosition.x}
-                y={labelPosition.y + 4}
+                x={pathData.labelPosition.x}
+                y={pathData.labelPosition.y + 4}
                 textAnchor="middle"
                 fontSize="11"
                 fontWeight="700"

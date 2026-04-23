@@ -4,6 +4,7 @@ import usePlaygroundApp from './hooks/usePlaygroundApp'
 import SiteFooter from './components/SiteFooter'
 import SeoHead from './components/SeoHead'
 import {
+  buildAdminUmlPath,
   buildLegalNoticePath,
   buildPatternPath,
   buildPatternQuizPath,
@@ -13,6 +14,7 @@ import {
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const AdminUmlPage = lazy(() => import('./pages/AdminUmlPage'))
 const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const PatternPage = lazy(() => import('./pages/PatternPage'))
@@ -109,16 +111,20 @@ export default function App() {
     isAuthOpen,
     authMode,
     authFormValues,
+    passwordChangeValues,
     authError,
     authPending,
+    passwordChangePending,
     isSceneModalOpen,
     isUmlModalOpen,
     navigate,
     openAuth,
     updateFieldValue,
     updateAuthField,
+    updatePasswordChangeField,
     handleExecute,
     handleAuthSubmit,
+    handlePasswordChangeSubmit,
     handleLogout,
     handleCatalogFilterChange,
     handleCatalogPageChange,
@@ -136,6 +142,8 @@ export default function App() {
         ? 'quiz'
         : route.name === 'progress'
           ? 'progress'
+          : route.name === 'adminUml'
+            ? 'admin'
           : route.name === 'legalNotice'
             ? 'legalNotice'
             : 'notFound'
@@ -155,6 +163,7 @@ export default function App() {
         status={status}
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
+        onNavigateAdminUml={() => navigate(buildAdminUmlPath())}
         onOpenAuth={openAuth}
         onLogout={handleLogout}
       />
@@ -228,6 +237,13 @@ export default function App() {
               onOpenPattern={(code) => navigate(buildPatternPath(code))}
               onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
             />
+          ) : route.name === 'adminUml' ? (
+            <AdminUmlPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              patterns={patterns}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'legalNotice' ? (
             <LegalNoticePage onNavigateHome={() => navigate('/')} />
           ) : (
@@ -259,6 +275,8 @@ export default function App() {
             isOpen={isAuthOpen}
             mode={authMode}
             pending={authPending}
+            passwordChangePending={passwordChangePending}
+            passwordChangeValues={passwordChangeValues}
             onClose={() => setIsAuthOpen(false)}
             onFieldChange={updateAuthField}
             onLogout={handleLogout}
@@ -266,6 +284,8 @@ export default function App() {
               setAuthMode(nextMode)
               setAuthError('')
             }}
+            onPasswordChangeField={updatePasswordChangeField}
+            onPasswordChangeSubmit={handlePasswordChangeSubmit}
             onSubmit={handleAuthSubmit}
           />
         </Suspense>

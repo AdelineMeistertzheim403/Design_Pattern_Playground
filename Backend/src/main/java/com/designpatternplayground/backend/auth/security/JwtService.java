@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.designpatternplayground.backend.auth.domain.UserAccount;
+import com.designpatternplayground.backend.auth.domain.UserRole;
 import com.designpatternplayground.backend.common.exception.AuthenticationFailedException;
 
 @Service
@@ -68,6 +69,8 @@ public class JwtService {
 			String username = extractStringClaim(claims, "sub");
 			Long userId = extractLongClaim(claims, "uid");
 			Long expiresAt = extractLongClaim(claims, "exp");
+			String role = extractStringClaim(claims, "role");
+			Boolean forcePasswordChange = extractBooleanClaim(claims, "fpw");
 
 			if (username == null || username.isBlank() || userId == null || expiresAt == null) {
 				throw new AuthenticationFailedException("Claims JWT invalides.");
@@ -77,7 +80,8 @@ public class JwtService {
 				throw new AuthenticationFailedException("Le JWT a expire.");
 			}
 
-			return new AuthenticatedUser(userId, username);
+			String normalizedRole = role == null || role.isBlank() ? UserRole.USER.name() : role;
+			return new AuthenticatedUser(userId, username, normalizedRole, Boolean.TRUE.equals(forcePasswordChange));
 		} catch (AuthenticationFailedException exception) {
 			throw exception;
 		} catch (Exception exception) {
@@ -113,6 +117,8 @@ public class JwtService {
 		return "{"
 			+ "\"sub\":\"" + escape(user.getUsername()) + "\","
 			+ "\"uid\":" + user.getId() + ","
+			+ "\"role\":\"" + escape(user.getRole().name()) + "\","
+			+ "\"fpw\":" + user.isForcePasswordChange() + ","
 			+ "\"iat\":" + issuedAt.getEpochSecond() + ","
 			+ "\"exp\":" + expiresAt.getEpochSecond()
 			+ "}";
@@ -153,6 +159,23 @@ public class JwtService {
 		}
 
 		return Long.parseLong(json.substring(valueStart, valueEnd));
+	}
+
+	private Boolean extractBooleanClaim(String json, String claimName) {
+		String pattern = "\"" + claimName + "\":";
+		int start = json.indexOf(pattern);
+		if (start < 0) {
+			return null;
+		}
+
+		int valueStart = start + pattern.length();
+		if (json.startsWith("true", valueStart)) {
+			return true;
+		}
+		if (json.startsWith("false", valueStart)) {
+			return false;
+		}
+		return null;
 	}
 
 	private String escape(String value) {
