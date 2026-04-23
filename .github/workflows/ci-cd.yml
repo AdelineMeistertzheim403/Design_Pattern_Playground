@@ -196,6 +196,58 @@ jobs:
           printf '\n' >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      - name: Check VPS disk space before sync
+        env:
+          VPS_SSH_HOST: ${{ secrets.VPS_SSH_HOST }}
+          VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+          VPS_SSH_USER: ${{ secrets.VPS_SSH_USER }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
+          VPS_DEPLOY_FREE_BUFFER_MB: ${{ vars.VPS_DEPLOY_FREE_BUFFER_MB }}
+        run: |
+          SSH_PORT="${VPS_SSH_PORT:-22}"
+          BUFFER_MB="${VPS_DEPLOY_FREE_BUFFER_MB:-512}"
+
+          ssh -p "$SSH_PORT" "$VPS_SSH_USER@$VPS_SSH_HOST" "mkdir -p '$VPS_APP_DIR'"
+
+          AVAILABLE_KB="$(ssh -p "$SSH_PORT" "$VPS_SSH_USER@$VPS_SSH_HOST" "df -Pk '$VPS_APP_DIR' | awk 'NR==2 {print \$4}'")"
+          if ! [[ "$AVAILABLE_KB" =~ ^[0-9]+$ ]]; then
+            echo "Unable to read free disk space on VPS for $VPS_APP_DIR."
+            ssh -p "$SSH_PORT" "$VPS_SSH_USER@$VPS_SSH_HOST" "df -h '$VPS_APP_DIR' || true"
+            exit 1
+          fi
+
+          TRANSFER_BYTES="$(rsync -azn --delete --stats \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            --exclude ".codex" \
+            --exclude "Backend/target/" \
+            --exclude "Frontend/node_modules/" \
+            --exclude "Frontend/dist/" \
+            --exclude ".env" \
+            --exclude "ops/registry/auth/" \
+            -e "ssh -p $SSH_PORT" \
+            ./ "$VPS_SSH_USER@$VPS_SSH_HOST:$VPS_APP_DIR/" | awk -F': ' '/Total transferred file size:/ {gsub(/,/, "", $2); print $2}')"
+
+          if ! [[ "$TRANSFER_BYTES" =~ ^[0-9]+$ ]]; then
+            echo "Unable to estimate rsync transfer size."
+            exit 1
+          fi
+
+          AVAILABLE_BYTES=$((AVAILABLE_KB * 1024))
+          BUFFER_BYTES=$((BUFFER_MB * 1024 * 1024))
+          REQUIRED_BYTES=$((TRANSFER_BYTES + BUFFER_BYTES))
+
+          echo "Estimated transfer size: $TRANSFER_BYTES bytes"
+          echo "Required free space with buffer: $REQUIRED_BYTES bytes"
+          echo "Available free space on VPS: $AVAILABLE_BYTES bytes"
+
+          if [ "$AVAILABLE_BYTES" -lt "$REQUIRED_BYTES" ]; then
+            echo "Insufficient free disk space on VPS before deployment."
+            echo "Need at least ${BUFFER_MB} MB buffer in addition to the incoming sync."
+            ssh -p "$SSH_PORT" "$VPS_SSH_USER@$VPS_SSH_HOST" "df -h '$VPS_APP_DIR'; du -sh '$VPS_APP_DIR' 2>/dev/null || true"
+            exit 1
+          fi
+
       - name: Sync project to VPS
         env:
           VPS_SSH_HOST: ${{ secrets.VPS_SSH_HOST }}
