@@ -19,14 +19,18 @@ export default function AuthDialog({
   isOpen,
   mode,
   formValues,
+  passwordChangeValues,
   pending,
+  passwordChangePending,
   error,
   currentUser,
   backendStatus,
   onClose,
   onModeChange,
   onFieldChange,
+  onPasswordChangeField,
   onSubmit,
+  onPasswordChangeSubmit,
   onLogout,
 }) {
   if (!isOpen) {
@@ -73,9 +77,50 @@ export default function AuthDialog({
               <p className="mt-2 text-sm text-stone-600">Compte cree le {new Date(currentUser.createdAt).toLocaleString('fr-FR')}</p>
             </article>
 
-            <div className="rounded-[24px] border border-black/10 bg-[var(--teal-soft)]/75 px-5 py-4 text-sm leading-7 text-stone-700">
-              Le compte servira ensuite a ajouter la sauvegarde de scenarios, l historique et les parcours de progression.
-            </div>
+            {currentUser.forcePasswordChange ? (
+              <form className="grid gap-4 rounded-[26px] border border-amber-200 bg-amber-50 p-5" onSubmit={onPasswordChangeSubmit}>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-800">Action requise</p>
+                  <p className="mt-3 text-sm leading-7 text-amber-950">
+                    Ce compte utilise encore son mot de passe initial. Change-le avant d acceder au mode admin.
+                  </p>
+                </div>
+
+                <label className="grid gap-2">
+                  <span className="text-sm font-semibold text-stone-800">Mot de passe actuel</span>
+                  <input
+                    autoComplete="current-password"
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+                    type="password"
+                    value={passwordChangeValues.currentPassword}
+                    onChange={(event) => onPasswordChangeField('currentPassword', event.target.value)}
+                  />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className="text-sm font-semibold text-stone-800">Nouveau mot de passe</span>
+                  <input
+                    autoComplete="new-password"
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+                    type="password"
+                    value={passwordChangeValues.newPassword}
+                    onChange={(event) => onPasswordChangeField('newPassword', event.target.value)}
+                  />
+                </label>
+
+                <button
+                  className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={passwordChangePending}
+                  type="submit"
+                >
+                  {passwordChangePending ? 'Mise a jour...' : 'Changer mon mot de passe'}
+                </button>
+              </form>
+            ) : (
+              <div className="rounded-[24px] border border-black/10 bg-[var(--teal-soft)]/75 px-5 py-4 text-sm leading-7 text-stone-700">
+                Le compte servira ensuite a ajouter la sauvegarde de scenarios, l historique et les parcours de progression.
+              </div>
+            )}
 
             <button
               className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"

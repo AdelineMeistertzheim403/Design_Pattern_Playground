@@ -14,6 +14,7 @@ import com.designpatternplayground.backend.auth.domain.RefreshTokenSession;
 import com.designpatternplayground.backend.auth.domain.RefreshTokenSessionRepository;
 import com.designpatternplayground.backend.auth.domain.UserAccount;
 import com.designpatternplayground.backend.auth.domain.UserAccountRepository;
+import com.designpatternplayground.backend.auth.domain.UserRole;
 import com.designpatternplayground.backend.auth.security.AuthenticatedUser;
 import com.designpatternplayground.backend.auth.security.JwtService;
 import com.designpatternplayground.backend.auth.web.AuthUserResponse;
@@ -61,7 +62,9 @@ public class AuthService {
 			normalizedUsername,
 			passwordHasher.hashPassword(password, salt),
 			salt,
-			LocalDateTime.now()
+			LocalDateTime.now(),
+			UserRole.USER,
+			false
 		));
 
 		return createAuthResponse(user);
@@ -85,6 +88,26 @@ public class AuthService {
 		UserAccount user = userAccountRepository.findById(authenticatedUser.id())
 			.orElseThrow(() -> new AuthenticationFailedException("Utilisateur introuvable."));
 		return toUserResponse(user);
+	}
+
+	@Transactional
+	public AuthSession changePassword(AuthenticatedUser authenticatedUser, String currentPassword, String newPassword) {
+		validatePassword(newPassword);
+
+		UserAccount user = userAccountRepository.findById(authenticatedUser.id())
+			.orElseThrow(() -> new AuthenticationFailedException("Utilisateur introuvable."));
+
+		if (!passwordHasher.matches(currentPassword, user.getPasswordSalt(), user.getPasswordHash())) {
+			throw new AuthenticationFailedException("Mot de passe actuel invalide.");
+		}
+
+		String salt = passwordHasher.generateSalt();
+		user.setPasswordSalt(salt);
+		user.setPasswordHash(passwordHasher.hashPassword(newPassword, salt));
+		user.setForcePasswordChange(false);
+
+		refreshTokenSessionRepository.deleteByUser_Id(user.getId());
+		return createAuthResponse(userAccountRepository.save(user));
 	}
 
 	@Transactional
@@ -179,7 +202,9 @@ public class AuthService {
 		return new AuthUserResponse(
 			user.getId(),
 			user.getUsername(),
-			user.getCreatedAt()
+			user.getCreatedAt(),
+			user.getRole().name(),
+			user.isForcePasswordChange()
 		);
 	}
 }
