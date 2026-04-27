@@ -219,6 +219,12 @@ select {
   letter-spacing: 0.18em;
 }
 
+.admin-svg-scene-preview svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 @keyframes scene-flow {
   from {
     stroke-dashoffset: 0;

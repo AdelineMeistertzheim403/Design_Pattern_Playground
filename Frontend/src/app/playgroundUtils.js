@@ -48,6 +48,10 @@ export function buildAdminUmlPath() {
   return '/admin/uml'
 }
 
+export function buildAdminSvgScenesPath() {
+  return '/admin/svg-scenes'
+}
+
 export function buildLegalNoticePath() {
   return '/mentions-legales'
 }
@@ -65,6 +69,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/admin/uml') {
     return { name: 'adminUml' }
+  }
+
+  if (normalized === '/admin/svg-scenes') {
+    return { name: 'adminSvgScenes' }
   }
 
   if (normalized === '/mentions-legales') {

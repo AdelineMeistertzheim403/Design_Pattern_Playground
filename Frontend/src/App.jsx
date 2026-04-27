@@ -4,6 +4,7 @@ import usePlaygroundApp from './hooks/usePlaygroundApp'
 import SiteFooter from './components/SiteFooter'
 import SeoHead from './components/SeoHead'
 import {
+  buildAdminSvgScenesPath,
   buildAdminUmlPath,
   buildLegalNoticePath,
   buildPatternPath,
@@ -14,6 +15,7 @@ import {
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const AdminSvgScenesPage = lazy(() => import('./pages/AdminSvgScenesPage'))
 const AdminUmlPage = lazy(() => import('./pages/AdminUmlPage'))
 const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
@@ -42,6 +44,7 @@ function PatternModals({
   visualExecution,
   visualSourceLabel,
   umlDiagram,
+  svgScene,
 }) {
   if (route.name !== 'pattern' || !selectedPattern) {
     return null
@@ -56,6 +59,7 @@ function PatternModals({
             onClose={() => setActiveVisualModal(null)}
           >
             <ExecutionScene
+              customSvgScene={svgScene}
               execution={visualExecution}
               isExpanded
               patternCode={selectedPattern.code}
@@ -105,6 +109,7 @@ export default function App() {
     isExecuting,
     learningContent,
     umlDiagram,
+    svgScene,
     visualExecution,
     visualSourceLabel,
     hasDraftChanges,
@@ -142,7 +147,7 @@ export default function App() {
         ? 'quiz'
         : route.name === 'progress'
           ? 'progress'
-          : route.name === 'adminUml'
+          : route.name === 'adminUml' || route.name === 'adminSvgScenes'
             ? 'admin'
           : route.name === 'legalNotice'
             ? 'legalNotice'
@@ -164,6 +169,7 @@ export default function App() {
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
         onNavigateAdminUml={() => navigate(buildAdminUmlPath())}
+        onNavigateAdminSvgScenes={() => navigate(buildAdminSvgScenesPath())}
         onOpenAuth={openAuth}
         onLogout={handleLogout}
       />
@@ -202,6 +208,7 @@ export default function App() {
               selectedPattern={selectedPattern}
               status={status}
               umlDiagram={umlDiagram}
+              svgScene={svgScene}
               visualExecution={visualExecution}
               visualSourceLabel={visualSourceLabel}
               onFieldValueChange={updateFieldValue}
@@ -244,6 +251,13 @@ export default function App() {
               patterns={patterns}
               onNavigateHome={() => navigate('/')}
             />
+          ) : route.name === 'adminSvgScenes' ? (
+            <AdminSvgScenesPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              patterns={patterns}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'legalNotice' ? (
             <LegalNoticePage onNavigateHome={() => navigate('/')} />
           ) : (
@@ -261,6 +275,7 @@ export default function App() {
         selectedPattern={selectedPattern}
         setActiveVisualModal={setActiveVisualModal}
         umlDiagram={umlDiagram}
+        svgScene={svgScene}
         visualExecution={visualExecution}
         visualSourceLabel={visualSourceLabel}
       />

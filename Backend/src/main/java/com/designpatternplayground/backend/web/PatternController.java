@@ -24,6 +24,8 @@ import com.designpatternplayground.backend.quiz.domain.PatternQuiz;
 import com.designpatternplayground.backend.quiz.domain.QuizProgressResponse;
 import com.designpatternplayground.backend.quiz.domain.QuizSubmissionRequest;
 import com.designpatternplayground.backend.quiz.domain.QuizSubmissionResult;
+import com.designpatternplayground.backend.svgscene.application.SvgSceneService;
+import com.designpatternplayground.backend.svgscene.web.SvgSceneResponse;
 import com.designpatternplayground.backend.uml.application.UmlDiagramService;
 import com.designpatternplayground.backend.uml.web.UmlDiagramResponse;
 
@@ -35,17 +37,20 @@ public class PatternController {
 	private final PatternQuizService patternQuizService;
 	private final PatternQuizProgressService patternQuizProgressService;
 	private final UmlDiagramService umlDiagramService;
+	private final SvgSceneService svgSceneService;
 
 	public PatternController(
 		PatternService patternService,
 		PatternQuizService patternQuizService,
 		PatternQuizProgressService patternQuizProgressService,
-		UmlDiagramService umlDiagramService
+		UmlDiagramService umlDiagramService,
+		SvgSceneService svgSceneService
 	) {
 		this.patternService = patternService;
 		this.patternQuizService = patternQuizService;
 		this.patternQuizProgressService = patternQuizProgressService;
 		this.umlDiagramService = umlDiagramService;
+		this.svgSceneService = svgSceneService;
 	}
 
 	@GetMapping
@@ -66,6 +71,11 @@ public class PatternController {
 	@GetMapping("/{code}/uml")
 	public UmlDiagramResponse getUmlDiagram(@PathVariable String code) {
 		return umlDiagramService.getByCode(code);
+	}
+
+	@GetMapping("/{code}/svg-scene")
+	public SvgSceneResponse getSvgScene(@PathVariable String code) {
+		return svgSceneService.getByCode(code);
 	}
 
 	@GetMapping("/{code}/quiz")

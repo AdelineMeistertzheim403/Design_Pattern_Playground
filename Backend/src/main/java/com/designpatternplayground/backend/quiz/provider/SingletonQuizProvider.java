@@ -4,9 +4,6 @@ import static com.designpatternplayground.backend.quiz.domain.QuestionDifficulty
 import static com.designpatternplayground.backend.quiz.domain.QuestionDifficulty.HARD;
 import static com.designpatternplayground.backend.quiz.domain.QuestionDifficulty.MEDIUM;
 import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.choice;
-import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.item;
-import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.matching;
-import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.pair;
 import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.singleChoice;
 import static com.designpatternplayground.backend.quiz.domain.QuizQuestions.trueFalse;
 

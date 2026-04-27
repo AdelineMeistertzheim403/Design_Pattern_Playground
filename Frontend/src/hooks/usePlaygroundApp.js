@@ -3,6 +3,7 @@ import {
   changeUserPassword,
   executePattern,
   getCurrentUser,
+  getPatternSvgScene,
   getPatternUml,
   getPatternSchema,
   getPatterns,
@@ -57,6 +58,7 @@ export default function usePlaygroundApp() {
   const [activeVisualModal, setActiveVisualModal] = useState(null)
   const [learningContent, setLearningContent] = useState(defaultLearningContent)
   const [umlDiagram, setUmlDiagram] = useState(null)
+  const [svgScene, setSvgScene] = useState(null)
   const [previewExecution, setPreviewExecution] = useState(null)
 
   useEffect(() => {
@@ -167,6 +169,7 @@ export default function usePlaygroundApp() {
     setExecutionError('')
     setLastExecutedPayload(null)
     setPreviewExecution(null)
+    setSvgScene(null)
 
     const loadPatternDetail = async () => {
       const [localSchema, localLearningContent, localUmlDiagram] = await Promise.all([
@@ -207,6 +210,15 @@ export default function usePlaygroundApp() {
         }
       } catch {
         // Keep the local fallback diagram when no persisted version exists.
+      }
+
+      try {
+        const storedScene = await getPatternSvgScene(activePatternCode)
+        if (!ignore && storedScene?.svgMarkup) {
+          setSvgScene(storedScene)
+        }
+      } catch {
+        // Keep the generated runtime scene when no persisted version exists.
       }
     }
 
@@ -489,6 +501,7 @@ export default function usePlaygroundApp() {
     isExecuting,
     learningContent,
     umlDiagram,
+    svgScene,
     visualExecution,
     visualSourceLabel,
     hasDraftChanges,
