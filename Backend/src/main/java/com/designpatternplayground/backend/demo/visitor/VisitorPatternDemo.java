@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.designpatternplayground.backend.common.exception.InvalidPatternConfigurationException;
 import com.designpatternplayground.backend.demo.visitor.domain.StructureVisitor;
-import com.designpatternplayground.backend.demo.visitor.domain.VisitFeedback;
 import com.designpatternplayground.backend.demo.visitor.domain.VisitorAnalysisType;
 import com.designpatternplayground.backend.demo.visitor.domain.VisitorTraversalStep;
 import com.designpatternplayground.backend.demo.visitor.domain.VisitorTreeNode;

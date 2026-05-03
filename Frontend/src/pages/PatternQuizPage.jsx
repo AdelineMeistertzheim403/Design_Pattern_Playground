@@ -16,6 +16,7 @@ import { cloneAnswer } from './pattern-quiz/quizUiUtils'
 
 const QuizQuestionCard = lazy(() => import('./pattern-quiz/QuizQuestionCard'))
 const QuizSummary = lazy(() => import('./pattern-quiz/QuizSummary'))
+const MAX_AUTO_SUBMISSION_ATTEMPTS = 2
 
 function DeferredQuizPlaceholder({
   title,
@@ -61,6 +62,7 @@ export default function PatternQuizPage({
   const [submissionError, setSubmissionError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasSubmittedProgress, setHasSubmittedProgress] = useState(false)
+  const [submissionAttemptCount, setSubmissionAttemptCount] = useState(0)
 
   const totalQuestions = quiz?.questions?.length ?? 0
   const currentQuestion = quiz && currentIndex < totalQuestions
@@ -76,12 +78,13 @@ export default function PatternQuizPage({
     setSubmissionError('')
     setIsSubmitting(false)
     setHasSubmittedProgress(false)
+    setSubmissionAttemptCount(0)
   }, [quiz?.patternCode])
 
   useEffect(() => {
     setDraftAnswer(createInitialAnswer(currentQuestion))
     setCurrentEvaluation(null)
-  }, [currentQuestion?.id])
+  }, [currentQuestion, currentQuestion?.id])
 
   useEffect(() => {
     let ignore = false
@@ -91,12 +94,18 @@ export default function PatternQuizPage({
         return
       }
 
-      if (completedQuestions.length !== totalQuestions || submissionResult || isSubmitting || hasSubmittedProgress) {
+      if (
+        completedQuestions.length !== totalQuestions
+        || submissionResult
+        || isSubmitting
+        || hasSubmittedProgress
+        || submissionAttemptCount >= MAX_AUTO_SUBMISSION_ATTEMPTS
+      ) {
         return
       }
 
       setIsSubmitting(true)
-      setHasSubmittedProgress(true)
+      setSubmissionAttemptCount((current) => current + 1)
       setSubmissionError('')
 
       try {
@@ -109,6 +118,7 @@ export default function PatternQuizPage({
 
         if (!ignore) {
           setSubmissionResult(result)
+          setHasSubmittedProgress(true)
           setProgress(result.progress)
         }
       } catch (error) {
@@ -135,6 +145,7 @@ export default function PatternQuizPage({
     quizEnabled,
     selectedPattern.code,
     setProgress,
+    submissionAttemptCount,
     submissionResult,
     totalQuestions,
   ])
@@ -195,6 +206,7 @@ export default function PatternQuizPage({
     setSubmissionResult(null)
     setSubmissionError('')
     setHasSubmittedProgress(false)
+    setSubmissionAttemptCount(0)
     setDraftAnswer(createInitialAnswer(quiz?.questions?.[0] ?? null))
   }
 
