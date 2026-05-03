@@ -2,6 +2,8 @@ package com.designpatternplayground.backend.quiz.domain;
 
 import java.util.List;
 
+import com.designpatternplayground.backend.progress.domain.ProgressUpdateResponse;
+
 public record QuizSubmissionResult(
 	String patternCode,
 	int correctAnswers,
@@ -13,6 +15,7 @@ public record QuizSubmissionResult(
 	boolean badgeUnlocked,
 	String badgeLabel,
 	List<QuizQuestionResult> questionResults,
-	QuizProgressResponse progress
+	QuizProgressResponse progress,
+	ProgressUpdateResponse progression
 ) {
 }
