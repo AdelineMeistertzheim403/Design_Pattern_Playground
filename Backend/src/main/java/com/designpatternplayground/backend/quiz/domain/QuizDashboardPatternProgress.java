@@ -23,6 +23,14 @@ public record QuizDashboardPatternProgress(
 	int cumulativePoints,
 	boolean badgeUnlocked,
 	LocalDateTime badgeUnlockedAt,
-	LocalDateTime lastAttemptAt
+	LocalDateTime lastAttemptAt,
+	int masteryPercent,
+	String masteryLabel,
+	boolean demoCompleted,
+	boolean quizPassed,
+	boolean missionCompleted,
+	boolean advancedMissionCompleted,
+	boolean mastered,
+	LocalDateTime masteredAt
 ) {
 }

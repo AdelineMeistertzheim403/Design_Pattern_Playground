@@ -1,3 +1,4 @@
+// Determine si le clic doit rester une navigation native (nouvel onglet, modif clavier, etc.).
 function shouldBypassClientNavigation(event, target) {
   return event.defaultPrevented
     || event.button !== 0
@@ -17,6 +18,7 @@ export default function SpaLink({
   target,
   ...props
 }) {
+  // Lien SPA qui delegue la navigation au routeur client quand c est possible.
   return (
     <a
       {...props}

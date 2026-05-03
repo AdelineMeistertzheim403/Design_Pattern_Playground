@@ -48,6 +48,19 @@ export function buildAdminUmlPath() {
   return '/admin/uml'
 }
 
+export function buildBadgesPath() {
+  return '/progression/badges'
+}
+
+export function buildRecentActivityPath() {
+  return '/progression/activite'
+}
+
+export function buildMissionPath(missionId = '') {
+  const normalizedMissionId = `${missionId ?? ''}`.trim()
+  return normalizedMissionId ? `/missions/${normalizedMissionId}` : '/missions'
+}
+
 export function buildLegalNoticePath() {
   return '/mentions-legales'
 }
@@ -67,8 +80,28 @@ export function parseRoute(pathname) {
     return { name: 'adminUml' }
   }
 
+  if (normalized === '/progression/badges') {
+    return { name: 'badges' }
+  }
+
+  if (normalized === '/progression/activite') {
+    return { name: 'activity' }
+  }
+
   if (normalized === '/mentions-legales') {
     return { name: 'legalNotice' }
+  }
+
+  if (normalized === '/missions') {
+    return { name: 'missions' }
+  }
+
+  const missionMatch = normalized.match(/^\/missions\/([a-z0-9-]+)$/)
+  if (missionMatch) {
+    return {
+      name: 'missions',
+      missionId: missionMatch[1],
+    }
   }
 
   const quizMatch = normalized.match(/^\/patterns\/([a-z0-9-]+)\/quiz$/)
