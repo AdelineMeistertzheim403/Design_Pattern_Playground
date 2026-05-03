@@ -4,6 +4,7 @@ import { executePattern, getPatternSchema, submitMissionResult } from '../../lib
 import { evaluateMissionSolution } from '../../missions/engine'
 import { buildMissionResult } from '../../missions/resultModel'
 import { executeFallbackPattern, loadFallbackSchema } from '../../patterns/loaders'
+import { buildMissionSchema } from './missionConfigSchema'
 import { executeMissionPattern, mapPatternsByCode } from './missionPageShared'
 
 export default function useMissionDetail({ backendStatus, currentUser, mission, patterns }) {
@@ -39,15 +40,28 @@ export default function useMissionDetail({ backendStatus, currentUser, mission, 
 
       const loadedEntries = await Promise.all(
         missingPatternCodes.map(async (patternCode) => {
+          let schema = null
+
           try {
             if (backendStatus === 'connected') {
-              return [patternCode, await getPatternSchema(patternCode)]
+              schema = await getPatternSchema(patternCode)
             }
           } catch {
             // Fallback below.
           }
 
-          return [patternCode, await loadFallbackSchema(patternCode)]
+          if (!schema) {
+            schema = await loadFallbackSchema(patternCode)
+          }
+
+          const adaptedSchema = buildMissionSchema({
+            mission,
+            patternCode,
+            schema,
+            patternName: patternsByCode[patternCode]?.name,
+          })
+
+          return [patternCode, adaptedSchema]
         }),
       )
 
@@ -81,7 +95,7 @@ export default function useMissionDetail({ backendStatus, currentUser, mission, 
     return () => {
       ignore = true
     }
-  }, [backendStatus, schemasByPattern, selectedPatterns])
+  }, [backendStatus, mission, patternsByCode, schemasByPattern, selectedPatterns])
 
   useEffect(() => {
     if (!selectedPatterns.length) {
@@ -140,12 +154,11 @@ export default function useMissionDetail({ backendStatus, currentUser, mission, 
     }))
   }
 
-  async function handleExecuteMission(event) {
-    event.preventDefault()
+  async function handleExecuteMission() {
 
     if (selectedPatterns.length === 0) {
       setError('Compose une solution avant de lancer la mission.')
-      return
+      return false
     }
 
     setExecutionPending(true)
@@ -207,9 +220,11 @@ export default function useMissionDetail({ backendStatus, currentUser, mission, 
         }),
         progression,
       })
+      return true
     } catch (requestError) {
       setResult(null)
       setError(requestError.message ?? "L execution de la mission a echoue.")
+      return false
     } finally {
       setExecutionPending(false)
     }

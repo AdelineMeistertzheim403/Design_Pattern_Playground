@@ -23,7 +23,10 @@ services:
       context: ./Backend
       dockerfile: Dockerfile
       target: dev
-    user: "${UID:-1000}:${GID:-1000}"
+    # On Windows/MINGW, the named volume mounted at /workspace/.m2 is often root-owned.
+    # Running as root by default avoids AccessDeniedException when Maven writes cache files.
+    # Linux users can override with BACKEND_UID/BACKEND_GID (e.g. 1000:1000).
+    user: "${BACKEND_UID:-0}:${BACKEND_GID:-0}"
     working_dir: /workspace
     command: ./mvnw spring-boot:run
     environment:

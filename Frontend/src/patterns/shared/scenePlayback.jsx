@@ -81,6 +81,12 @@ export function useScenePlayback(frames, initialDelayMs = 900) {
     setCurrentFrameIndex(Math.max(0, safeFrames.length - 1))
   }
 
+  function handleGoToFrame(frameIndex) {
+    setIsPlaying(false)
+    const boundedIndex = Math.max(0, Math.min(frameIndex, safeFrames.length - 1))
+    setCurrentFrameIndex(boundedIndex)
+  }
+
   return {
     frames: safeFrames,
     currentFrame,
@@ -94,6 +100,7 @@ export function useScenePlayback(frames, initialDelayMs = 900) {
     handlePrevious,
     handleNext,
     handleReset,
+    handleGoToFrame,
   }
 }
 

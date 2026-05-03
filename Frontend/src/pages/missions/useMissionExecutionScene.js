@@ -33,8 +33,8 @@ export default function useMissionExecutionScene({
 
   const playback = useScenePlayback(buildPlaybackFrames(stageSteps, 'Mission ready'), 850)
   const visibleStepCount = playback.currentFrame.visibleStepCount ?? stageSteps.length
-  const activeStage = stageSteps.find((step) => step.patternCode === activePatternCode)
-    ?? stageSteps.find((step) => step.patternCode === playback.currentFrame.step?.patternCode)
+  const activeStage = stageSteps.find((step) => step.patternCode === playback.currentFrame.step?.patternCode)
+    ?? stageSteps.find((step) => step.patternCode === activePatternCode)
     ?? stageSteps[0]
     ?? null
 

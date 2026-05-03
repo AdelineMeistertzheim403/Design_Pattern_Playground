@@ -48,6 +48,10 @@ function moveListValue(values, fromIndex, toIndex) {
   return nextValues
 }
 
+function getValueLabel(field, value) {
+  return field?.allowedValueLabels?.[value] ?? value
+}
+
 export default function PatternFormField({
   field,
   formValues,
@@ -56,23 +60,51 @@ export default function PatternFormField({
 }) {
   const numericUi = getNumericFieldUi(patternCode, field.name)
   const selectedListValues = normalizeListFieldValue(formValues[field.name])
+  const isReadOnly = Boolean(field.readOnly)
+  const impactScore = Number(field.missionImpactScore ?? 0)
+
+  function emitFieldValue(value) {
+    if (isReadOnly) {
+      return
+    }
+
+    onFieldValueChange(field, value)
+  }
 
   return (
     <label className="grid gap-2">
-      <span className="text-sm font-semibold text-stone-800">
-        {field.label}
-        {field.required ? ' *' : ''}
-      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm font-semibold text-stone-800">
+          {field.label}
+          {field.required ? ' *' : ''}
+        </span>
+        {field.missionCritical ? (
+          <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800">
+            Parametre critique mission
+          </span>
+        ) : null}
+        {field.missionCritical && impactScore > 0 ? (
+          <span className="rounded-full border border-indigo-300 bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-800">
+            Impact +{impactScore}
+          </span>
+        ) : null}
+        {isReadOnly ? (
+          <span className="rounded-full border border-black/10 bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-600">
+            Verrouille mission
+          </span>
+        ) : null}
+      </div>
 
       {field.type === 'SELECT' ? (
         <select
-          className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+          className={`rounded-2xl border border-black/10 px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20 ${isReadOnly ? 'cursor-not-allowed bg-stone-100' : 'bg-white'}`}
+          disabled={isReadOnly}
           value={formValues[field.name] ?? ''}
-          onChange={(event) => onFieldValueChange(field, event.target.value)}
+          onChange={(event) => emitFieldValue(event.target.value)}
         >
           {(field.allowedValues ?? []).map((value) => (
             <option key={value} value={value}>
-              {value}
+              {getValueLabel(field, value)}
             </option>
           ))}
         </select>
@@ -82,9 +114,10 @@ export default function PatternFormField({
             formValues[field.name]
               ? 'border-stone-950 bg-stone-950 text-white'
               : 'border-black/10 bg-white text-stone-700'
-          }`}
+          } ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          disabled={isReadOnly}
           type="button"
-          onClick={() => onFieldValueChange(field, !formValues[field.name])}
+          onClick={() => emitFieldValue(!formValues[field.name])}
         >
           <span>{getBooleanStateLabel(patternCode, field.name, Boolean(formValues[field.name]))}</span>
           <span>{field.name}</span>
@@ -96,23 +129,25 @@ export default function PatternFormField({
               {Number(formValues[field.name] ?? numericUi.min).toLocaleString('fr-FR')} {numericUi.unitLabel}
             </span>
             <input
-              className="w-28 rounded-2xl border border-black/10 bg-white px-3 py-2 text-right text-sm text-stone-900 outline-none focus:border-black/20"
+              className={`w-28 rounded-2xl border border-black/10 px-3 py-2 text-right text-sm text-stone-900 outline-none focus:border-black/20 ${isReadOnly ? 'cursor-not-allowed bg-stone-100' : 'bg-white'}`}
+              disabled={isReadOnly}
               max={numericUi.max}
               min={numericUi.min}
               step={numericUi.step}
               type="number"
               value={formValues[field.name] ?? ''}
-              onChange={(event) => onFieldValueChange(field, event.target.value)}
+              onChange={(event) => emitFieldValue(event.target.value)}
             />
           </div>
           <input
-            className="flyweight-range"
+            className={`flyweight-range ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+            disabled={isReadOnly}
             max={numericUi.max}
             min={numericUi.min}
             step={numericUi.step}
             type="range"
             value={Number(formValues[field.name] ?? numericUi.min)}
-            onChange={(event) => onFieldValueChange(field, event.target.value)}
+            onChange={(event) => emitFieldValue(event.target.value)}
           />
           <p className="text-sm leading-7 text-stone-600">{numericUi.hint}</p>
         </div>
@@ -123,10 +158,11 @@ export default function PatternFormField({
               <button
                 key={value}
                 className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:-translate-y-0.5 hover:border-black/20"
+                disabled={isReadOnly}
                 type="button"
-                onClick={() => onFieldValueChange(field, [...selectedListValues, value])}
+                onClick={() => emitFieldValue([...selectedListValues, value])}
               >
-                + {value}
+                + {getValueLabel(field, value)}
               </button>
             ))}
           </div>
@@ -137,8 +173,9 @@ export default function PatternFormField({
               {selectedListValues.length > 0 ? (
                 <button
                   className="rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition hover:border-black/20"
+                  disabled={isReadOnly}
                   type="button"
-                  onClick={() => onFieldValueChange(field, [])}
+                  onClick={() => emitFieldValue([])}
                 >
                   Vider
                 </button>
@@ -156,30 +193,31 @@ export default function PatternFormField({
                       <span className="rounded-full bg-white/14 px-2.5 py-1 text-[11px] font-semibold tracking-[0.08em] text-white/86">
                         {index + 1}
                       </span>
-                      <span className="text-sm font-semibold">{value}</span>
+                      <span className="text-sm font-semibold">{getValueLabel(field, value)}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <button
                         className="rounded-full border border-white/18 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10 disabled:opacity-35"
-                        disabled={index === 0}
+                        disabled={isReadOnly || index === 0}
                         type="button"
-                        onClick={() => onFieldValueChange(field, moveListValue(selectedListValues, index, index - 1))}
+                        onClick={() => emitFieldValue(moveListValue(selectedListValues, index, index - 1))}
                       >
                         ↑
                       </button>
                       <button
                         className="rounded-full border border-white/18 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10 disabled:opacity-35"
-                        disabled={index === selectedListValues.length - 1}
+                        disabled={isReadOnly || index === selectedListValues.length - 1}
                         type="button"
-                        onClick={() => onFieldValueChange(field, moveListValue(selectedListValues, index, index + 1))}
+                        onClick={() => emitFieldValue(moveListValue(selectedListValues, index, index + 1))}
                       >
                         ↓
                       </button>
                       <button
                         className="rounded-full border border-white/18 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/84 transition hover:bg-white/10"
+                        disabled={isReadOnly}
                         type="button"
-                        onClick={() => onFieldValueChange(field, selectedListValues.filter((_, itemIndex) => itemIndex !== index))}
+                        onClick={() => emitFieldValue(selectedListValues.filter((_, itemIndex) => itemIndex !== index))}
                       >
                         ×
                       </button>
@@ -212,16 +250,17 @@ export default function PatternFormField({
                       ? 'border-stone-950 bg-stone-950 text-white'
                       : 'border-black/10 bg-white text-stone-700'
                   }`}
+                  disabled={isReadOnly}
                   type="button"
                   onClick={() => {
                     const nextValues = isSelected
                       ? selectedListValues.filter((item) => item !== value)
                       : [...selectedListValues, value]
 
-                    onFieldValueChange(field, nextValues)
+                      emitFieldValue(nextValues)
                   }}
                 >
-                  {value}
+                  {getValueLabel(field, value)}
                 </button>
               )
             })}
@@ -236,7 +275,7 @@ export default function PatternFormField({
                     key={`${value}-${index}`}
                     className="rounded-full bg-stone-950 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-white"
                   >
-                    {index + 1}. {value}
+                    {index + 1}. {getValueLabel(field, value)}
                   </span>
                 ))}
               </div>
@@ -254,10 +293,11 @@ export default function PatternFormField({
       ) : isInterpreterScriptField(patternCode, field) ? (
         <div className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
           <textarea
-            className="min-h-52 rounded-2xl border border-black/10 bg-white px-4 py-3 font-mono text-sm leading-7 text-stone-900 outline-none focus:border-black/20"
+            className={`min-h-52 rounded-2xl border border-black/10 px-4 py-3 font-mono text-sm leading-7 text-stone-900 outline-none focus:border-black/20 ${isReadOnly ? 'cursor-not-allowed bg-stone-100' : 'bg-white'}`}
+            disabled={isReadOnly}
             spellCheck={false}
             value={Array.isArray(formValues[field.name]) ? formValues[field.name].join('\n') : formValues[field.name] ?? ''}
-            onChange={(event) => onFieldValueChange(field, event.target.value)}
+            onChange={(event) => emitFieldValue(event.target.value)}
           />
           <p className="text-sm leading-7 text-stone-600">
             Ecris une instruction par ligne. Le mini langage accepte `MOVE n`, `TURN LEFT`, `TURN RIGHT`, `ATTACK`, `WAIT` et les blocs `REPEAT n {'{'} ... {'}'}`.
@@ -265,18 +305,24 @@ export default function PatternFormField({
         </div>
       ) : field.type === 'LIST' ? (
         <textarea
-          className="min-h-28 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+          className={`min-h-28 rounded-2xl border border-black/10 px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20 ${isReadOnly ? 'cursor-not-allowed bg-stone-100' : 'bg-white'}`}
+          disabled={isReadOnly}
           value={Array.isArray(formValues[field.name]) ? formValues[field.name].join('\n') : formValues[field.name] ?? ''}
-          onChange={(event) => onFieldValueChange(field, event.target.value)}
+          onChange={(event) => emitFieldValue(event.target.value)}
         />
       ) : (
         <input
-          className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20"
+          className={`rounded-2xl border border-black/10 px-4 py-3 text-sm text-stone-900 outline-none focus:border-black/20 ${isReadOnly ? 'cursor-not-allowed bg-stone-100' : 'bg-white'}`}
+          disabled={isReadOnly}
           type={field.type === 'NUMBER' ? 'number' : 'text'}
           value={formValues[field.name] ?? ''}
-          onChange={(event) => onFieldValueChange(field, event.target.value)}
+          onChange={(event) => emitFieldValue(event.target.value)}
         />
       )}
+
+      {field.description ? (
+        <p className="text-xs leading-6 text-stone-500">{field.description}</p>
+      ) : null}
     </label>
   )
 }

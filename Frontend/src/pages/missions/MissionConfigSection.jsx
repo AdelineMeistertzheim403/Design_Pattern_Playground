@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import PatternFormField from '../pattern-page/PatternFormField'
 
 export default function MissionConfigSection({
@@ -10,6 +11,30 @@ export default function MissionConfigSection({
   patternsByCode,
   selectedPatterns,
 }) {
+  const orderedFields = useMemo(() => {
+    const fields = activeSchema?.fields ?? []
+
+    return fields
+      .map((field, index) => ({
+        field,
+        index,
+        isCritical: Boolean(field.missionCritical),
+        impactScore: Number(field.missionImpactScore ?? 0),
+      }))
+      .sort((left, right) => {
+        if (left.isCritical !== right.isCritical) {
+          return left.isCritical ? -1 : 1
+        }
+
+        if (left.impactScore !== right.impactScore) {
+          return right.impactScore - left.impactScore
+        }
+
+        return left.index - right.index
+      })
+      .map((entry) => entry.field)
+  }, [activeSchema])
+
   if (!selectedPatterns.length) {
     return null
   }
@@ -20,7 +45,7 @@ export default function MissionConfigSection({
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Configuration dynamique</p>
           <p className="mt-1 text-sm leading-7 text-stone-600">
-            Choisis une brique de la solution puis ajuste ses parametres avant la simulation.
+            Choisis une brique de la solution puis ajuste ses parametres contextualises sur l enonce mission avant la simulation.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -62,7 +87,7 @@ export default function MissionConfigSection({
           ) : null}
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
-            {(activeSchema.fields ?? []).map((field) => (
+            {orderedFields.map((field) => (
               <PatternFormField
                 key={`${activeConfigPattern}-${field.name}`}
                 field={field}
