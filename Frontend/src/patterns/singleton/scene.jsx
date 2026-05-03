@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
   EmptyScenePlaceholder,
@@ -115,9 +116,7 @@ export default function SingletonScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Shared Instance Dashboard
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Shared Instance Dashboard')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>

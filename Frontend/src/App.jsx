@@ -101,6 +101,7 @@ export default function App() {
     schema,
     formValues,
     execution,
+    executionSource,
     executionError,
     isExecuting,
     learningContent,
@@ -190,6 +191,7 @@ export default function App() {
             <PatternPage
               currentUser={currentUser}
               execution={execution}
+              executionSource={executionSource}
               executionError={executionError}
               formValues={formValues}
               hasDraftChanges={hasDraftChanges}

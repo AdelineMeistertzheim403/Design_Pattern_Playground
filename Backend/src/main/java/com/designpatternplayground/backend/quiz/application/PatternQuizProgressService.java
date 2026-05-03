@@ -15,7 +15,6 @@ import com.designpatternplayground.backend.auth.domain.UserAccount;
 import com.designpatternplayground.backend.auth.domain.UserAccountRepository;
 import com.designpatternplayground.backend.auth.security.AuthenticatedUser;
 import com.designpatternplayground.backend.quiz.domain.PatternQuiz;
-import com.designpatternplayground.backend.quiz.domain.QuestionType;
 import com.designpatternplayground.backend.quiz.domain.QuizAnswerSubmission;
 import com.designpatternplayground.backend.quiz.domain.QuizProgressResponse;
 import com.designpatternplayground.backend.quiz.domain.QuizQuestion;

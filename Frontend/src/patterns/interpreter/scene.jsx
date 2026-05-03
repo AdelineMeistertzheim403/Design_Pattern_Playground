@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { createElement, useEffect, useMemo, useState } from 'react'
 
 import {
   EmptyScenePlaceholder,
@@ -212,9 +212,7 @@ export default function InterpreterScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Code your logic
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Code your logic')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
@@ -242,7 +240,6 @@ export default function InterpreterScene({
               className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${playMode === 'STEP' ? 'border-stone-950 bg-stone-950 text-white' : 'border-black/10 bg-white text-stone-700'}`}
               type="button"
               onClick={() => {
-                setPlayMode('STEP')
                 setIsPlaying(false)
               }}
             >
@@ -253,7 +250,7 @@ export default function InterpreterScene({
               type="button"
               onClick={handleReplay}
             >
-              Lancer la demo
+              Animer la scene
             </button>
             <button
               className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"

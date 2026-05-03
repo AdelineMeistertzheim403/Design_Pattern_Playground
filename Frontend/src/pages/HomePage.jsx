@@ -4,14 +4,12 @@ import { buildPatternPath } from '../app/playgroundUtils'
 import { getPatternPreviewTagline } from '../patterns/catalog'
 
 export default function HomePage({
-  patterns,
   visiblePatterns,
   filteredPatternsCount,
   catalogFilters,
   catalogFilterOptions,
   catalogPage,
   totalPatternPages,
-  status,
   currentUser,
   onCatalogFilterChange,
   onCatalogPageChange,
