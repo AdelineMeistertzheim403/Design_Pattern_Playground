@@ -4,7 +4,16 @@ export const API_URL = configuredApiUrl
   ? configuredApiUrl.replace(/\/$/, '')
   : ''
 
-async function request(path, options = {}) {
+let refreshInFlight = null
+
+function shouldAttemptRefresh(path) {
+  return !path.startsWith('/api/auth/login')
+    && !path.startsWith('/api/auth/register')
+    && !path.startsWith('/api/auth/refresh')
+    && !path.startsWith('/api/auth/logout')
+}
+
+async function doFetch(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     credentials: 'include',
     headers: {
@@ -17,6 +26,37 @@ async function request(path, options = {}) {
   const contentType = response.headers.get('content-type') ?? ''
   const isJson = contentType.includes('application/json')
   const payload = isJson ? await response.json() : null
+
+  return { response, payload }
+}
+
+async function refreshSessionOnce() {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      const { response } = await doFetch('/api/auth/refresh', {
+        method: 'POST',
+      })
+
+      return response.ok
+    })()
+      .catch(() => false)
+      .finally(() => {
+        refreshInFlight = null
+      })
+  }
+
+  return refreshInFlight
+}
+
+async function request(path, options = {}, allowRefreshRetry = true) {
+  const { response, payload } = await doFetch(path, options)
+
+  if (response.status === 401 && allowRefreshRetry && shouldAttemptRefresh(path)) {
+    const refreshed = await refreshSessionOnce()
+    if (refreshed) {
+      return request(path, options, false)
+    }
+  }
 
   if (!response.ok) {
     throw new Error(payload?.message ?? `Request failed with status ${response.status}`)
@@ -35,6 +75,10 @@ export function getPattern(code) {
 
 export function getPatternSchema(code) {
   return request(`/api/patterns/${code}/schema`)
+}
+
+export function getPatternUml(code) {
+  return request(`/api/patterns/${code}/uml`)
 }
 
 export function getPatternQuiz(code) {
@@ -116,5 +160,23 @@ export function getCurrentUser() {
 export function logoutUser() {
   return request('/api/auth/logout', {
     method: 'POST',
+  })
+}
+
+export function changeUserPassword(payload) {
+  return request('/api/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function listAdminUmlDiagrams() {
+  return request('/api/admin/uml-diagrams')
+}
+
+export function saveAdminUmlDiagram(code, payload) {
+  return request(`/api/admin/uml-diagrams/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
   })
 }

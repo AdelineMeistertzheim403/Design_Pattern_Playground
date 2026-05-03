@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { createElement, useMemo } from 'react'
 
 import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
@@ -159,16 +159,16 @@ export default function CompositeScene({
   sourceLabel,
   onOpenModal,
 }) {
-  const model = extractCompositeModel(execution)
+  const model = useMemo(() => extractCompositeModel(execution), [execution])
+
+  const playback = useScenePlayback(
+    useMemo(() => buildPlaybackFrames(model?.steps ?? [], 'Tree ready'), [model]),
+    900,
+  )
 
   if (!model) {
     return <EmptyScenePlaceholder />
   }
-
-  const playback = useScenePlayback(
-    useMemo(() => buildPlaybackFrames(model.steps, 'Tree ready'), [model.steps]),
-    900,
-  )
   const visibleStepCount = playback.currentFrame.visibleStepCount
   const currentStepIndex = playback.currentFrame.currentStepIndex
 
@@ -199,9 +199,7 @@ export default function CompositeScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Tree Builder
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Tree Builder')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>

@@ -87,12 +87,17 @@ export default function SeoHead({
     upsertMeta('meta[property="og:url"]', { property: 'og:url' }, payload.canonicalUrl)
     upsertMeta('meta[property="og:image"]', { property: 'og:image' }, payload.imageUrl)
     upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt' }, 'Logo Design Pattern Playground')
+    if (payload.imageWidth) {
+      upsertMeta('meta[property="og:image:width"]', { property: 'og:image:width' }, payload.imageWidth)
+      upsertMeta('meta[property="og:image:height"]', { property: 'og:image:height' }, payload.imageHeight)
+    }
     upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name' }, SITE_NAME)
     upsertMeta('meta[property="og:locale"]', { property: 'og:locale' }, 'fr_FR')
     upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card' }, 'summary_large_image')
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title' }, payload.title)
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description' }, payload.description)
     upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image' }, payload.imageUrl)
+    upsertMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt' }, 'Logo Design Pattern Playground')
     upsertLink('canonical', payload.canonicalUrl)
     upsertStructuredData(structuredData)
   }, [learningContent, pageKind, patterns, selectedPattern])

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { createElement, useEffect, useMemo, useState } from 'react'
 
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
@@ -423,14 +423,10 @@ export default function BuilderScene({
   )
   const [isPlaying, setIsPlaying] = useState(false)
 
-  if (!model) {
-    return <EmptyScenePlaceholder />
-  }
-
   useEffect(() => {
     setCurrentFrameIndex(Math.max(0, playbackFrames.length - 1))
     setIsPlaying(false)
-  }, [playbackFrames.length, model.mode, model.buildName, model.productType])
+  }, [playbackFrames.length, model?.mode, model?.buildName, model?.productType])
 
   useEffect(() => {
     if (playMode === 'STEP') {
@@ -452,6 +448,10 @@ export default function BuilderScene({
 
     return () => window.clearTimeout(timeoutId)
   }, [currentFrameIndex, delayMs, isPlaying, playMode, playbackFrames.length])
+
+  if (!model) {
+    return <EmptyScenePlaceholder />
+  }
 
   const currentFrame = playbackFrames[currentFrameIndex] ?? playbackFrames[playbackFrames.length - 1]
   const visibleStageCount = currentFrame?.visibleStageCount ?? 0
@@ -501,9 +501,7 @@ export default function BuilderScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Build Your Object
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Build Your Object')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
@@ -548,7 +546,7 @@ export default function BuilderScene({
 
         <div className="flex flex-wrap items-center gap-2">
           <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>
-            Lancer l assemblage
+            Animer l assemblage
           </button>
           {playMode === 'AUTO' ? (
             <button

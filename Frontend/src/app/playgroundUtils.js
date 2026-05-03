@@ -44,6 +44,10 @@ export function buildProgressPath() {
   return '/progression'
 }
 
+export function buildAdminUmlPath() {
+  return '/admin/uml'
+}
+
 export function buildBadgesPath() {
   return '/progression/badges'
 }
@@ -70,6 +74,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/progression') {
     return { name: 'progress' }
+  }
+
+  if (normalized === '/admin/uml') {
+    return { name: 'adminUml' }
   }
 
   if (normalized === '/progression/badges') {

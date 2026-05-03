@@ -35,6 +35,9 @@ services:
       SPRING_DATASOURCE_USERNAME: design_pattern_playground
       SPRING_DATASOURCE_PASSWORD: design_pattern_playground
       SPRING_H2_CONSOLE_ENABLED: "false"
+      SPRING_SQL_INIT_MODE: always
+      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:sql/dev-default-admin.sql
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
       APP_COOKIE_SECURE: "false"
     depends_on:
       postgres:

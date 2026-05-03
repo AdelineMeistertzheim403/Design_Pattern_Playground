@@ -30,7 +30,7 @@ public class FlyweightQuizProvider implements PatternQuizProvider {
 		return new PatternQuiz(
 			getPatternCode(),
 			"Quiz Flyweight",
-			"Teste ta comprehension du partage d etat, de la reduction du nombre d instances et des cas d usage a grande echelle.",
+			"Teste ta comprehension du partage d etat, de la reduction des duplications lourdes et des cas d usage a grande echelle.",
 			75,
 			"Badge valide",
 			0,
@@ -49,9 +49,9 @@ public class FlyweightQuizProvider implements PatternQuizProvider {
 				),
 				trueFalse(
 					"flyweight-q2",
-					"Le Flyweight cree plus d objets pour ameliorer les performances.",
+					"Avec Flyweight, chaque objet garde sa propre copie des donnees lourdes.",
 					EASY,
-					"Au contraire, il vise a reduire le nombre d instances lourdes.",
+					"Faux : il peut y avoir beaucoup d objets legers, mais ils partagent une donnee lourde commune au lieu de la dupliquer.",
 					false
 				),
 				singleChoice(
@@ -102,7 +102,7 @@ public class FlyweightQuizProvider implements PatternQuizProvider {
 					MEDIUM,
 					"Il mutualise les objets partages pour eviter de re-instancier les memes donnees lourdes.",
 					List.of(
-						choice("reduce", "Reduire le nombre d instances"),
+						choice("reduce", "Reduire la duplication des donnees lourdes"),
 						choice("complexify", "Augmenter la complexite volontairement"),
 						choice("remove-classes", "Supprimer les classes")
 					),
@@ -134,7 +134,7 @@ public class FlyweightQuizProvider implements PatternQuizProvider {
 					"Sans mutualisation, chaque objet garde sa propre copie des donnees lourdes et la memoire explose.",
 					List.of(
 						choice("few", "Trop peu d objets"),
-						choice("memory", "Trop d instances en memoire"),
+						choice("memory", "Trop de copies lourdes en memoire"),
 						choice("logic", "Pas assez de logique")
 					),
 					"memory"

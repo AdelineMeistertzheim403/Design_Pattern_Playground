@@ -25,6 +25,8 @@ import com.designpatternplayground.backend.quiz.domain.PatternQuiz;
 import com.designpatternplayground.backend.quiz.domain.QuizProgressResponse;
 import com.designpatternplayground.backend.quiz.domain.QuizSubmissionRequest;
 import com.designpatternplayground.backend.quiz.domain.QuizSubmissionResult;
+import com.designpatternplayground.backend.uml.application.UmlDiagramService;
+import com.designpatternplayground.backend.uml.web.UmlDiagramResponse;
 
 @RestController
 @RequestMapping("/api/patterns")
@@ -33,17 +35,20 @@ public class PatternController {
 	private final PatternService patternService;
 	private final PatternQuizService patternQuizService;
 	private final PatternQuizProgressService patternQuizProgressService;
+	private final UmlDiagramService umlDiagramService;
 	private final ProgressTrackingService progressTrackingService;
 
 	public PatternController(
 		PatternService patternService,
 		PatternQuizService patternQuizService,
 		PatternQuizProgressService patternQuizProgressService,
+		UmlDiagramService umlDiagramService,
 		ProgressTrackingService progressTrackingService
 	) {
 		this.patternService = patternService;
 		this.patternQuizService = patternQuizService;
 		this.patternQuizProgressService = patternQuizProgressService;
+		this.umlDiagramService = umlDiagramService;
 		this.progressTrackingService = progressTrackingService;
 	}
 
@@ -60,6 +65,11 @@ public class PatternController {
 	@GetMapping("/{code}/schema")
 	public PatternSchema getSchema(@PathVariable String code) {
 		return patternService.getSchema(code);
+	}
+
+	@GetMapping("/{code}/uml")
+	public UmlDiagramResponse getUmlDiagram(@PathVariable String code) {
+		return umlDiagramService.getByCode(code);
 	}
 
 	@GetMapping("/{code}/quiz")

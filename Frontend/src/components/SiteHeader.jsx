@@ -1,4 +1,4 @@
-import { buildMissionPath, buildProgressPath } from '../app/playgroundUtils'
+import { buildAdminUmlPath, buildMissionPath, buildProgressPath } from '../app/playgroundUtils'
 import SpaLink from './SpaLink'
 
 export default function SiteHeader({
@@ -6,10 +6,13 @@ export default function SiteHeader({
   routeName,
   onNavigateHome,
   onNavigateProgress,
+  onNavigateAdminUml,
   onNavigateMissions,
   onOpenAuth,
   onLogout,
 }) {
+  const isAdmin = currentUser?.role === 'ADMIN'
+
   return (
     <header className="sticky top-0 z-40 border-b border-black/8 bg-[rgba(243,234,217,0.82)] backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
@@ -22,6 +25,8 @@ export default function SiteHeader({
             alt="Logo Design Pattern Playground"
             className="w-70 rounded-[1.75rem] object-contain"
             src="/logo.png"
+            width="1020"
+            height="235"
           />
         </SpaLink>
 
@@ -49,6 +54,20 @@ export default function SiteHeader({
           >
             Ma progression
           </SpaLink>
+
+          {isAdmin ? (
+            <SpaLink
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                routeName === 'adminUml'
+                  ? 'border-stone-950 bg-stone-950 text-white'
+                  : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
+              }`}
+              href={buildAdminUmlPath()}
+              onNavigate={onNavigateAdminUml}
+            >
+              Admin UML
+            </SpaLink>
+          ) : null}
 
           {currentUser ? (
             <>

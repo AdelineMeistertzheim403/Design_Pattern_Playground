@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { createElement, useMemo } from 'react'
 
 import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
@@ -53,19 +53,19 @@ export default function MediatorScene({
   sourceLabel,
   onOpenModal,
 }) {
-  const model = extractMediatorModel(execution)
+  const model = useMemo(() => extractMediatorModel(execution), [execution])
+
+  const playback = useScenePlayback(
+    useMemo(
+      () => buildPlaybackFrames((model?.deliveries ?? []).map((delivery) => ({ title: `Delivery ${delivery.index}` })), 'Message ready'),
+      [model],
+    ),
+    900,
+  )
 
   if (!model) {
     return <EmptyScenePlaceholder />
   }
-
-  const playback = useScenePlayback(
-    useMemo(
-      () => buildPlaybackFrames(model.deliveries.map((delivery) => ({ title: `Delivery ${delivery.index}` })), 'Message ready'),
-      [model.deliveries],
-    ),
-    900,
-  )
   const visibleStepCount = playback.currentFrame.visibleStepCount
   const currentStepIndex = playback.currentFrame.currentStepIndex
 
@@ -106,9 +106,7 @@ export default function MediatorScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Chat Hub Simulator
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Chat Hub Simulator')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
