@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { createElement, useMemo } from 'react'
 
 import { ScenePlaybackControls, buildPlaybackFrames, useScenePlayback } from '../shared/scenePlayback'
 import ZoomableViewport from '../../components/ZoomableViewport'
@@ -62,19 +62,17 @@ export default function StateScene({
   sourceLabel,
   onOpenModal,
 }) {
-  const model = extractStateModel(execution)
+  const model = useMemo(() => extractStateModel(execution), [execution])
+  const playbackFrames = useMemo(
+    () => buildPlaybackFrames((model?.timeline ?? []).map((step) => ({ title: step.actionCode })), 'State ready'),
+    [model?.timeline],
+  )
+  const playback = useScenePlayback(playbackFrames, 900)
 
   if (!model) {
     return <EmptyScenePlaceholder />
   }
 
-  const playback = useScenePlayback(
-    useMemo(
-      () => buildPlaybackFrames(model.timeline.map((step) => ({ title: step.actionCode })), 'State ready'),
-      [model.timeline],
-    ),
-    900,
-  )
   const visibleTimeline = model.timeline.slice(0, playback.currentFrame.visibleStepCount)
   const latestStep = visibleTimeline[visibleTimeline.length - 1] ?? null
   const latestAcceptedStep = [...visibleTimeline].reverse().find((step) => step.accepted) ?? null
@@ -200,9 +198,11 @@ export default function StateScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Character State Simulator
-          </TitleTag>
+          {createElement(
+            TitleTag,
+            { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' },
+            'Character State Simulator',
+          )}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>

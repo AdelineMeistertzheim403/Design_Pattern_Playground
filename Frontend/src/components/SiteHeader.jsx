@@ -4,7 +4,6 @@ import SpaLink from './SpaLink'
 export default function SiteHeader({
   currentUser,
   routeName,
-  status,
   onNavigateHome,
   onNavigateProgress,
   onNavigateAdminUml,

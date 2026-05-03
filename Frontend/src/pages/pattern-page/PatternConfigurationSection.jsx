@@ -126,7 +126,7 @@ export default function PatternConfigurationSection({
               disabled={isExecuting}
               type="submit"
             >
-              {isExecuting ? 'Execution en cours...' : 'Lancer la demo'}
+              {isExecuting ? 'Execution API en cours...' : 'Lancer la demo (API)'}
             </button>
           </div>
 

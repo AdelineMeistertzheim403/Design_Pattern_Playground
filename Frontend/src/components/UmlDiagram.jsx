@@ -23,13 +23,13 @@ function tokenizeForWrap(text) {
   return `${text ?? ''}`
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/([<>(){}\[\],.:;])/g, ' $1 ')
+    .replace(/([<>(){}[\],.:;])/g, ' $1 ')
     .replace(/\s+/g, ' ')
     .trim()
     .split(' ')
     .filter(Boolean)
     .flatMap((token) => (
-      /^[<>(){}\[\],.:;]$/.test(token)
+      /^[<>(){}[\],.:;]$/.test(token)
         ? [token]
         : splitLongToken(token)
     ))

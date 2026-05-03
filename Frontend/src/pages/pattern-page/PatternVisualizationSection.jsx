@@ -18,6 +18,13 @@ export default function PatternVisualizationSection({
         eyebrow="Scene SVG"
         title="Visualisation interactive"
       >
+        <div className="mb-3 rounded-[18px] border border-blue-200 bg-blue-50 px-4 py-3 text-xs leading-6 text-blue-900">
+          Les controles de cette zone animent uniquement la scene locale. Pour generer le retour d execution (summary, output, logs), utilise le bouton
+          {' '}
+          <span className="font-semibold">Lancer la demo (API)</span>
+          {' '}
+          dans la section Configuration.
+        </div>
         <ExecutionScene
           execution={visualExecution}
           onOpenModal={onOpenSceneModal}

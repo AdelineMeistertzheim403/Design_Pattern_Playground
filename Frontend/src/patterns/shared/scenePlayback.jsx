@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function buildPlaybackFrames(steps, introLabel = 'Initial state') {
   const normalizedSteps = Array.isArray(steps) ? steps : []
@@ -134,7 +134,7 @@ export function ScenePlaybackControls({ playback, className = '' }) {
         </label>
       ) : null}
       <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={playback.handleLaunchDemo}>
-        {playback.playMode === 'AUTO' ? (playback.isPlaying ? 'Lecture...' : 'Lancer la demo') : 'Suivant'}
+        {playback.playMode === 'AUTO' ? (playback.isPlaying ? 'Animation...' : 'Animer la scene') : 'Etape suivante'}
       </button>
       <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={playback.handlePrevious} disabled={playback.currentFrameIndex === 0}>
         Precedent

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { createElement, useEffect, useMemo, useState } from 'react'
 
 import ZoomableViewport from '../../components/ZoomableViewport'
 import {
@@ -222,14 +222,10 @@ export default function IteratorScene({
   const [currentFrameIndex, setCurrentFrameIndex] = useState(Math.max(0, frames.length - 1))
   const [isPlaying, setIsPlaying] = useState(false)
 
-  if (!model) {
-    return <EmptyScenePlaceholder />
-  }
-
   useEffect(() => {
     setCurrentFrameIndex(Math.max(0, frames.length - 1))
     setIsPlaying(false)
-  }, [frames.length, model.mode, model.collectionCode, model.explorerName])
+  }, [frames.length, model?.mode, model?.collectionCode, model?.explorerName])
 
   useEffect(() => {
     if (playMode === 'STEP') {
@@ -251,6 +247,10 @@ export default function IteratorScene({
 
     return () => window.clearTimeout(timeoutId)
   }, [currentFrameIndex, delayMs, frames.length, isPlaying, playMode])
+
+  if (!model) {
+    return <EmptyScenePlaceholder />
+  }
 
   const currentFrame = frames[currentFrameIndex] ?? frames[frames.length - 1]
 
@@ -327,9 +327,7 @@ export default function IteratorScene({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
-          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Traversal Explorer
-          </TitleTag>
+          {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Traversal Explorer')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
       </div>
@@ -378,7 +376,7 @@ export default function IteratorScene({
           ) : null}
 
           <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>
-            Lancer la demo
+            Animer la scene
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>
             Precedent

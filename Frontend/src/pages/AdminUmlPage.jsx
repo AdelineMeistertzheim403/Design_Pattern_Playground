@@ -659,6 +659,7 @@ export default function AdminUmlPage({
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachPreview, boxesById, draft.classes, draft.relations, viewBox.height, viewBox.minX, viewBox.minY, viewBox.width])
 
   if (!currentUser) {
