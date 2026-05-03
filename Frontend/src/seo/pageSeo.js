@@ -39,8 +39,10 @@ export function buildPageSeoPayload({
         learningContent?.strapline,
       ]),
       imageUrl,
+      imageWidth: '1020',
+      imageHeight: '235',
       robots: 'index,follow',
-      title: `${selectedPattern.name} design pattern : explication, UML et exemple interactif | ${SITE_NAME}`,
+      title: `${selectedPattern.name} design pattern Java : explication, UML et demo interactive | ${SITE_NAME}`,
       type: 'article',
     }
   }
@@ -72,6 +74,8 @@ export function buildPageSeoPayload({
       canonicalUrl,
       description: 'Mentions legales, hebergement, politique de confidentialite et informations sur les donnees personnelles du site.',
       imageUrl,
+      imageWidth: '1020',
+      imageHeight: '235',
       robots: 'index,follow',
       title: `Mentions legales et confidentialite | ${SITE_NAME}`,
       type: 'website',
@@ -91,10 +95,12 @@ export function buildPageSeoPayload({
 
   return {
     canonicalUrl,
-    description: 'Comprendre les design patterns grace a des demonstrations interactives, des schemas UML, des exemples concrets et des quiz de validation.',
+    description: 'Apprends les design patterns GoF en Java et Spring Boot avec des demos interactives, des schemas UML et des quiz. Exemples concrets en React.',
     imageUrl,
+    imageWidth: '1020',
+    imageHeight: '235',
     robots: 'index,follow',
-    title: `${SITE_NAME} | Demos interactives, UML et quiz sur les design patterns`,
+    title: `${SITE_NAME} | Apprendre les design patterns Java avec demos interactives et UML`,
     type: 'website',
   }
 }

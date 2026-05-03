@@ -25,6 +25,8 @@ export default function SiteHeader({
             alt="Logo Design Pattern Playground"
             className="w-70 rounded-[1.75rem] object-contain"
             src="/logo.png"
+            width="1020"
+            height="235"
           />
         </SpaLink>
 

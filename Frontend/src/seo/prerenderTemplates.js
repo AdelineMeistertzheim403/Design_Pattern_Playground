@@ -25,6 +25,7 @@ export function buildHomePrerenderMarkup(patterns) {
         <p style="margin:0; font-size:12px; text-transform:uppercase; letter-spacing:0.18em; color:#6b655e;">Comprendre les design patterns en les voyant fonctionner</p>
         <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Apprendre les design patterns avec des demos interactives</h1>
         <p style="margin:18px 0 0; max-width:840px; font-size:18px; line-height:1.8; color:#4f463d;">Design Pattern Playground aide a relier la theorie, le diagramme UML et le comportement a l execution. Chaque pattern dispose d une page dediee avec explication, demonstration visuelle et quiz.</p>
+      <p style="margin:12px 0 0; max-width:840px; font-size:16px; line-height:1.8; color:#6b655e;">Les implementations sont en Java avec Spring Boot. L interface interactive est construite avec React. Explore les patterns GoF : Creational, Structural et Behavioral.</p>
       </section>
       <section style="padding:18px 0 0;">
         <h2 style="margin:0 0 18px; font-size:34px; line-height:1.2; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Catalogue des design patterns</h2>
