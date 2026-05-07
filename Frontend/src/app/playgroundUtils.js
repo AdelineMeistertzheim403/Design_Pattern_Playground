@@ -48,6 +48,10 @@ export function buildAdminUmlPath() {
   return '/admin/uml'
 }
 
+export function buildUmlStudioPath() {
+  return '/uml-studio'
+}
+
 export function buildBadgesPath() {
   return '/progression/badges'
 }
@@ -82,6 +86,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/admin/uml') {
     return { name: 'adminUml' }
+  }
+
+  if (normalized === '/uml-studio') {
+    return { name: 'umlStudio' }
   }
 
   if (normalized === '/progression/badges') {

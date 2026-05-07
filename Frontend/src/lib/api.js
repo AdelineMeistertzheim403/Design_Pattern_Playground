@@ -185,6 +185,21 @@ export function saveAdminUmlDiagram(code, payload) {
   })
 }
 
+export function listUserUmlDiagrams() {
+  return request('/api/uml-studio/diagrams')
+}
+
+export function getUserUmlDiagram(code) {
+  return request(`/api/uml-studio/diagrams/${code}`)
+}
+
+export function saveUserUmlDiagram(code, payload) {
+  return request(`/api/uml-studio/diagrams/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
 export function listAdminSvgScenes() {
   return request('/api/admin/svg-scenes')
 }

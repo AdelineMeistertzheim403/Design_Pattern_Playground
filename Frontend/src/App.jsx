@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import SiteHeader from './components/SiteHeader'
 import usePlaygroundApp from './hooks/usePlaygroundApp'
 import SiteFooter from './components/SiteFooter'
@@ -13,7 +13,9 @@ import {
   buildPatternQuizPath,
   buildProgressPath,
   buildRecentActivityPath,
+  buildUmlStudioPath,
 } from './app/playgroundUtils'
+import { savePendingUmlStudioLaunch } from './app/umlStudioStorage'
 
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const BadgesPage = lazy(() => import('./pages/BadgesPage'))
@@ -28,6 +30,8 @@ const PatternPage = lazy(() => import('./pages/PatternPage'))
 const PatternQuizPage = lazy(() => import('./pages/PatternQuizPage'))
 const QuizDashboardPage = lazy(() => import('./pages/QuizDashboardPage'))
 const RecentActivityPage = lazy(() => import('./pages/RecentActivityPage'))
+const UmlStudioLaunchModal = lazy(() => import('./components/UmlStudioLaunchModal'))
+const UmlStudioPage = lazy(() => import('./pages/UmlStudioPage'))
 const UmlDiagram = lazy(() => import('./components/UmlDiagram'))
 const VisualizationModal = lazy(() => import('./components/VisualizationModal'))
 
@@ -95,6 +99,8 @@ function PatternModals({
 }
 
 export default function App() {
+  const [isUmlStudioLaunchOpen, setIsUmlStudioLaunchOpen] = useState(false)
+  const [umlStudioLaunchRequest, setUmlStudioLaunchRequest] = useState(null)
   const {
     route,
     patterns,
@@ -156,7 +162,7 @@ export default function App() {
           ? 'missions'
         : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
           ? 'progress'
-          : route.name === 'adminUml' || route.name === 'adminSvgScenes'
+          : route.name === 'adminUml' || route.name === 'adminSvgScenes' || route.name === 'umlStudio'
             ? 'admin'
           : route.name === 'legalNotice'
             ? 'legalNotice'
@@ -177,6 +183,7 @@ export default function App() {
         status={status}
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
+        onOpenUmlStudio={() => setIsUmlStudioLaunchOpen(true)}
         onNavigateAdminUml={() => navigate(buildAdminUmlPath())}
         onNavigateMissions={() => navigate(buildMissionPath())}
         onNavigateAdminSvgScenes={() => navigate(buildAdminSvgScenesPath())}
@@ -264,6 +271,15 @@ export default function App() {
               patterns={patterns}
               onNavigateHome={() => navigate('/')}
             />
+          ) : route.name === 'umlStudio' ? (
+            <UmlStudioPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              launchRequest={umlStudioLaunchRequest}
+              patterns={patterns}
+              onOpenAuth={openAuth}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'activity' ? (
             <RecentActivityPage
               backendStatus={backendStatus}
@@ -318,6 +334,38 @@ export default function App() {
         visualExecution={visualExecution}
         visualSourceLabel={visualSourceLabel}
       />
+
+      {isUmlStudioLaunchOpen ? (
+        <Suspense fallback={null}>
+          <UmlStudioLaunchModal
+            backendStatus={backendStatus}
+            currentUser={currentUser}
+            patterns={patterns}
+            onClose={() => setIsUmlStudioLaunchOpen(false)}
+            onCreateBlank={() => {
+              const payload = { kind: 'blank', requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+            onOpenSaved={({ storage, id }) => {
+              const payload = { kind: 'saved', storage, id, requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+            onOpenTemplate={(patternCode) => {
+              const payload = { kind: 'template', code: patternCode, requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+          />
+        </Suspense>
+      ) : null}
 
       {isAuthOpen ? (
         <Suspense fallback={null}>

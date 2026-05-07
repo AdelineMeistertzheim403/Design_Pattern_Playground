@@ -46,6 +46,7 @@ public class SecurityConfig {
 					.requestMatchers(HttpMethod.GET, "/api/patterns/*/quiz").authenticated()
 					.requestMatchers("/api/patterns/*/quiz/**").authenticated()
 					.requestMatchers("/api/auth/me").authenticated()
+					.requestMatchers("/api/uml-studio/**").authenticated()
 					.requestMatchers("/api/admin/**").hasRole("ADMIN")
 					.requestMatchers("/api/patterns/**").permitAll()
 				.anyRequest().permitAll()
