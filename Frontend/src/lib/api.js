@@ -4,7 +4,16 @@ export const API_URL = configuredApiUrl
   ? configuredApiUrl.replace(/\/$/, '')
   : ''
 
-async function request(path, options = {}) {
+let refreshInFlight = null
+
+function shouldAttemptRefresh(path) {
+  return !path.startsWith('/api/auth/login')
+    && !path.startsWith('/api/auth/register')
+    && !path.startsWith('/api/auth/refresh')
+    && !path.startsWith('/api/auth/logout')
+}
+
+async function doFetch(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     credentials: 'include',
     headers: {
@@ -17,6 +26,37 @@ async function request(path, options = {}) {
   const contentType = response.headers.get('content-type') ?? ''
   const isJson = contentType.includes('application/json')
   const payload = isJson ? await response.json() : null
+
+  return { response, payload }
+}
+
+async function refreshSessionOnce() {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      const { response } = await doFetch('/api/auth/refresh', {
+        method: 'POST',
+      })
+
+      return response.ok
+    })()
+      .catch(() => false)
+      .finally(() => {
+        refreshInFlight = null
+      })
+  }
+
+  return refreshInFlight
+}
+
+async function request(path, options = {}, allowRefreshRetry = true) {
+  const { response, payload } = await doFetch(path, options)
+
+  if (response.status === 401 && allowRefreshRetry && shouldAttemptRefresh(path)) {
+    const refreshed = await refreshSessionOnce()
+    if (refreshed) {
+      return request(path, options, false)
+    }
+  }
 
   if (!response.ok) {
     throw new Error(payload?.message ?? `Request failed with status ${response.status}`)
@@ -64,8 +104,34 @@ export function getQuizDashboard() {
   return request('/api/quiz/dashboard')
 }
 
+export function getRecentActivity(limit = 30) {
+  return request(`/api/progress/activity?limit=${limit}`)
+}
+
 export function executePattern(payload) {
   return request('/api/patterns/execute', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getMissions() {
+  return request('/api/missions')
+}
+
+export function getMission(missionId) {
+  return request(`/api/missions/${missionId}`)
+}
+
+export function executeMission(payload) {
+  return request('/api/missions/execute', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function submitMissionResult(payload) {
+  return request('/api/missions/submissions', {
     method: 'POST',
     body: JSON.stringify(payload),
   })

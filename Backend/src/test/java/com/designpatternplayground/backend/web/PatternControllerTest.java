@@ -165,7 +165,92 @@ class PatternControllerTest {
 			.andExpect(jsonPath("$.startedPatterns").value(1))
 			.andExpect(jsonPath("$.validatedPatterns").value(1))
 			.andExpect(jsonPath("$.totalBestPoints").value(130))
+			.andExpect(jsonPath("$.profile.totalXp").value(70))
+			.andExpect(jsonPath("$.badges", hasSize(22)))
 			.andExpect(jsonPath("$.patterns", hasSize(expectedPatternCount)));
+	}
+
+	@Test
+	void shouldPersistMissionProgressAndXpForAuthenticatedUser() throws Exception {
+		Cookie accessCookie = registerAndExtractAccessCookie("mission_runner", "secret123");
+
+		mockMvc.perform(post("/api/missions/submissions")
+			.cookie(accessCookie)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "missionId": "global-logger",
+				  "success": true,
+				  "score": 92,
+				  "durationSeconds": 18,
+				  "selectedPatterns": ["singleton"]
+				}
+				"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.xpGained").value(60))
+			.andExpect(jsonPath("$.totalXp").value(60))
+			.andExpect(jsonPath("$.level").value(1));
+
+		mockMvc.perform(get("/api/quiz/dashboard")
+			.cookie(accessCookie))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.profile.totalXp").value(60))
+			.andExpect(jsonPath("$.missions.successfulMissions").value(1))
+			.andExpect(jsonPath("$.missions.bestHardMissionSuccessStreak").value(0));
+	}
+
+	@Test
+	void shouldExposeRecentActivityForAuthenticatedUser() throws Exception {
+		Cookie accessCookie = registerAndExtractAccessCookie("activity_runner", "secret123");
+
+		mockMvc.perform(post("/api/patterns/strategy/quiz/submissions")
+			.cookie(accessCookie)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "answers": [
+				    { "questionId": "strategy-q1", "selectedChoiceIds": ["algorithm"] },
+				    { "questionId": "strategy-q2", "selectedChoiceIds": ["true"] },
+				    { "questionId": "strategy-q3", "selectedChoiceIds": ["ifelse"] },
+				    { "questionId": "strategy-q4", "selectedChoiceIds": ["class"] },
+				    {
+				      "questionId": "strategy-q5",
+				      "matchingAnswers": {
+				        "strategy": "behavior",
+				        "context": "use",
+				        "client": "choose"
+				      }
+				    },
+				    { "questionId": "strategy-q6", "selectedChoiceIds": ["behavioral"] },
+				    { "questionId": "strategy-q7", "selectedChoiceIds": ["true"] },
+				    { "questionId": "strategy-q8", "selectedChoiceIds": ["payment"] },
+				    { "questionId": "strategy-q9", "selectedChoiceIds": ["use"] },
+				    { "questionId": "strategy-q10", "selectedChoiceIds": ["flexibility"] }
+				  ]
+				}
+				"""))
+			.andExpect(status().isOk());
+
+		mockMvc.perform(post("/api/missions/submissions")
+			.cookie(accessCookie)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+				  "missionId": "global-logger",
+				  "success": true,
+				  "score": 88,
+				  "durationSeconds": 22,
+				  "selectedPatterns": ["singleton"]
+				}
+				"""))
+			.andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/progress/activity")
+			.cookie(accessCookie))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items", hasSize(4)))
+			.andExpect(jsonPath("$.items[0].type", notNullValue()))
+			.andExpect(jsonPath("$.items[0].occurredAt", notNullValue()));
 	}
 
 	@Test

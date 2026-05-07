@@ -198,7 +198,7 @@ export const patternUmlDiagram = {
 export const fallbackQuiz = {
   "patternCode": "flyweight",
   "title": "Quiz Flyweight",
-  "description": "Teste ta comprehension du partage d etat, de la reduction du nombre d instances et des cas d usage a grande echelle.",
+  "description": "Teste ta comprehension du partage d etat, de la reduction des duplications lourdes et des cas d usage a grande echelle.",
   "passingPercent": 75,
   "badgeLabel": "Badge valide",
   "maxPoints": 0,
@@ -235,11 +235,11 @@ export const fallbackQuiz = {
     },
     {
       "id": "flyweight-q2",
-      "label": "Le Flyweight cree plus d objets pour ameliorer les performances.",
+      "label": "Avec Flyweight, chaque objet garde sa propre copie des donnees lourdes.",
       "type": "TRUE_FALSE",
       "difficulty": "EASY",
       "points": 0,
-      "explanation": "Au contraire, il vise a reduire le nombre d instances lourdes.",
+      "explanation": "Faux : il peut y avoir beaucoup d objets legers, mais ils partagent une donnee lourde commune au lieu de la dupliquer.",
       "choices": [
         {
           "id": "true",
@@ -371,7 +371,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "reduce",
-          "label": "Reduire le nombre d instances"
+          "label": "Reduire la duplication des donnees lourdes"
         },
         {
           "id": "complexify",
@@ -461,7 +461,7 @@ export const fallbackQuiz = {
         },
         {
           "id": "memory",
-          "label": "Trop d instances en memoire"
+          "label": "Trop de copies lourdes en memoire"
         },
         {
           "id": "logic",
@@ -509,4 +509,3 @@ export const fallbackQuiz = {
     }
   ]
 }
-

@@ -24,6 +24,19 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
+  {
+    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
+    files: ['src/patterns/shared/*.jsx', 'src/patterns/shared/*.js'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

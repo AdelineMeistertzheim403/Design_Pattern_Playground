@@ -23,13 +23,13 @@ function tokenizeForWrap(text) {
   return `${text ?? ''}`
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/([<>(){}\[\],.:;])/g, ' $1 ')
+    .replace(/([<>(){}[\],.:;])/g, ' $1 ')
     .replace(/\s+/g, ' ')
     .trim()
     .split(' ')
     .filter(Boolean)
     .flatMap((token) => (
-      /^[<>(){}\[\],.:;]$/.test(token)
+      /^[<>(){}[\],.:;]$/.test(token)
         ? [token]
         : splitLongToken(token)
     ))
@@ -945,47 +945,47 @@ export default function UmlDiagram({
       </div>
 
       <ZoomableViewport enabled={isExpanded} viewportClassName={isExpanded ? 'mt-6' : 'mt-4'}>
-      <svg className={svgClassName} viewBox={computedViewBox} role="img">
-        <defs>
-          <marker
-            id={`${defsId}-arrow`}
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="5"
-            orient="auto"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a5a3f" />
-          </marker>
-          <marker
-            id={`${defsId}-triangle`}
-            markerWidth="12"
-            markerHeight="12"
-            refX="10"
-            refY="6"
-            orient="auto"
-          >
-            <path d="M 0 6 L 10 0 L 10 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
-          </marker>
-          <marker
-            id={`${defsId}-diamond`}
-            markerWidth="12"
-            markerHeight="12"
-            refX="0"
-            refY="6"
-            orient="auto"
-          >
-            <path d="M 0 6 L 6 0 L 12 6 L 6 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
-          </marker>
-        </defs>
+        <svg className={svgClassName} viewBox={computedViewBox} role="img">
+          <defs>
+            <marker
+              id={`${defsId}-arrow`}
+              markerWidth="10"
+              markerHeight="10"
+              refX="9"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a5a3f" />
+            </marker>
+            <marker
+              id={`${defsId}-triangle`}
+              markerWidth="12"
+              markerHeight="12"
+              refX="10"
+              refY="6"
+              orient="auto"
+            >
+              <path d="M 0 6 L 10 0 L 10 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
+            </marker>
+            <marker
+              id={`${defsId}-diamond`}
+              markerWidth="12"
+              markerHeight="12"
+              refX="0"
+              refY="6"
+              orient="auto"
+            >
+              <path d="M 0 6 L 6 0 L 12 6 L 6 12 z" fill="#fff9ef" stroke="#7a5a3f" strokeWidth="1.2" />
+            </marker>
+          </defs>
 
-        {diagram.relations.map((relation, index) => {
-          const points = buildRelationPoints(relation, classesById, relationMetaList[index], {
-            useRelationWaypoints: useAbsoluteLayout,
-          })
-          if (!points) {
-            return null
-          }
+          {diagram.relations.map((relation, index) => {
+            const points = buildRelationPoints(relation, classesById, relationMetaList[index], {
+              useRelationWaypoints: useAbsoluteLayout,
+            })
+            if (!points) {
+              return null
+            }
 
           const pathData = getRelationPathData(relation, points, {
             useExplicitPosition: useAbsoluteLayout,
@@ -1032,103 +1032,103 @@ export default function UmlDiagram({
           )
         })}
 
-        {arrangedLayout.boxes.map((box) => {
-          const tone = getTone(box)
-          const hasFields = box.fieldLines.length > 0
-          const hasMethods = box.methodLines.length > 0
-          const hasContent = hasFields || hasMethods
+          {arrangedLayout.boxes.map((box) => {
+            const tone = getTone(box)
+            const hasFields = box.fieldLines.length > 0
+            const hasMethods = box.methodLines.length > 0
+            const hasContent = hasFields || hasMethods
 
-          return (
-            <g key={box.id} transform={`translate(${box.x} ${box.y})`}>
-              <rect
-                width={box.width}
-                height={box.height}
-                rx="18"
-                fill={tone.fill}
-                stroke={tone.stroke}
-                strokeWidth="2.4"
-                className="scene-node-shadow"
-              />
-              <line x1="0" y1={box.headerHeight} x2={box.width} y2={box.headerHeight} stroke={tone.stroke} strokeOpacity="0.45" />
-              {hasFields ? (
-                <line
-                  x1="0"
-                  y1={box.fieldDividerY}
-                  x2={box.width}
-                  y2={box.fieldDividerY}
+            return (
+              <g key={box.id} transform={`translate(${box.x} ${box.y})`}>
+                <rect
+                  width={box.width}
+                  height={box.height}
+                  rx="18"
+                  fill={tone.fill}
                   stroke={tone.stroke}
-                  strokeOpacity="0.35"
+                  strokeWidth="2.4"
+                  className="scene-node-shadow"
                 />
-              ) : null}
+                <line x1="0" y1={box.headerHeight} x2={box.width} y2={box.headerHeight} stroke={tone.stroke} strokeOpacity="0.45" />
+                {hasFields ? (
+                  <line
+                    x1="0"
+                    y1={box.fieldDividerY}
+                    x2={box.width}
+                    y2={box.fieldDividerY}
+                    stroke={tone.stroke}
+                    strokeOpacity="0.35"
+                  />
+                ) : null}
 
-              <text
-                x={box.width / 2}
-                y="16"
-                textAnchor="middle"
-                fontSize={box.stereotypeFontSize}
-                fontWeight="700"
-                letterSpacing="0.2em"
-                fill={tone.text}
-                opacity="0.62"
-              >
-                {`<<${box.stereotype}>>`}
-              </text>
-              {box.titleLines.map((line, index) => (
                 <text
-                  key={`${box.id}-title-${index}`}
                   x={box.width / 2}
-                  y={box.titleStartY + index * box.titleLineHeight}
+                  y="16"
                   textAnchor="middle"
-                  fontSize={box.titleFontSize}
+                  fontSize={box.stereotypeFontSize}
                   fontWeight="700"
+                  letterSpacing="0.2em"
                   fill={tone.text}
+                  opacity="0.62"
                 >
-                  {line}
+                  {`<<${box.stereotype}>>`}
                 </text>
-              ))}
+                {box.titleLines.map((line, index) => (
+                  <text
+                    key={`${box.id}-title-${index}`}
+                    x={box.width / 2}
+                    y={box.titleStartY + index * box.titleLineHeight}
+                    textAnchor="middle"
+                    fontSize={box.titleFontSize}
+                    fontWeight="700"
+                    fill={tone.text}
+                  >
+                    {line}
+                  </text>
+                ))}
 
-              {box.fieldLines.map((line, index) => (
-                <text
-                  key={`${box.id}-field-${index}`}
-                  x="18"
-                  y={box.memberStartY + index * box.memberLineHeight}
-                  fontSize={box.memberFontSize}
-                  fontWeight="500"
-                  fill={tone.text}
-                >
-                  {line}
-                </text>
-              ))}
+                {box.fieldLines.map((line, index) => (
+                  <text
+                    key={`${box.id}-field-${index}`}
+                    x="18"
+                    y={box.memberStartY + index * box.memberLineHeight}
+                    fontSize={box.memberFontSize}
+                    fontWeight="500"
+                    fill={tone.text}
+                  >
+                    {line}
+                  </text>
+                ))}
 
-              {box.methodLines.map((line, index) => (
-                <text
-                  key={`${box.id}-method-${index}`}
-                  x="18"
-                  y={box.methodStartY + index * box.memberLineHeight}
-                  fontSize={box.memberFontSize}
-                  fontWeight="500"
-                  fill={tone.text}
-                >
-                  {line}
-                </text>
-              ))}
+                {box.methodLines.map((line, index) => (
+                  <text
+                    key={`${box.id}-method-${index}`}
+                    x="18"
+                    y={box.methodStartY + index * box.memberLineHeight}
+                    fontSize={box.memberFontSize}
+                    fontWeight="500"
+                    fill={tone.text}
+                  >
+                    {line}
+                  </text>
+                ))}
 
-              {!hasContent ? (
-                <text
-                  x="18"
-                  y={box.memberStartY}
-                  fontSize={box.memberFontSize}
-                  fontWeight="500"
-                  fill={tone.text}
-                  opacity="0.72"
-                >
-                  Aucun membre pour cette vue simplifiee
-                </text>
-              ) : null}
-            </g>
-          )
-        })}
-      </svg>
+                {!hasContent ? (
+                  <text
+                    x="18"
+                    y={box.memberStartY}
+                    fontSize={box.memberFontSize}
+                    fontWeight="500"
+                    fill={tone.text}
+                    opacity="0.72"
+                  >
+                    Aucun membre pour cette vue simplifiee
+                  </text>
+                ) : null}
+              </g>
+            )
+          })}
+        </svg>
       </ZoomableViewport>
     </div>
   )

@@ -26,6 +26,7 @@ export default function PatternPage({
   schema,
   formValues,
   execution,
+  executionSource,
   executionError,
   isExecuting,
   learningContent,
@@ -99,6 +100,7 @@ export default function PatternPage({
       >
         <PatternExecutionResultSection
           execution={execution}
+          executionSource={executionSource}
           hasDraftChanges={hasDraftChanges}
         />
       </Suspense>

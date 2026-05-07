@@ -23,10 +23,17 @@ services:
       context: ./Backend
       dockerfile: Dockerfile
       target: dev
+    # On Windows/MINGW, the named volume mounted at /workspace/.m2 is often root-owned.
+    # Running as root by default avoids AccessDeniedException when Maven writes cache files.
+    # Linux users can override with BACKEND_UID/BACKEND_GID (e.g. 1000:1000).
+    user: "${BACKEND_UID:-0}:${BACKEND_GID:-0}"
     working_dir: /workspace
     command: ./mvnw spring-boot:run
     environment:
-      MAVEN_OPTS: -Dmaven.repo.local=/root/.m2/repository
+      HOME: /workspace
+      MAVEN_USER_HOME: /workspace/.m2
+      MAVEN_CONFIG: /workspace/.m2
+      MAVEN_OPTS: -Dmaven.repo.local=/workspace/.m2/repository
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/design_pattern_playground
       SPRING_DATASOURCE_USERNAME: design_pattern_playground
       SPRING_DATASOURCE_PASSWORD: design_pattern_playground
@@ -42,7 +49,7 @@ services:
       - "8080:8080"
     volumes:
       - ./Backend:/workspace
-      - backend_m2:/root/.m2
+      - backend_m2:/workspace/.m2
 
   frontend:
     build:

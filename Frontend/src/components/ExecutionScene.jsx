@@ -87,14 +87,24 @@ export default function ExecutionScene({
   sourceLabel,
   isExpanded = false,
   onOpenModal,
+  forceGeneric = false,
+  highlightNodeIds = [],
+  highlightEdgeKeys = [],
+  highlightEdgeKinds = {},
   customSvgScene = null,
 }) {
   const visualization = execution?.visualization
-  const shouldLoadPatternScene = Boolean(visualization?.nodes?.length) && hasSpecializedPatternScene(patternCode)
+  const shouldLoadPatternScene = Boolean(visualization?.nodes?.length) && hasSpecializedPatternScene(patternCode) && !forceGeneric
+  const highlightedNodeSet = new Set(highlightNodeIds)
+  const highlightedEdgeSet = new Set(highlightEdgeKeys)
   const [sceneModuleState, setSceneModuleState] = useState({
     status: 'idle',
     component: null,
   })
+
+  function buildEdgeKey(edge) {
+    return `${edge.from}::${edge.to}::${edge.label ?? ''}`
+  }
 
   useEffect(() => {
     let ignore = false
@@ -237,8 +247,17 @@ export default function ExecutionScene({
 
             const labelPosition = getEdgeLabelPosition(source, target)
             const animated = ['notify', 'publish', 'execute', 'create'].includes(edge.label)
-            const edgeLabel = edge.label.toUpperCase()
+            const edgeKey = buildEdgeKey(edge)
+            const isEdgeHighlighted = highlightedEdgeSet.has(edgeKey)
+            const edgeKind = highlightEdgeKinds[edgeKey] ?? null
+            const edgeLabel = `${edge.label ?? 'link'}`.toUpperCase()
             const edgeLabelWidth = Math.max(72, Math.ceil(estimateTextWidth(edgeLabel, 11) + 28))
+            const edgeClassName = [
+              animated ? 'scene-flow-line' : null,
+              isEdgeHighlighted ? 'scene-edge-highlight' : null,
+              isEdgeHighlighted && edgeKind === 'added' ? 'scene-edge-highlight-added' : null,
+              isEdgeHighlighted && edgeKind === 'modified' ? 'scene-edge-highlight-modified' : null,
+            ].filter(Boolean).join(' ')
 
             return (
               <g key={`${edge.from}-${edge.to}-${index}`}>
@@ -247,9 +266,9 @@ export default function ExecutionScene({
                   fill="none"
                   stroke={animated ? '#246b5e' : '#8b6b4e'}
                   strokeDasharray={animated ? '10 8' : '0'}
-                  strokeWidth="2.6"
+                  strokeWidth={isEdgeHighlighted ? '3.2' : '2.6'}
                   markerEnd={`url(#${defsId}-arrow)`}
-                  className={animated ? 'scene-flow-line' : ''}
+                  className={edgeClassName}
                 />
 
                 {animated ? (
@@ -289,6 +308,7 @@ export default function ExecutionScene({
             }
 
             const tone = getTone(node)
+            const isHighlighted = highlightedNodeSet.has(node.id)
             const { titleLines, subtitleLines } = getNodeTextLayout(node)
             const titleFontSize = getFittedFontSize(titleLines, 18, 15, position.width - 44)
             const subtitleFontSize = getFittedFontSize(subtitleLines, 11, 10, position.width - 44)
@@ -303,8 +323,8 @@ export default function ExecutionScene({
                   rx="24"
                   fill={tone.fill}
                   stroke={tone.stroke}
-                  strokeWidth="2.5"
-                  className="scene-node-shadow"
+                  strokeWidth={isHighlighted ? '3.2' : '2.5'}
+                  className={isHighlighted ? 'scene-node-shadow scene-node-highlight' : 'scene-node-shadow'}
                 />
                 <text x="22" y="24" fontSize="10" fontWeight="700" letterSpacing="0.2em" fill={tone.subtle}>
                   {node.type.toUpperCase()}

@@ -2,6 +2,7 @@ import { buildLegalNoticePath } from '../app/playgroundUtils'
 import SpaLink from './SpaLink'
 
 export default function SiteFooter({ onNavigateLegalNotice }) {
+  // Footer avec lien legal qui passe par la navigation SPA.
   const legalNoticePath = buildLegalNoticePath()
 
   return (

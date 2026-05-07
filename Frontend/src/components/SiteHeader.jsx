@@ -1,14 +1,14 @@
-import { buildAdminSvgScenesPath, buildAdminUmlPath, buildProgressPath } from '../app/playgroundUtils'
+import { buildAdminSvgScenesPath, buildAdminUmlPath, buildMissionPath, buildProgressPath } from '../app/playgroundUtils'
 import SpaLink from './SpaLink'
 
 export default function SiteHeader({
   currentUser,
   routeName,
-  status,
   onNavigateHome,
   onNavigateProgress,
   onNavigateAdminSvgScenes,
   onNavigateAdminUml,
+  onNavigateMissions,
   onOpenAuth,
   onLogout,
 }) {
@@ -26,13 +26,27 @@ export default function SiteHeader({
             alt="Logo Design Pattern Playground"
             className="w-70 rounded-[1.75rem] object-contain"
             src="/logo.png"
+            width="1020"
+            height="235"
           />
         </SpaLink>
 
         <div className="flex flex-wrap items-center justify-end gap-3">
           <SpaLink
             className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              routeName === 'progress'
+              routeName === 'missions'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
+            }`}
+            href={buildMissionPath()}
+            onNavigate={onNavigateMissions}
+          >
+            Mode mission
+          </SpaLink>
+
+          <SpaLink
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              routeName === 'progress' || routeName === 'badges' || routeName === 'activity'
                 ? 'border-stone-950 bg-stone-950 text-white'
                 : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
             }`}

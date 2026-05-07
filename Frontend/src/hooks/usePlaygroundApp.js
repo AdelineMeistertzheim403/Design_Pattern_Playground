@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useMemo, useState } from 'react'
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react'
 import {
   changeUserPassword,
   executePattern,
@@ -37,6 +37,7 @@ export default function usePlaygroundApp() {
   const [schema, setSchema] = useState(emptyPatternSchema)
   const [formValues, setFormValues] = useState({})
   const [execution, setExecution] = useState(null)
+  const [executionSource, setExecutionSource] = useState(null)
   const [executionError, setExecutionError] = useState('')
   const [lastExecutedPayload, setLastExecutedPayload] = useState(null)
   const [backendStatus, setBackendStatus] = useState('loading')
@@ -60,6 +61,7 @@ export default function usePlaygroundApp() {
   const [umlDiagram, setUmlDiagram] = useState(null)
   const [svgScene, setSvgScene] = useState(null)
   const [previewExecution, setPreviewExecution] = useState(null)
+  const lastPatternLoadRef = useRef(null)
 
   useEffect(() => {
     const handlePopState = () => {
@@ -165,10 +167,15 @@ export default function usePlaygroundApp() {
       }
     }
 
-    setExecution(null)
-    setExecutionError('')
-    setLastExecutedPayload(null)
-    setPreviewExecution(null)
+    const shouldResetPatternState = lastPatternLoadRef.current !== activePatternCode
+    if (shouldResetPatternState) {
+      setExecution(null)
+      setExecutionSource(null)
+      setExecutionError('')
+      setLastExecutedPayload(null)
+      setPreviewExecution(null)
+      lastPatternLoadRef.current = activePatternCode
+    }
     setSvgScene(null)
 
     const loadPatternDetail = async () => {
@@ -379,29 +386,19 @@ export default function usePlaygroundApp() {
     const payload = draftPayload
 
     try {
-      const result = backendStatus === 'connected'
-        ? await executePattern(payload)
-        : await executeFallbackPattern(activePatternCode, payload.parameters)
+      if (backendStatus !== 'connected') {
+        throw new Error("Le backend n est pas disponible. Le retour d execution est desactive tant que l API n est pas joignable.")
+      }
 
+      const result = await executePattern(payload)
       setExecution(result)
+      setExecutionSource('api')
       setLastExecutedPayload(payload)
     } catch (error) {
-      if (backendStatus === 'connected') {
-        setBackendStatus('fallback')
-
-        try {
-          setExecution(await executeFallbackPattern(activePatternCode, payload.parameters))
-          setLastExecutedPayload(payload)
-        } catch {
-          setExecution(null)
-          setLastExecutedPayload(null)
-          setExecutionError(error.message ?? "L execution a echoue.")
-        }
-      } else {
-        setExecution(null)
-        setLastExecutedPayload(null)
-        setExecutionError(error.message ?? "L execution a echoue.")
-      }
+      setExecution(null)
+      setExecutionSource(null)
+      setLastExecutedPayload(null)
+      setExecutionError(error.message ?? "L execution a echoue.")
     } finally {
       setIsExecuting(false)
     }
@@ -497,6 +494,7 @@ export default function usePlaygroundApp() {
     schema,
     formValues,
     execution,
+    executionSource,
     executionError,
     isExecuting,
     learningContent,

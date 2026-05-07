@@ -216,7 +216,8 @@ jobs:
             exit 1
           fi
 
-          TRANSFER_BYTES="$(rsync -azn --delete --stats \
+          RSYNC_STATS="$(mktemp)"
+          rsync -azn --delete --stats \
             --exclude ".git/" \
             --exclude ".github/" \
             --exclude ".codex" \
@@ -226,10 +227,29 @@ jobs:
             --exclude ".env" \
             --exclude "ops/registry/auth/" \
             -e "ssh -p $SSH_PORT" \
-            ./ "$VPS_SSH_USER@$VPS_SSH_HOST:$VPS_APP_DIR/" | awk -F': ' '/Total transferred file size:/ {gsub(/,/, "", $2); print $2}')"
+            ./ "$VPS_SSH_USER@$VPS_SSH_HOST:$VPS_APP_DIR/" > "$RSYNC_STATS"
+
+          TRANSFER_BYTES="$(awk -F': ' '
+            /Total transferred file size:/ {
+              value=$2
+              gsub(/,/, "", value)
+              gsub(/ bytes/, "", value)
+              print value
+            }
+          ' "$RSYNC_STATS")"
 
           if ! [[ "$TRANSFER_BYTES" =~ ^[0-9]+$ ]]; then
-            echo "Unable to estimate rsync transfer size."
+            echo "rsync stats did not expose a parsable transfer size. Falling back to local file size estimate."
+            TRANSFER_BYTES="$(find . \
+              \( -path './.git' -o -path './.github' -o -path './.codex' -o -path './Backend/target' -o -path './Frontend/node_modules' -o -path './Frontend/dist' -o -path './ops/registry/auth' \) -prune \
+              -o \( -path './.env' \) -prune \
+              -o -type f -printf '%s\n' | awk '{sum += $1} END {print sum + 0}')"
+          fi
+
+          rm -f "$RSYNC_STATS"
+
+          if ! [[ "$TRANSFER_BYTES" =~ ^[0-9]+$ ]]; then
+            echo "Unable to estimate transfer size from rsync stats or fallback local scan."
             exit 1
           fi
 

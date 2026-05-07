@@ -3,6 +3,7 @@ import { formatOutputValue } from '../../app/playgroundUtils'
 
 function ExecutionResultContent({
   execution,
+  executionSource,
   hasDraftChanges,
 }) {
   if (!execution) {
@@ -23,7 +24,12 @@ function ExecutionResultContent({
       ) : null}
 
       <article className="rounded-[26px] border border-black/10 bg-[var(--panel)] p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Summary</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Summary</p>
+          <span className="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+            {executionSource === 'api' ? 'Source: API' : 'Source: inconnue'}
+          </span>
+        </div>
         <p className="mt-4 text-sm leading-7 text-stone-700">{execution.summary}</p>
       </article>
 
@@ -57,6 +63,7 @@ function ExecutionResultContent({
 
 export default function PatternExecutionResultSection({
   execution,
+  executionSource,
   hasDraftChanges,
 }) {
   return (
@@ -67,6 +74,7 @@ export default function PatternExecutionResultSection({
     >
       <ExecutionResultContent
         execution={execution}
+        executionSource={executionSource}
         hasDraftChanges={hasDraftChanges}
       />
     </CollapsiblePanel>
