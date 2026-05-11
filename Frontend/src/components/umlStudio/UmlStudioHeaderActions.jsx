@@ -49,6 +49,7 @@ function ActionButton({ disabled = false, icon, label, onClick, variant = 'defau
 
 export default function UmlStudioHeaderActions({
   diagramName,
+  nameLabel = 'Nom du diagramme',
   onDiagramNameChange,
   onExportPng,
   onExportSvg,
@@ -60,7 +61,7 @@ export default function UmlStudioHeaderActions({
   return (
     <div className="flex w-full flex-col gap-3 xl:w-auto xl:flex-row xl:items-end xl:justify-end xl:gap-4">
       <label className="flex min-w-0 flex-col gap-2 text-sm text-stone-700 xl:w-[320px]">
-        <span className="font-semibold text-stone-900">Nom du diagramme</span>
+        <span className="font-semibold text-stone-900">{nameLabel}</span>
         <input
           className="rounded-2xl border border-black/10 bg-white/88 px-4 py-3 text-sm text-stone-900 outline-none"
           value={diagramName}
