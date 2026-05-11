@@ -556,6 +556,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
             savePending={savePending}
           />
         </div>
+        {notice ? <p className="mt-4 rounded-2xl border border-black/8 bg-white/80 px-4 py-3 text-sm text-stone-700">{notice}</p> : null}
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_340px]">

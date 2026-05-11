@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import VisualizationModal from './VisualizationModal'
 import { loadSavedUmlStudioDocuments } from '../app/umlStudioStorage'
-import { listUserUmlDiagrams } from '../lib/api'
+import { loadSavedSvgSceneStudioDocuments } from '../app/svgSceneStudioStorage'
+import { listUserSvgScenes, listUserUmlDiagrams } from '../lib/api'
 
 export default function UmlStudioLaunchModal({
   backendStatus,
@@ -13,16 +14,25 @@ export default function UmlStudioLaunchModal({
   onOpenTemplate,
 }) {
   const [mode, setMode] = useState('blank')
+  const [editorType, setEditorType] = useState('uml')
   const [selectedPatternCode, setSelectedPatternCode] = useState(patterns[0]?.code ?? '')
   const [selectedSavedId, setSelectedSavedId] = useState('')
   const [remoteSavedDocuments, setRemoteSavedDocuments] = useState([])
   const [isRemoteSavedLoading, setIsRemoteSavedLoading] = useState(false)
   const localSavedDocuments = useMemo(() => loadSavedUmlStudioDocuments(), [])
+  const localSavedSvgScenes = useMemo(() => loadSavedSvgSceneStudioDocuments(), [])
   const effectivePatternCode = selectedPatternCode || patterns[0]?.code || ''
   const canUseRemoteSavedDocuments = backendStatus === 'connected' && Boolean(currentUser)
-  const savedDocuments = canUseRemoteSavedDocuments
-    ? remoteSavedDocuments.map((item) => ({ ...item, storage: 'remote' }))
-    : localSavedDocuments.map((item) => ({ ...item, storage: 'local' }))
+  const savedDocuments = useMemo(() => {
+    const remoteDocuments = canUseRemoteSavedDocuments
+      ? remoteSavedDocuments.map((item) => ({ ...item, storage: 'remote' }))
+      : []
+    const localDocuments = editorType === 'svg-scene'
+      ? localSavedSvgScenes.map((item) => ({ ...item, storage: 'local' }))
+      : localSavedDocuments.map((item) => ({ ...item, storage: 'local' }))
+
+    return canUseRemoteSavedDocuments ? remoteDocuments : localDocuments
+  }, [canUseRemoteSavedDocuments, editorType, localSavedDocuments, localSavedSvgScenes, remoteSavedDocuments])
 
   useEffect(() => {
     if (!selectedPatternCode && patterns[0]?.code) {
@@ -43,7 +53,9 @@ export default function UmlStudioLaunchModal({
     const loadRemoteSavedDocuments = async () => {
       setIsRemoteSavedLoading(true)
       try {
-        const documents = await listUserUmlDiagrams()
+        const documents = editorType === 'svg-scene'
+          ? await listUserSvgScenes()
+          : await listUserUmlDiagrams()
         if (!ignore) {
           setRemoteSavedDocuments(Array.isArray(documents) ? documents : [])
         }
@@ -63,7 +75,7 @@ export default function UmlStudioLaunchModal({
     return () => {
       ignore = true
     }
-  }, [canUseRemoteSavedDocuments])
+  }, [canUseRemoteSavedDocuments, editorType])
 
   return (
     <VisualizationModal title="Ouvrir l editeur UML" onClose={onClose}>
@@ -74,11 +86,46 @@ export default function UmlStudioLaunchModal({
           Ouvre un canvas vide, charge un template base sur un design pattern, ou reprends un diagramme deja sauvegarde.
         </p>
 
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {[
+            { id: 'uml', title: 'Diagramme de classe' },
+            { id: 'svg-scene', title: 'Scene SVG' },
+          ].map((option) => (
+            <button
+              key={option.id}
+              className={`rounded-[24px] border px-5 py-4 text-left transition ${
+                editorType === option.id
+                  ? 'border-stone-950 bg-stone-950 text-white'
+                  : 'border-black/10 bg-white/88 text-stone-800 hover:border-black/20'
+              }`}
+              type="button"
+              onClick={() => {
+                setEditorType(option.id)
+                setSelectedSavedId('')
+              }}
+            >
+              <p className="text-base font-semibold">{option.title}</p>
+            </button>
+          ))}
+        </div>
+
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {[
-            { id: 'blank', title: 'Nouveau diagramme', description: 'Demarrer avec un canvas UML vide.' },
-            { id: 'template', title: 'Depuis un template', description: 'Partir d un diagramme de design pattern existant.' },
-            { id: 'saved', title: 'Ouvrir un diagramme', description: 'Reprendre un diagramme sauvegarde en base ou localement.' },
+            {
+              id: 'blank',
+              title: 'Nouveau diagramme',
+              description: editorType === 'svg-scene' ? 'Demarrer avec une scene SVG vide.' : 'Demarrer avec un canvas UML vide.',
+            },
+            {
+              id: 'template',
+              title: 'Depuis un template',
+              description: editorType === 'svg-scene' ? 'Partir d une scene SVG de design pattern existante.' : 'Partir d un diagramme de design pattern existant.',
+            },
+            {
+              id: 'saved',
+              title: 'Ouvrir un diagramme',
+              description: editorType === 'svg-scene' ? 'Reprendre une scene sauvegardee en base ou localement.' : 'Reprendre un diagramme sauvegarde en base ou localement.',
+            },
           ].map((option) => (
             <button
               key={option.id}
@@ -161,18 +208,18 @@ export default function UmlStudioLaunchModal({
             type="button"
             onClick={() => {
               if (mode === 'blank') {
-                onCreateBlank()
+                onCreateBlank(editorType)
                 return
               }
 
               if (mode === 'template' && effectivePatternCode) {
-                onOpenTemplate(effectivePatternCode)
+                onOpenTemplate(editorType, effectivePatternCode)
                 return
               }
 
               if (selectedSavedId) {
                 const [storage, documentId] = selectedSavedId.split(':')
-                onOpenSaved({ storage, id: documentId })
+                onOpenSaved({ editorType, storage, id: documentId })
               }
             }}
             disabled={(mode === 'template' && !effectivePatternCode) || (mode === 'saved' && !selectedSavedId && savedDocuments.length > 0)}

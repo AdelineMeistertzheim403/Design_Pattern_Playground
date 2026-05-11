@@ -50,7 +50,7 @@ public class SvgSceneService {
 			throw new IllegalArgumentException("Le code du chemin et le code du payload doivent correspondre.");
 		}
 
-		String svgMarkup = validateSvgMarkup(request.svgMarkup());
+		String svgMarkup = validateAndNormalizeMarkup(request.svgMarkup());
 		LocalDateTime now = LocalDateTime.now();
 		SvgSceneDocument document = svgSceneRepository.findByCodeIgnoreCase(normalizedCode)
 			.orElseGet(() -> new SvgSceneDocument(
@@ -103,7 +103,7 @@ public class SvgSceneService {
 		return normalized;
 	}
 
-	private String validateSvgMarkup(String svgMarkup) {
+	public String validateAndNormalizeMarkup(String svgMarkup) {
 		String trimmed = svgMarkup == null ? "" : svgMarkup.trim();
 		if (trimmed.isBlank()) {
 			throw new IllegalArgumentException("Le SVG est obligatoire.");

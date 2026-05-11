@@ -51,6 +51,7 @@ public class SecurityConfig {
 					.requestMatchers("/api/patterns/*/quiz/**").authenticated()
 					.requestMatchers("/api/auth/me").authenticated()
 					.requestMatchers("/api/uml-studio/**").authenticated()
+					.requestMatchers("/api/svg-scene-studio/**").authenticated()
 					// Admin editors for UML and SVG scenes stay behind the ADMIN role.
 					.requestMatchers("/api/admin/**").hasRole("ADMIN")
 					// Pattern catalogue, schemas and public UML overrides remain readable anonymously.

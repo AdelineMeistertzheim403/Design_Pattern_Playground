@@ -52,6 +52,10 @@ export function buildUmlStudioPath() {
   return '/uml-studio'
 }
 
+export function buildSvgSceneStudioPath() {
+  return '/svg-scene-studio'
+}
+
 export function buildBadgesPath() {
   return '/progression/badges'
 }
@@ -90,6 +94,10 @@ export function parseRoute(pathname) {
 
   if (normalized === '/uml-studio') {
     return { name: 'umlStudio' }
+  }
+
+  if (normalized === '/svg-scene-studio') {
+    return { name: 'svgSceneStudio' }
   }
 
   if (normalized === '/progression/badges') {

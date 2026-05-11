@@ -13,6 +13,7 @@ import {
   buildPatternQuizPath,
   buildProgressPath,
   buildRecentActivityPath,
+  buildSvgSceneStudioPath,
   buildUmlStudioPath,
 } from './app/playgroundUtils'
 import { savePendingUmlStudioLaunch } from './app/umlStudioStorage'
@@ -32,6 +33,7 @@ const QuizDashboardPage = lazy(() => import('./pages/QuizDashboardPage'))
 const RecentActivityPage = lazy(() => import('./pages/RecentActivityPage'))
 const UmlStudioLaunchModal = lazy(() => import('./components/UmlStudioLaunchModal'))
 const UmlStudioPage = lazy(() => import('./pages/UmlStudioPage'))
+const SvgSceneStudioPage = lazy(() => import('./pages/SvgSceneStudioPage'))
 const UmlDiagram = lazy(() => import('./components/UmlDiagram'))
 const VisualizationModal = lazy(() => import('./components/VisualizationModal'))
 
@@ -162,7 +164,7 @@ export default function App() {
           ? 'missions'
         : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
           ? 'progress'
-          : route.name === 'adminUml' || route.name === 'adminSvgScenes' || route.name === 'umlStudio'
+          : route.name === 'adminUml' || route.name === 'adminSvgScenes' || route.name === 'umlStudio' || route.name === 'svgSceneStudio'
             ? 'admin'
           : route.name === 'legalNotice'
             ? 'legalNotice'
@@ -280,6 +282,15 @@ export default function App() {
               onOpenAuth={openAuth}
               onNavigateHome={() => navigate('/')}
             />
+          ) : route.name === 'svgSceneStudio' ? (
+            <SvgSceneStudioPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              launchRequest={umlStudioLaunchRequest}
+              patterns={patterns}
+              onOpenAuth={openAuth}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'activity' ? (
             <RecentActivityPage
               backendStatus={backendStatus}
@@ -342,26 +353,26 @@ export default function App() {
             currentUser={currentUser}
             patterns={patterns}
             onClose={() => setIsUmlStudioLaunchOpen(false)}
-            onCreateBlank={() => {
-              const payload = { kind: 'blank', requestId: Date.now() }
+            onCreateBlank={(editorType) => {
+              const payload = { editorType, kind: 'blank', requestId: Date.now() }
               savePendingUmlStudioLaunch(payload)
               setUmlStudioLaunchRequest(payload)
               setIsUmlStudioLaunchOpen(false)
-              navigate(buildUmlStudioPath())
+              navigate(editorType === 'svg-scene' ? buildSvgSceneStudioPath() : buildUmlStudioPath())
             }}
-            onOpenSaved={({ storage, id }) => {
-              const payload = { kind: 'saved', storage, id, requestId: Date.now() }
+            onOpenSaved={({ editorType, storage, id }) => {
+              const payload = { editorType, kind: 'saved', storage, id, requestId: Date.now() }
               savePendingUmlStudioLaunch(payload)
               setUmlStudioLaunchRequest(payload)
               setIsUmlStudioLaunchOpen(false)
-              navigate(buildUmlStudioPath())
+              navigate(editorType === 'svg-scene' ? buildSvgSceneStudioPath() : buildUmlStudioPath())
             }}
-            onOpenTemplate={(patternCode) => {
-              const payload = { kind: 'template', code: patternCode, requestId: Date.now() }
+            onOpenTemplate={(editorType, patternCode) => {
+              const payload = { editorType, kind: 'template', code: patternCode, requestId: Date.now() }
               savePendingUmlStudioLaunch(payload)
               setUmlStudioLaunchRequest(payload)
               setIsUmlStudioLaunchOpen(false)
-              navigate(buildUmlStudioPath())
+              navigate(editorType === 'svg-scene' ? buildSvgSceneStudioPath() : buildUmlStudioPath())
             }}
           />
         </Suspense>

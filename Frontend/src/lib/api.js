@@ -200,6 +200,21 @@ export function saveUserUmlDiagram(code, payload) {
   })
 }
 
+export function listUserSvgScenes() {
+  return request('/api/svg-scene-studio/scenes')
+}
+
+export function getUserSvgScene(code) {
+  return request(`/api/svg-scene-studio/scenes/${code}`)
+}
+
+export function saveUserSvgScene(code, payload) {
+  return request(`/api/svg-scene-studio/scenes/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
 export function listAdminSvgScenes() {
   return request('/api/admin/svg-scenes')
 }
