@@ -1,3 +1,32 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faEye,
+  faFileCode,
+  faFileImage,
+  faFloppyDisk,
+  faRotateLeft,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons'
+
+const ICONS_BY_NAME = {
+  png: faFileImage,
+  preview: faEye,
+  save: faFloppyDisk,
+  spinner: faSpinner,
+  svg: faFileCode,
+  undo: faRotateLeft,
+}
+
+function Icon({ name, spinning = false }) {
+  const icon = ICONS_BY_NAME[name]
+
+  if (!icon) {
+    return null
+  }
+
+  return <FontAwesomeIcon icon={icon} spin={spinning} className="h-8 w-8" aria-hidden="true" />
+}
+
 function ActionButton({ disabled = false, icon, label, onClick, variant = 'default' }) {
   const className = variant === 'primary'
     ? 'rounded-full bg-stone-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-wait disabled:opacity-60'
@@ -13,7 +42,7 @@ function ActionButton({ disabled = false, icon, label, onClick, variant = 'defau
       disabled={disabled}
     >
       {/* Icon-only buttons keep the header compact; title and aria-label preserve discoverability. */}
-      <i className={icon} aria-hidden="true" />
+      <Icon name={icon} spinning={icon === 'spinner'} />
     </button>
   )
 }
@@ -40,17 +69,17 @@ export default function UmlStudioHeaderActions({
       </label>
       {/* Buttons stay on one row on large screens; smaller screens can scroll horizontally instead of wrapping. */}
       <div className="flex flex-nowrap items-center gap-3 overflow-x-auto xl:overflow-visible">
-        <ActionButton icon="fa-solid fa-rotate-left" label="Annuler la derniere action" onClick={onUndo} />
+        <ActionButton icon="undo" label="Annuler la derniere action" onClick={onUndo} />
         <ActionButton
-          icon={savePending ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'}
+          icon={savePending ? 'spinner' : 'save'}
           label={savePending ? 'Sauvegarde en cours' : 'Sauvegarder'}
           onClick={onSave}
           variant="primary"
           disabled={savePending}
         />
-        <ActionButton icon="fa-solid fa-eye" label="Apercu" onClick={onPreviewOpen} />
-        <ActionButton icon="fa-solid fa-file-code" label="Exporter en SVG" onClick={onExportSvg} />
-        <ActionButton icon="fa-solid fa-file-image" label="Exporter en PNG" onClick={onExportPng} />
+        <ActionButton icon="preview" label="Apercu" onClick={onPreviewOpen} />
+        <ActionButton icon="svg" label="Exporter en SVG" onClick={onExportSvg} />
+        <ActionButton icon="png" label="Exporter en PNG" onClick={onExportPng} />
       </div>
     </div>
   )
