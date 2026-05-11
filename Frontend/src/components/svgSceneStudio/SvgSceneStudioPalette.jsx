@@ -21,8 +21,10 @@ export default function SvgSceneStudioPalette({
   onImportPatternCodeChange,
   onImportPatternElement,
   onImportPatternScene,
+  onPlaybackModeChange,
   onShowGridChange,
   onWidthChange,
+  playbackMode,
   patterns,
   showGrid,
   viewBox,
@@ -96,6 +98,14 @@ export default function SvgSceneStudioPalette({
         <label className="mt-4 flex items-center gap-3 text-sm text-stone-700">
           <input checked={showGrid} type="checkbox" onChange={(event) => onShowGridChange(event.target.checked)} />
           Afficher le quadrillage
+        </label>
+
+        <label className="mt-4 flex flex-col gap-2 text-sm text-stone-700">
+          <span className="font-semibold text-stone-900">Mode d animation</span>
+          <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={playbackMode} onChange={(event) => onPlaybackModeChange(event.target.value)}>
+            <option value="auto">Animation automatique</option>
+            <option value="step">Pas a pas</option>
+          </select>
         </label>
       </section>
     </aside>

@@ -656,8 +656,10 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
           onImportPatternCodeChange={setImportPatternCode}
           onImportPatternElement={handleImportPatternElement}
           onImportPatternScene={handleImportPatternScene}
+          onPlaybackModeChange={(value) => setDraft((currentDraft) => ({ ...currentDraft, playbackMode: value }))}
           onShowGridChange={setShowGrid}
           onWidthChange={(width) => setDraft((currentDraft) => ({ ...currentDraft, viewBox: formatViewBox({ ...parseViewBox(currentDraft.viewBox), width }) }))}
+          playbackMode={draft.playbackMode ?? 'auto'}
           patterns={patterns}
           showGrid={showGrid}
           viewBox={viewBox}
