@@ -2,7 +2,17 @@
 
 Frontend React 19 + Vite + Tailwind du `Design Pattern Playground`.
 
-Ce README decrit la structure actuelle apres le gros refactor par pattern et explique comment ajouter un nouveau design pattern sans regrossir les fichiers centraux.
+Ce README decrit la structure actuelle apres le gros refactor par pattern, l ajout des espaces utilisateur et des editeurs UML, puis explique comment ajouter un nouveau design pattern sans regrossir les fichiers centraux.
+
+## Ce que gere le frontend
+
+- navigation SPA et rendu des pages principales
+- fallback local quand le backend n est pas disponible
+- authentification, session persistante et changement de mot de passe force
+- catalogue, pages pattern, quiz, progression, badges et missions
+- visualisation UML et scenes SVG
+- editeur UML admin
+- studio UML utilisateur avec zoom, quadrillage, export SVG/PNG et sauvegarde
 
 ## Architecture actuelle
 
@@ -33,6 +43,14 @@ Ces fichiers gerent :
 - le code splitting par route et par pattern
 - la composition globale des pages
 
+Le studio UML utilisateur s appuie sur :
+
+- `src/pages/UmlStudioPage.jsx` pour l orchestration
+- `src/components/umlStudio/umlStudioDocument.js` pour le format de document et les helpers
+- `src/components/umlStudio/UmlStudioCanvas.jsx` pour le rendu SVG interactif
+- `src/components/umlStudio/UmlStudioPalette.jsx` pour la creation
+- `src/components/umlStudio/UmlStudioInspector.jsx` pour l edition des proprietes
+
 ### Pages et composants generiques
 
 Pages :
@@ -42,6 +60,9 @@ Pages :
 - `src/pages/pattern-page/`
 - `src/pages/PatternQuizPage.jsx`
 - `src/pages/QuizDashboardPage.jsx`
+- `src/pages/AdminUmlPage.jsx`
+- `src/pages/AdminSvgScenesPage.jsx`
+- `src/pages/UmlStudioPage.jsx`
 - `src/pages/NotFoundPage.jsx`
 
 Composants transverses :
@@ -52,6 +73,11 @@ Composants transverses :
 - `src/components/VisualizationModal.jsx`
 - `src/components/AuthDialog.jsx`
 - `src/components/ExecutionScene.jsx`
+
+Composants lies aux editeurs UML :
+
+- `src/components/uml/` : rendu UML generique et layouts de patterns
+- `src/components/umlStudio/` : sous-composants du studio UML utilisateur
 
 Important :
 

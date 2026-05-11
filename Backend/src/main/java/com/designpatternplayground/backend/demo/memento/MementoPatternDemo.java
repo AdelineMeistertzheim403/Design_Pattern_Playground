@@ -79,6 +79,8 @@ public class MementoPatternDemo implements DesignPatternDemo {
 		boolean useMemento = WITH_MEMENTO.equals(config.mode());
 		MementoPreset preset = MementoPreset.fromCode(config.presetCode());
 		MementoWorkspaceState initialState = preset.initialState();
+		// The demo builds several fully materialized states so the frontend can compare
+		// exact restoration versus a manual, lossy rollback attempt.
 		MementoWorkspaceState styledState = new MementoWorkspaceState(
 			initialState.sceneLabel(),
 			useMemento ? "Aurora Bloom" : "Solar Bloom",
@@ -121,6 +123,8 @@ public class MementoPatternDemo implements DesignPatternDemo {
 		MementoWorkspaceState restoredState = useMemento
 			? restoreTarget.snapshotState()
 			: new MementoWorkspaceState(
+				// Without Memento, the client reconstructs only fragments of the previous state,
+				// which intentionally leaves drift in the restored scene.
 				restoreTarget.snapshotState().sceneLabel(),
 				restoreTarget.snapshotState().theme(),
 				emergencyState.energy(),
@@ -130,6 +134,8 @@ public class MementoPatternDemo implements DesignPatternDemo {
 			);
 
 		List<MementoStep> steps = List.of(
+			// The timeline is intentionally verbose because it feeds both logs and visual playback
+			// in the frontend without requiring another transformation layer.
 			new MementoStep(
 				1,
 				"INIT",

@@ -88,6 +88,7 @@ export default function usePlaygroundApp() {
         setPatterns(apiPatterns)
         setBackendStatus('connected')
       } catch {
+        // The product keeps a fully local teaching mode when the API is unavailable.
         if (!ignore) {
           setPatterns(fallbackPatterns)
           setBackendStatus('fallback')
@@ -120,6 +121,8 @@ export default function usePlaygroundApp() {
         persistSession(user)
       } catch {
         try {
+          // A stale access token is silently recovered through the refresh cookie so
+          // the SPA can resume the session without pushing the user back to the login modal.
           const response = await refreshUserSession()
           if (ignore) {
             return
@@ -169,6 +172,8 @@ export default function usePlaygroundApp() {
 
     const shouldResetPatternState = lastPatternLoadRef.current !== activePatternCode
     if (shouldResetPatternState) {
+      // Route changes between patterns should not leak previous execution state into
+      // the next pattern page, especially when lazy chunks resolve out of order.
       setExecution(null)
       setExecutionSource(null)
       setExecutionError('')
@@ -194,6 +199,8 @@ export default function usePlaygroundApp() {
       setLearningContent(localLearningContent)
       setUmlDiagram(localUmlDiagram)
 
+      // The page always has a local fallback first, then upgrades itself with persisted
+      // backend content when the API is reachable.
       if (backendStatus !== 'connected' || !selectedPattern) {
         return
       }

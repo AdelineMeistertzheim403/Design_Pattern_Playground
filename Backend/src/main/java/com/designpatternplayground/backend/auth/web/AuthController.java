@@ -79,6 +79,8 @@ public class AuthController {
 
 	private ResponseEntity<AuthResponse> buildAuthenticatedResponse(AuthSession session) {
 		HttpHeaders headers = new HttpHeaders();
+		// Access and refresh tokens are only returned through cookies; the JSON payload exposes
+		// user information but never the raw token material to the SPA.
 		authCookieService.addAuthenticationCookies(headers, session.accessToken(), session.refreshToken());
 		return ResponseEntity.ok()
 			.headers(headers)

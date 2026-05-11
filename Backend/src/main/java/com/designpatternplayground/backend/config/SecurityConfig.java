@@ -23,6 +23,8 @@ public class SecurityConfig {
 		ApiAuthenticationEntryPoint authenticationEntryPoint
 	) throws Exception {
 		http
+			// The SPA authenticates via HttpOnly cookies, so the API itself stays stateless
+			// and relies on the JWT filter instead of server-side HTTP sessions.
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(Customizer.withDefaults())
 			.httpBasic(AbstractHttpConfigurer::disable)
@@ -35,6 +37,7 @@ public class SecurityConfig {
 				exception.authenticationEntryPoint(authenticationEntryPoint)
 			)
 				.authorizeHttpRequests(authorize -> authorize
+					// Public entry points required before authentication and for local H2 debugging.
 					.requestMatchers(
 						"/api/auth/register",
 						"/api/auth/login",
@@ -42,12 +45,15 @@ public class SecurityConfig {
 						"/api/auth/logout",
 						"/h2-console/**"
 					).permitAll()
+					// Quiz progress, user studio persistence and account bootstrap endpoints are private.
 					.requestMatchers("/api/quiz/**").authenticated()
 					.requestMatchers(HttpMethod.GET, "/api/patterns/*/quiz").authenticated()
 					.requestMatchers("/api/patterns/*/quiz/**").authenticated()
 					.requestMatchers("/api/auth/me").authenticated()
 					.requestMatchers("/api/uml-studio/**").authenticated()
+					// Admin editors for UML and SVG scenes stay behind the ADMIN role.
 					.requestMatchers("/api/admin/**").hasRole("ADMIN")
+					// Pattern catalogue, schemas and public UML overrides remain readable anonymously.
 					.requestMatchers("/api/patterns/**").permitAll()
 				.anyRequest().permitAll()
 			)

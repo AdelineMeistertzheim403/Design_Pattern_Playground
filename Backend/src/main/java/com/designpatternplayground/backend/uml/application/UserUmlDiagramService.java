@@ -38,6 +38,8 @@ public class UserUmlDiagramService {
 
 	@Transactional(readOnly = true)
 	public List<UserUmlDiagramSummaryResponse> listForUser(AuthenticatedUser actor) {
+		// User diagrams are intentionally isolated per account. The public studio never
+		// exposes another user's drafts or saved work through shared codes.
 		return userUmlDiagramRepository.findAllByOwnerIdOrderByUpdatedAtDesc(actor.id()).stream()
 			.map(document -> new UserUmlDiagramSummaryResponse(
 				document.getCode(),
@@ -65,6 +67,8 @@ public class UserUmlDiagramService {
 
 		validateDiagram(request.diagram());
 
+		// We reload the persistent owner entity to keep the JPA association explicit and
+		// avoid creating detached references from the security principal alone.
 		UserAccount owner = userAccountRepository.findById(actor.id())
 			.orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable."));
 		LocalDateTime now = LocalDateTime.now();
@@ -122,6 +126,8 @@ public class UserUmlDiagramService {
 	}
 
 	private void validateDiagram(JsonNode diagram) {
+		// The frontend editor stores more fields than the backend knows about, but the
+		// structural contract stays minimal: a diagram object with class and relation arrays.
 		if (!diagram.isObject()) {
 			throw new IllegalArgumentException("Le diagramme doit etre un objet JSON.");
 		}

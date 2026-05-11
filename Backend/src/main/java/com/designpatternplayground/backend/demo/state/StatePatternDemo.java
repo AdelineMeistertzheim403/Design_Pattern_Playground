@@ -88,6 +88,8 @@ public class StatePatternDemo implements DesignPatternDemo {
 			timeline = IntStream.range(0, config.actions().size())
 				.mapToObj(index -> {
 					CharacterAction action = CharacterAction.fromCode(config.actions().get(index));
+					// In the State version, each concrete state decides locally whether it accepts
+					// an action and what the next state should be.
 					StateTransitionStep step = context.dispatch(action, index + 1);
 					logs.add("Action " + step.index() + " - " + step.actionCode() + " : " + step.detail());
 					return step;
@@ -104,6 +106,8 @@ public class StatePatternDemo implements DesignPatternDemo {
 
 			for (int index = 0; index < config.actions().size(); index += 1) {
 				CharacterAction action = CharacterAction.fromCode(config.actions().get(index));
+				// This branch intentionally centralizes transitions to show how quickly the
+				// imperative alternative becomes harder to read and extend.
 				StateTransitionStep step = dispatchWithoutStatePattern(currentStateCode, action, config.characterName(), index + 1);
 				currentStateCode = step.toState();
 				logs.add("Action " + step.index() + " - " + step.actionCode() + " : " + step.detail());
@@ -128,6 +132,8 @@ public class StatePatternDemo implements DesignPatternDemo {
 		}
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
+		// The output captures both the final state and the traversed timeline because the
+		// frontend uses it for explanation, metrics and visual summary cards.
 		output.put("mode", useState ? WITH_STATE : WITHOUT_STATE);
 		output.put("modeLabel", useState ? "Avec State" : "Sans State");
 		output.put("characterName", config.characterName());

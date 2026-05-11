@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthPasswordHasher {
 
+	// PBKDF2 keeps the implementation dependency-light while remaining suitable for a small
+	// educational product. The iteration count is intentionally high enough to slow brute force.
 	private static final int ITERATIONS = 120000;
 	private static final int KEY_LENGTH = 256;
 	private static final int SALT_LENGTH = 16;
@@ -41,6 +43,8 @@ public class AuthPasswordHasher {
 	}
 
 	public boolean matches(String rawPassword, String salt, String expectedHash) {
+		// Re-hashing with the stored salt keeps verification stateless and avoids persisting any
+		// derived verifier other than the final PBKDF2 hash.
 		String candidateHash = hashPassword(rawPassword, salt);
 		return candidateHash.equals(expectedHash);
 	}
