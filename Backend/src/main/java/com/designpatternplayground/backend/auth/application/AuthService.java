@@ -58,6 +58,8 @@ public class AuthService {
 		}
 
 		String salt = passwordHasher.generateSalt();
+		// New self-registered users always start as USER and are never forced through the
+		// admin password-rotation flow.
 		UserAccount user = userAccountRepository.save(new UserAccount(
 			normalizedUsername,
 			passwordHasher.hashPassword(password, salt),
@@ -122,6 +124,7 @@ public class AuthService {
 		}
 
 		UserAccount user = session.getUser();
+		// Refresh tokens are single-use so a stolen token cannot be replayed repeatedly.
 		refreshTokenSessionRepository.deleteByToken(session.getToken());
 		return createAuthResponse(user);
 	}
@@ -145,6 +148,8 @@ public class AuthService {
 
 	private AuthSession createAuthResponse(UserAccount user) {
 		LocalDateTime now = LocalDateTime.now();
+		// Expired refresh rows are cleaned opportunistically during auth flows to avoid a
+		// dedicated scheduler for such a small persistence model.
 		refreshTokenSessionRepository.deleteByExpiresAtBefore(now);
 
 		RefreshTokenSession refreshTokenSession = refreshTokenSessionRepository.save(new RefreshTokenSession(

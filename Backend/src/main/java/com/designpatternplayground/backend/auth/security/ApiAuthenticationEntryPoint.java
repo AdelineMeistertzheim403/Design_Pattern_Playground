@@ -30,6 +30,8 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		HttpServletRequest request,
 		AuthenticationException authException
 	) {
+		// A small handwritten JSON payload keeps auth failures consistent with the rest of
+		// the API without introducing another error wrapper just for security exceptions.
 		return "{"
 			+ "\"timestamp\":\"" + LocalDateTime.now() + "\","
 			+ "\"status\":" + HttpStatus.UNAUTHORIZED.value() + ","

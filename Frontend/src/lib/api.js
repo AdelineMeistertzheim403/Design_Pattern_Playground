@@ -81,6 +81,10 @@ export function getPatternUml(code) {
   return request(`/api/patterns/${code}/uml`)
 }
 
+export function getPatternSvgScene(code) {
+  return request(`/api/patterns/${code}/svg-scene`)
+}
+
 export function getPatternQuiz(code) {
   return request(`/api/patterns/${code}/quiz`)
 }
@@ -176,6 +180,36 @@ export function listAdminUmlDiagrams() {
 
 export function saveAdminUmlDiagram(code, payload) {
   return request(`/api/admin/uml-diagrams/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function listUserUmlDiagrams() {
+  return request('/api/uml-studio/diagrams')
+}
+
+export function getUserUmlDiagram(code) {
+  return request(`/api/uml-studio/diagrams/${code}`)
+}
+
+export function saveUserUmlDiagram(code, payload) {
+  return request(`/api/uml-studio/diagrams/${code}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function listAdminSvgScenes() {
+  return request('/api/admin/svg-scenes')
+}
+
+export function getAdminSvgScene(code) {
+  return request(`/api/admin/svg-scenes/${code}`)
+}
+
+export function saveAdminSvgScene(code, payload) {
+  return request(`/api/admin/svg-scenes/${code}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   })

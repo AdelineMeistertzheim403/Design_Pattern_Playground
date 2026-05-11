@@ -2,7 +2,39 @@
 
 Backend Spring Boot du `Design Pattern Playground`.
 
-Ce document explique comment ajouter un nouveau design pattern dans l'API.
+Ce document resume l architecture backend actuelle, puis explique comment ajouter un nouveau design pattern dans l API.
+
+## Ce que gere le backend
+
+- catalogue des patterns, schemas dynamiques et execution des demos
+- quiz, progression, badges et missions
+- authentification JWT via cookies `HttpOnly`
+- bootstrap d un compte admin et changement de mot de passe force
+- persistance des diagrammes UML admin par pattern
+- persistance des diagrammes UML utilisateur par compte
+- persistance des scenes SVG surchargeables par l admin
+
+## Modules principaux
+
+- `auth/` : comptes, tokens, roles et bootstrap admin
+- `pattern/` : contrat commun des patterns, metadata, schema et execution
+- `demo/` : implementations concretes des patterns
+- `quiz/` : quiz, soumissions et dashboard
+- `missions/` : missions et soumissions
+- `progress/` : badges, activite recente et progression agregee
+- `uml/` : diagrammes UML admin et utilisateur
+- `svg/` : scenes SVG admin
+- `web/` : points d entree HTTP publics
+
+## Endpoints utiles
+
+- `GET /api/patterns`
+- `POST /api/patterns/execute`
+- `GET /api/patterns/{code}/uml`
+- `GET/PUT /api/admin/uml-diagrams/{code}`
+- `GET/PUT /api/uml-studio/diagrams/{code}`
+- `POST /api/auth/login`
+- `POST /api/auth/change-password`
 
 ## Vue d'ensemble
 
@@ -13,6 +45,12 @@ Le backend expose les patterns via un contrat commun :
 - [PatternRegistry.java](/home/adeline/Documents/Design_Patern_Playground/Backend/src/main/java/com/designpatternplayground/backend/pattern/registry/PatternRegistry.java)
 
 Quand un bean Spring `@Component` implemente `DesignPatternDemo`, il est automatiquement detecte par le registre. Il n'y a donc rien a declarer a la main dans un tableau central.
+
+Important :
+
+- les diagrammes UML publics des patterns peuvent etre remplaces en base par un admin
+- les diagrammes du studio UML public sont sauvegardes par utilisateur et non globalement
+- le frontend garde un mode fallback local, donc le backend doit rester tolerant a une consommation partielle de l API
 
 ## Contrat a respecter
 

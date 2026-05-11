@@ -102,6 +102,8 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		List<Map<String, Object>> variants = new ArrayList<>();
 
 		IntStream.range(0, variantCount).forEach(index -> {
+			// Each variant simulates one intrinsic object graph that can be shared by many
+			// scene objects differing only by extrinsic coordinates and scale.
 			int distributedObjects = distributeObjects(config.objectCount(), variantCount, index);
 			SharedSceneAsset asset = factory.getFlyweight(profile, index + 1);
 
@@ -144,6 +146,8 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 			: "Aucun gain : le pattern n est pas active.");
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
+		// Output stays numeric and explicit so the frontend can render both pedagogy and
+		// comparisons without knowing Flyweight internals.
 		output.put("mode", config.useFlyweight() ? "WITH_FLYWEIGHT" : "WITHOUT_FLYWEIGHT");
 		output.put("modeLabel", config.useFlyweight() ? "Avec Flyweight" : "Sans Flyweight");
 		output.put("assetType", profile.code());
@@ -184,6 +188,8 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		List<VisualizationNode> nodes = new ArrayList<>();
 		List<VisualizationEdge> edges = new ArrayList<>();
 
+		// The visualization compresses thousands of logical objects into a handful of nodes,
+		// mirroring the exact point of Flyweight: many usages, few shared instances.
 		nodes.add(new VisualizationNode(
 			"scene",
 			config.objectCount() + " " + profile.label().toLowerCase(Locale.ROOT),

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthCookieService {
 
+	// Access tokens are scoped to /api, while refresh tokens are limited to /api/auth so the
+	// browser sends the stronger credential only to authentication endpoints.
 	private static final String ACCESS_TOKEN_PATH = "/api";
 	private static final String REFRESH_TOKEN_PATH = "/api/auth";
 
@@ -77,6 +79,8 @@ public class AuthCookieService {
 	}
 
 	private ResponseCookie buildCookie(String name, String value, String path, Duration maxAge) {
+		// The same builder is reused for normal issuance and cookie clearing; maxAge=0 performs
+		// the deletion while preserving the original cookie path and domain.
 		ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
 			.httpOnly(true)
 			.secure(secureCookies)

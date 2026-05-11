@@ -31,6 +31,7 @@ export default function PatternPage({
   isExecuting,
   learningContent,
   umlDiagram,
+  svgScene,
   currentUser,
   status,
   onNavigateHome,
@@ -80,6 +81,7 @@ export default function PatternPage({
       >
         <PatternVisualizationSection
           selectedPattern={selectedPattern}
+          svgScene={svgScene}
           umlDiagram={umlDiagram}
           visualExecution={visualExecution}
           visualSourceLabel={visualSourceLabel}
