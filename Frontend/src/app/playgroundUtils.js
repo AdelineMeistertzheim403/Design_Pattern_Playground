@@ -48,6 +48,10 @@ export function buildAdminUmlPath() {
   return '/admin/uml'
 }
 
+export function buildUmlStudioPath() {
+  return '/uml-studio'
+}
+
 export function buildBadgesPath() {
   return '/progression/badges'
 }
@@ -59,6 +63,10 @@ export function buildRecentActivityPath() {
 export function buildMissionPath(missionId = '') {
   const normalizedMissionId = `${missionId ?? ''}`.trim()
   return normalizedMissionId ? `/missions/${normalizedMissionId}` : '/missions'
+}
+
+export function buildAdminSvgScenesPath() {
+  return '/admin/svg-scenes'
 }
 
 export function buildLegalNoticePath() {
@@ -80,12 +88,20 @@ export function parseRoute(pathname) {
     return { name: 'adminUml' }
   }
 
+  if (normalized === '/uml-studio') {
+    return { name: 'umlStudio' }
+  }
+
   if (normalized === '/progression/badges') {
     return { name: 'badges' }
   }
 
   if (normalized === '/progression/activite') {
     return { name: 'activity' }
+  }
+
+  if (normalized === '/admin/svg-scenes') {
+    return { name: 'adminSvgScenes' }
   }
 
   if (normalized === '/mentions-legales') {

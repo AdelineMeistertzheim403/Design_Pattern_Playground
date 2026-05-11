@@ -4,6 +4,7 @@ import UmlDiagram from '../../components/UmlDiagram'
 
 export default function PatternVisualizationSection({
   selectedPattern,
+  svgScene,
   umlDiagram,
   visualExecution,
   visualSourceLabel,
@@ -26,6 +27,7 @@ export default function PatternVisualizationSection({
           dans la section Configuration.
         </div>
         <ExecutionScene
+          customSvgScene={svgScene}
           execution={visualExecution}
           onOpenModal={onOpenSceneModal}
           patternCode={selectedPattern.code}

@@ -38,6 +38,8 @@ public class JwtService {
 			Instant issuedAt = Instant.now();
 			Instant expiresAt = issuedAt.plus(expiration);
 
+			// The project keeps JWT handling explicit instead of pulling a full JWT library:
+			// header + payload JSON, Base64URL encoding, then HMAC-SHA256 signature.
 			String header = encode("""
 				{"alg":"HS256","typ":"JWT"}
 				""".trim());
@@ -80,6 +82,8 @@ public class JwtService {
 				throw new AuthenticationFailedException("Le JWT a expire.");
 			}
 
+			// The token embeds role and password-change state so authorization checks can run
+			// without hitting the database on every request.
 			String normalizedRole = role == null || role.isBlank() ? UserRole.USER.name() : role;
 			return new AuthenticatedUser(userId, username, normalizedRole, Boolean.TRUE.equals(forcePasswordChange));
 		} catch (AuthenticationFailedException exception) {

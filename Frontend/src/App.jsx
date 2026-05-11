@@ -1,9 +1,10 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import SiteHeader from './components/SiteHeader'
 import usePlaygroundApp from './hooks/usePlaygroundApp'
 import SiteFooter from './components/SiteFooter'
 import SeoHead from './components/SeoHead'
 import {
+  buildAdminSvgScenesPath,
   buildAdminUmlPath,
   buildBadgesPath,
   buildLegalNoticePath,
@@ -12,12 +13,15 @@ import {
   buildPatternQuizPath,
   buildProgressPath,
   buildRecentActivityPath,
+  buildUmlStudioPath,
 } from './app/playgroundUtils'
+import { savePendingUmlStudioLaunch } from './app/umlStudioStorage'
 
 const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const BadgesPage = lazy(() => import('./pages/BadgesPage'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const AdminSvgScenesPage = lazy(() => import('./pages/AdminSvgScenesPage'))
 const AdminUmlPage = lazy(() => import('./pages/AdminUmlPage'))
 const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
 const MissionPage = lazy(() => import('./pages/MissionPage'))
@@ -26,6 +30,8 @@ const PatternPage = lazy(() => import('./pages/PatternPage'))
 const PatternQuizPage = lazy(() => import('./pages/PatternQuizPage'))
 const QuizDashboardPage = lazy(() => import('./pages/QuizDashboardPage'))
 const RecentActivityPage = lazy(() => import('./pages/RecentActivityPage'))
+const UmlStudioLaunchModal = lazy(() => import('./components/UmlStudioLaunchModal'))
+const UmlStudioPage = lazy(() => import('./pages/UmlStudioPage'))
 const UmlDiagram = lazy(() => import('./components/UmlDiagram'))
 const VisualizationModal = lazy(() => import('./components/VisualizationModal'))
 
@@ -48,6 +54,7 @@ function PatternModals({
   visualExecution,
   visualSourceLabel,
   umlDiagram,
+  svgScene,
 }) {
   if (route.name !== 'pattern' || !selectedPattern) {
     return null
@@ -62,6 +69,7 @@ function PatternModals({
             onClose={() => setActiveVisualModal(null)}
           >
             <ExecutionScene
+              customSvgScene={svgScene}
               execution={visualExecution}
               isExpanded
               patternCode={selectedPattern.code}
@@ -91,6 +99,8 @@ function PatternModals({
 }
 
 export default function App() {
+  const [isUmlStudioLaunchOpen, setIsUmlStudioLaunchOpen] = useState(false)
+  const [umlStudioLaunchRequest, setUmlStudioLaunchRequest] = useState(null)
   const {
     route,
     patterns,
@@ -112,6 +122,7 @@ export default function App() {
     isExecuting,
     learningContent,
     umlDiagram,
+    svgScene,
     visualExecution,
     visualSourceLabel,
     hasDraftChanges,
@@ -151,7 +162,7 @@ export default function App() {
           ? 'missions'
         : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
           ? 'progress'
-          : route.name === 'adminUml'
+          : route.name === 'adminUml' || route.name === 'adminSvgScenes' || route.name === 'umlStudio'
             ? 'admin'
           : route.name === 'legalNotice'
             ? 'legalNotice'
@@ -172,8 +183,10 @@ export default function App() {
         status={status}
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
+        onOpenUmlStudio={() => setIsUmlStudioLaunchOpen(true)}
         onNavigateAdminUml={() => navigate(buildAdminUmlPath())}
         onNavigateMissions={() => navigate(buildMissionPath())}
+        onNavigateAdminSvgScenes={() => navigate(buildAdminSvgScenesPath())}
         onOpenAuth={openAuth}
         onLogout={handleLogout}
       />
@@ -213,6 +226,7 @@ export default function App() {
               selectedPattern={selectedPattern}
               status={status}
               umlDiagram={umlDiagram}
+              svgScene={svgScene}
               visualExecution={visualExecution}
               visualSourceLabel={visualSourceLabel}
               onFieldValueChange={updateFieldValue}
@@ -257,6 +271,15 @@ export default function App() {
               patterns={patterns}
               onNavigateHome={() => navigate('/')}
             />
+          ) : route.name === 'umlStudio' ? (
+            <UmlStudioPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              launchRequest={umlStudioLaunchRequest}
+              patterns={patterns}
+              onOpenAuth={openAuth}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'activity' ? (
             <RecentActivityPage
               backendStatus={backendStatus}
@@ -283,6 +306,13 @@ export default function App() {
               onNavigateMission={(missionId) => navigate(buildMissionPath(missionId))}
               onNavigatePattern={(code) => navigate(buildPatternPath(code))}
             />
+          ) : route.name === 'adminSvgScenes' ? (
+            <AdminSvgScenesPage
+              backendStatus={backendStatus}
+              currentUser={currentUser}
+              patterns={patterns}
+              onNavigateHome={() => navigate('/')}
+            />
           ) : route.name === 'legalNotice' ? (
             <LegalNoticePage onNavigateHome={() => navigate('/')} />
           ) : (
@@ -300,9 +330,42 @@ export default function App() {
         selectedPattern={selectedPattern}
         setActiveVisualModal={setActiveVisualModal}
         umlDiagram={umlDiagram}
+        svgScene={svgScene}
         visualExecution={visualExecution}
         visualSourceLabel={visualSourceLabel}
       />
+
+      {isUmlStudioLaunchOpen ? (
+        <Suspense fallback={null}>
+          <UmlStudioLaunchModal
+            backendStatus={backendStatus}
+            currentUser={currentUser}
+            patterns={patterns}
+            onClose={() => setIsUmlStudioLaunchOpen(false)}
+            onCreateBlank={() => {
+              const payload = { kind: 'blank', requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+            onOpenSaved={({ storage, id }) => {
+              const payload = { kind: 'saved', storage, id, requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+            onOpenTemplate={(patternCode) => {
+              const payload = { kind: 'template', code: patternCode, requestId: Date.now() }
+              savePendingUmlStudioLaunch(payload)
+              setUmlStudioLaunchRequest(payload)
+              setIsUmlStudioLaunchOpen(false)
+              navigate(buildUmlStudioPath())
+            }}
+          />
+        </Suspense>
+      ) : null}
 
       {isAuthOpen ? (
         <Suspense fallback={null}>

@@ -39,9 +39,12 @@ public class AdminBootstrapService {
 
 			UserAccount existingUser = userAccountRepository.findByUsernameIgnoreCase(bootstrapUsername).orElse(null);
 			if (existingUser != null) {
+				// Existing accounts are promoted in place to avoid duplicating a reserved admin username.
 				if (existingUser.getRole() != UserRole.ADMIN) {
 					existingUser.setRole(UserRole.ADMIN);
 				}
+				// Even for an existing account, the bootstrap path forces a password rotation before
+				// allowing access to the admin editors.
 				existingUser.setForcePasswordChange(true);
 				userAccountRepository.save(existingUser);
 				return;

@@ -17,6 +17,8 @@ public class AuthSchemaMigrationService {
 	@Bean
 	ApplicationRunner migrateAuthSchema() {
 		return (arguments) -> {
+			// This lightweight migration keeps existing PostgreSQL databases compatible even
+			// though the project still relies on Hibernate update for the rest of the schema.
 			jdbcTemplate.execute("""
 				alter table user_accounts
 				add column if not exists role varchar(20) not null default 'USER'

@@ -3,6 +3,7 @@ import {
   changeUserPassword,
   executePattern,
   getCurrentUser,
+  getPatternSvgScene,
   getPatternUml,
   getPatternSchema,
   getPatterns,
@@ -58,6 +59,7 @@ export default function usePlaygroundApp() {
   const [activeVisualModal, setActiveVisualModal] = useState(null)
   const [learningContent, setLearningContent] = useState(defaultLearningContent)
   const [umlDiagram, setUmlDiagram] = useState(null)
+  const [svgScene, setSvgScene] = useState(null)
   const [previewExecution, setPreviewExecution] = useState(null)
   const lastPatternLoadRef = useRef(null)
 
@@ -86,6 +88,7 @@ export default function usePlaygroundApp() {
         setPatterns(apiPatterns)
         setBackendStatus('connected')
       } catch {
+        // The product keeps a fully local teaching mode when the API is unavailable.
         if (!ignore) {
           setPatterns(fallbackPatterns)
           setBackendStatus('fallback')
@@ -118,6 +121,8 @@ export default function usePlaygroundApp() {
         persistSession(user)
       } catch {
         try {
+          // A stale access token is silently recovered through the refresh cookie so
+          // the SPA can resume the session without pushing the user back to the login modal.
           const response = await refreshUserSession()
           if (ignore) {
             return
@@ -167,6 +172,8 @@ export default function usePlaygroundApp() {
 
     const shouldResetPatternState = lastPatternLoadRef.current !== activePatternCode
     if (shouldResetPatternState) {
+      // Route changes between patterns should not leak previous execution state into
+      // the next pattern page, especially when lazy chunks resolve out of order.
       setExecution(null)
       setExecutionSource(null)
       setExecutionError('')
@@ -174,6 +181,7 @@ export default function usePlaygroundApp() {
       setPreviewExecution(null)
       lastPatternLoadRef.current = activePatternCode
     }
+    setSvgScene(null)
 
     const loadPatternDetail = async () => {
       const [localSchema, localLearningContent, localUmlDiagram] = await Promise.all([
@@ -191,6 +199,8 @@ export default function usePlaygroundApp() {
       setLearningContent(localLearningContent)
       setUmlDiagram(localUmlDiagram)
 
+      // The page always has a local fallback first, then upgrades itself with persisted
+      // backend content when the API is reachable.
       if (backendStatus !== 'connected' || !selectedPattern) {
         return
       }
@@ -214,6 +224,15 @@ export default function usePlaygroundApp() {
         }
       } catch {
         // Keep the local fallback diagram when no persisted version exists.
+      }
+
+      try {
+        const storedScene = await getPatternSvgScene(activePatternCode)
+        if (!ignore && storedScene?.svgMarkup) {
+          setSvgScene(storedScene)
+        }
+      } catch {
+        // Keep the generated runtime scene when no persisted version exists.
       }
     }
 
@@ -487,6 +506,7 @@ export default function usePlaygroundApp() {
     isExecuting,
     learningContent,
     umlDiagram,
+    svgScene,
     visualExecution,
     visualSourceLabel,
     hasDraftChanges,

@@ -55,12 +55,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			filterChain.doFilter(request, response);
 		} catch (AuthenticationFailedException exception) {
+			// Invalid access tokens do not short-circuit the chain. Public endpoints still work,
+			// and protected endpoints will fail later through the standard entry point.
 			SecurityContextHolder.clearContext();
 			filterChain.doFilter(request, response);
 		}
 	}
 
 	private String resolveToken(HttpServletRequest request) {
+		// Authorization header is checked first for tooling and tests; the SPA normally relies
+		// on HttpOnly cookies in browser traffic.
 		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		if (authorizationHeader != null && !authorizationHeader.isBlank()) {
 			return extractBearerToken(authorizationHeader);

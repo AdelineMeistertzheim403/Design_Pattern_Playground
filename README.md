@@ -8,10 +8,20 @@ Ce depot contient un backend Spring Boot et un frontend React pour simuler et vi
 
 Le playground couvre maintenant 23 patterns avec demo interactive, scene SVG, pedagogie et quiz par pattern.
 
+## Fonctionnalites
+
+- catalogue de 23 design patterns avec demos, quiz, contenu pedagogique et schemas UML
+- fallback frontend local quand l API n est pas disponible
+- authentification JWT via cookies `HttpOnly`
+- progression utilisateur, badges, activite recente et missions
+- editeur UML admin pour surcharger les diagrammes publics des patterns
+- studio UML utilisateur pour creer, modifier, exporter et sauvegarder des diagrammes
+- persistance PostgreSQL pour les comptes, la progression, les scenes SVG et les diagrammes UML
+
 ## Structure
 
 - `Backend/` : API Spring Boot 4 avec un registre de patterns, des schemas dynamiques, une authentification JWT via cookies `HttpOnly` et une persistance PostgreSQL.
-- `Frontend/` : application React 19 + Vite + Tailwind qui consomme l API et degrade en mode local si le backend est indisponible.
+- `Frontend/` : application React 19 + Vite + Tailwind qui consomme l API, degrade en mode local si le backend est indisponible et embarque les editeurs UML.
 - `docs/` : diagrammes PlantUML transverses au produit complet.
 
 ## Documentation Et Diagrammes
@@ -59,6 +69,8 @@ Points utiles :
 - API catalogue : `http://localhost:8080/api/patterns`
 - Schema d un pattern : `http://localhost:8080/api/patterns/strategy/schema`
 - Execution d une demo : `POST http://localhost:8080/api/patterns/execute`
+- Diagrammes UML admin : `GET/PUT /api/admin/uml-diagrams/{code}`
+- Diagrammes UML utilisateur : `GET/PUT /api/uml-studio/diagrams/{code}`
 
 ## Demarrer le frontend
 
@@ -83,6 +95,12 @@ Acces utiles :
 - Frontend : `http://localhost:5173`
 - Backend : `http://localhost:8080`
 - PostgreSQL : `localhost:5433` par defaut
+
+Compte admin de dev :
+
+- identifiant : `admin`
+- mot de passe initial : `ChangeMe123!`
+- changement de mot de passe obligatoire a la premiere connexion
 
 Si `5433` ne vous convient pas, vous pouvez surcharger le port publie avant le lancement :
 
@@ -122,6 +140,7 @@ Prerequis prod :
 - une valeur `ADMINER_HOST_PORT` si tu veux changer le port local VPS utilise par `adminer`
 - une valeur `APP_CORS_ALLOWED_ORIGINS` avec l origine exacte du frontend en prod
 - un `APP_JWT_SECRET` fort dans `.env`
+- un couple `APP_BOOTSTRAP_ADMIN_USERNAME` / `APP_BOOTSTRAP_ADMIN_PASSWORD` si vous voulez creer un admin automatiquement au demarrage
 - si vous voulez appeler une API sur une autre origine, renseigner `VITE_API_URL` lors du build GitHub Actions
 - si le frontend et l API ne sont plus servis sur la meme origine, adaptez `APP_COOKIE_SAME_SITE` et `APP_COOKIE_SECURE`
 

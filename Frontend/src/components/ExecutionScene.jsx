@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import EditableSvgScene, { parseEditableSceneMarkup } from './EditableSvgScene'
 import ZoomableViewport from './ZoomableViewport'
 
 import { hasSpecializedPatternScene } from '../patterns/catalog'
@@ -25,6 +26,61 @@ function SceneLoadingPlaceholder({ panelClassName }) {
   )
 }
 
+function PersistedSvgScene({
+  customSvgScene,
+  execution,
+  isExpanded,
+  onOpenModal,
+  panelClassName,
+  sourceLabel,
+  TitleTag,
+}) {
+  const editableScene = parseEditableSceneMarkup(customSvgScene.svgMarkup)
+
+  return (
+    <div className={panelClassName}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
+            {customSvgScene.name}
+          </TitleTag>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">
+            BDD
+          </span>
+          {sourceLabel ? (
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">
+              {sourceLabel}
+            </span>
+          ) : null}
+          {onOpenModal ? (
+            <button
+              className="rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-stone-700 transition hover:border-black/20"
+              type="button"
+              onClick={onOpenModal}
+            >
+              Agrandir
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <div className={`admin-svg-scene-preview mt-6 overflow-hidden rounded-[24px] border border-black/10 bg-white/80 ${isExpanded ? 'min-h-[420px]' : ''}`}>
+        {editableScene ? (
+          <EditableSvgScene
+            className={isExpanded ? 'h-auto min-h-[420px] w-full' : 'h-auto w-full'}
+            execution={execution}
+            scene={editableScene}
+          />
+        ) : (
+          <div dangerouslySetInnerHTML={{ __html: customSvgScene.svgMarkup }} />
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function ExecutionScene({
   execution,
   patternCode,
@@ -35,6 +91,7 @@ export default function ExecutionScene({
   highlightNodeIds = [],
   highlightEdgeKeys = [],
   highlightEdgeKinds = {},
+  customSvgScene = null,
 }) {
   const visualization = execution?.visualization
   const shouldLoadPatternScene = Boolean(visualization?.nodes?.length) && hasSpecializedPatternScene(patternCode) && !forceGeneric
@@ -93,10 +150,6 @@ export default function ExecutionScene({
     }
   }, [patternCode, shouldLoadPatternScene])
 
-  if (!visualization?.nodes?.length) {
-    return <EmptyScenePlaceholder />
-  }
-
   const panelClassName = isExpanded
     ? 'rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.99),rgba(247,240,226,0.94))] p-6 shadow-[0_30px_90px_rgba(24,20,14,0.16)] lg:p-8'
     : 'rounded-[30px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.98),rgba(247,240,226,0.9))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]'
@@ -105,6 +158,24 @@ export default function ExecutionScene({
     : 'h-auto w-full'
   const TitleTag = isExpanded ? 'h2' : 'h3'
   const SceneComponent = sceneModuleState.component
+
+  if (customSvgScene?.svgMarkup) {
+    return (
+      <PersistedSvgScene
+        customSvgScene={customSvgScene}
+        execution={execution}
+        isExpanded={isExpanded}
+        onOpenModal={onOpenModal}
+        panelClassName={panelClassName}
+        sourceLabel={sourceLabel}
+        TitleTag={TitleTag}
+      />
+    )
+  }
+
+  if (!visualization?.nodes?.length) {
+    return <EmptyScenePlaceholder />
+  }
 
   if (shouldLoadPatternScene && sceneModuleState.status === 'loading' && !SceneComponent) {
     return <SceneLoadingPlaceholder panelClassName={panelClassName} />
