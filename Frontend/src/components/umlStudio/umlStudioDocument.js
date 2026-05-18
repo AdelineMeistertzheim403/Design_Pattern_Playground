@@ -1,6 +1,7 @@
 export const DEFAULT_VIEW_BOX = '0 0 1440 960'
 export const BOX_DEFAULTS = { width: 220, height: 132 }
 export const TEXT_DEFAULTS = { width: 240, height: 90 }
+export const ACTIVITY_DEFAULTS = { width: 220, height: 96 }
 export const SIDE_OPTIONS = ['top', 'right', 'bottom', 'left']
 export const CLASS_HEADER_HEIGHT = 58
 export const CLASS_SECTION_MIN_HEIGHT = 48
@@ -12,6 +13,7 @@ export const DEFAULT_RELATION_COLOR = '#7a5a3f'
 export const DEFAULT_TEXT_BORDER_COLOR = '#6a5544'
 export const DEFAULT_TEXT_FILL_COLOR = '#ffffff'
 export const DEFAULT_TEXT_COLOR = '#3d2d20'
+export const DIAGRAM_TYPE_OPTIONS = ['class', 'activity']
 
 export function slugify(value) {
   return `${value ?? ''}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
@@ -73,6 +75,7 @@ export function resolveClassSectionLayout(box) {
 export function normalizeDocument(document) {
   const source = document && typeof document === 'object' ? document : {}
   const sourceClasses = Array.isArray(source.classes) ? source.classes : []
+  const sourceActivityNodes = Array.isArray(source.activityNodes) ? source.activityNodes : []
   const sourceTexts = Array.isArray(source.texts) ? source.texts : []
   const sourceRelations = Array.isArray(source.relations) ? source.relations : []
 
@@ -81,6 +84,7 @@ export function normalizeDocument(document) {
   return {
     id: source.id ?? `uml-${Date.now()}`,
     name: source.name ?? 'Nouveau diagramme UML',
+    diagramType: DIAGRAM_TYPE_OPTIONS.includes(source.diagramType) ? source.diagramType : 'class',
     viewBox: source.viewBox ?? DEFAULT_VIEW_BOX,
     classes: sourceClasses.map((box, index) => ({
       ...resolveClassSectionLayout(box),
@@ -95,6 +99,18 @@ export function normalizeDocument(document) {
       borderColor: box?.borderColor ?? DEFAULT_BOX_BORDER_COLOR,
       fillColor: box?.fillColor ?? DEFAULT_BOX_FILL_COLOR,
       textColor: box?.textColor ?? DEFAULT_BOX_TEXT_COLOR,
+    })),
+    activityNodes: sourceActivityNodes.map((node, index) => ({
+      id: node?.id ?? `activity-${index + 1}`,
+      kind: ['start', 'end', 'action', 'decision'].includes(node?.kind) ? node.kind : 'action',
+      label: node?.label ?? `Etape ${index + 1}`,
+      x: Number.isFinite(Number(node?.x)) ? Number(node.x) : 120 + index * 240,
+      y: Number.isFinite(Number(node?.y)) ? Number(node.y) : 120,
+      width: Number.isFinite(Number(node?.width)) ? Number(node.width) : ACTIVITY_DEFAULTS.width,
+      height: Number.isFinite(Number(node?.height)) ? Number(node.height) : ACTIVITY_DEFAULTS.height,
+      borderColor: node?.borderColor ?? DEFAULT_BOX_BORDER_COLOR,
+      fillColor: node?.fillColor ?? DEFAULT_BOX_FILL_COLOR,
+      textColor: node?.textColor ?? DEFAULT_BOX_TEXT_COLOR,
     })),
     texts: sourceTexts.map((text, index) => ({
       id: text?.id ?? `text-${index + 1}`,
@@ -126,8 +142,8 @@ export function normalizeDocument(document) {
   }
 }
 
-export function createEmptyDocument() {
-  return normalizeDocument({ viewBox: DEFAULT_VIEW_BOX, classes: [], texts: [], relations: [] })
+export function createEmptyDocument(diagramType = 'class') {
+  return normalizeDocument({ diagramType, viewBox: DEFAULT_VIEW_BOX, classes: [], activityNodes: [], texts: [], relations: [] })
 }
 
 export function createBox(index) {
@@ -160,6 +176,26 @@ export function createTextBlock(index) {
     fillColor: DEFAULT_TEXT_FILL_COLOR,
     textColor: DEFAULT_TEXT_COLOR,
   }
+}
+
+export function createActivityNode(kind, index) {
+  const base = {
+    id: `activity-${Date.now()}-${index}`,
+    kind,
+    label: kind === 'start' ? 'Depart' : kind === 'end' ? 'Fin' : kind === 'decision' ? 'Condition' : 'Action',
+    x: 140 + index * 24,
+    y: 120 + index * 24,
+    width: kind === 'decision' ? 150 : kind === 'start' || kind === 'end' ? 48 : ACTIVITY_DEFAULTS.width,
+    height: kind === 'decision' ? 150 : kind === 'start' || kind === 'end' ? 48 : ACTIVITY_DEFAULTS.height,
+    borderColor: DEFAULT_BOX_BORDER_COLOR,
+    fillColor: kind === 'start' ? '#3d2d20' : kind === 'end' ? '#fff9ef' : DEFAULT_BOX_FILL_COLOR,
+    textColor: kind === 'start' ? '#fff9ef' : DEFAULT_BOX_TEXT_COLOR,
+  }
+  return base
+}
+
+export function getDiagramNodes(document) {
+  return document?.diagramType === 'activity' ? (document.activityNodes ?? []) : (document.classes ?? [])
 }
 
 export function getAnchor(box, side) {
@@ -260,6 +296,7 @@ export function buildRelationPath(relation, boxesById) {
     return {
       start,
       end,
+      polyline: [start, end],
       d: `M ${start.x} ${start.y} Q ${control.x} ${control.y} ${end.x} ${end.y}`,
       labelPositionAt,
     }
@@ -278,6 +315,7 @@ export function buildRelationPath(relation, boxesById) {
   return {
     start,
     end,
+    polyline,
     d: polyline.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' '),
     labelPositionAt(progress) {
       const t = clamp(progress, 0, 1)
@@ -302,6 +340,41 @@ export function buildRelationPath(relation, boxesById) {
       return end
     },
   }
+}
+
+export function insertRelationPoint(relation, boxesById, point) {
+  const pathData = buildRelationPath(relation, boxesById)
+  if (!pathData?.polyline?.length || pathData.polyline.length < 2) {
+    return [...(relation.points ?? []), { x: Math.round(point.x), y: Math.round(point.y) }]
+  }
+
+  let insertIndex = relation.points?.length ?? 0
+  let bestDistance = Number.POSITIVE_INFINITY
+
+  for (let index = 0; index < pathData.polyline.length - 1; index += 1) {
+    const start = pathData.polyline[index]
+    const end = pathData.polyline[index + 1]
+    const dx = end.x - start.x
+    const dy = end.y - start.y
+    const lengthSquared = dx * dx + dy * dy
+    const projection = lengthSquared > 0
+      ? clamp(((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared, 0, 1)
+      : 0
+    const projectedPoint = {
+      x: start.x + dx * projection,
+      y: start.y + dy * projection,
+    }
+    const distance = Math.hypot(point.x - projectedPoint.x, point.y - projectedPoint.y)
+
+    if (distance < bestDistance) {
+      bestDistance = distance
+      insertIndex = index
+    }
+  }
+
+  const nextPoints = [...(relation.points ?? [])]
+  nextPoints.splice(insertIndex, 0, { x: Math.round(point.x), y: Math.round(point.y) })
+  return nextPoints
 }
 
 export function markerEnd(defsId, relation) {

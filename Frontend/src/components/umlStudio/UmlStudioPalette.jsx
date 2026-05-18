@@ -1,4 +1,6 @@
 export default function UmlStudioPalette({
+  diagramType,
+  onAddActivityNode,
   onAddClass,
   onAddRelation,
   onAddText,
@@ -17,11 +19,28 @@ export default function UmlStudioPalette({
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Palette</p>
       <div className="mt-4 flex flex-col gap-3">
         {/* Creation tools stay explicit instead of drag-from-palette to keep the editor usable on touchpads. */}
-        <button className="rounded-2xl bg-stone-950 px-4 py-3 text-left text-sm font-semibold text-white" type="button" onClick={onAddClass}>
-          Ajouter une boite UML
-        </button>
+        {diagramType === 'activity' ? (
+          <>
+            <button className="rounded-2xl bg-stone-950 px-4 py-3 text-left text-sm font-semibold text-white" type="button" onClick={() => onAddActivityNode('start')}>
+              Ajouter un point de depart
+            </button>
+            <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={() => onAddActivityNode('end')}>
+              Ajouter un point d arrivee
+            </button>
+            <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={() => onAddActivityNode('action')}>
+              Ajouter une action utilisateur
+            </button>
+            <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={() => onAddActivityNode('decision')}>
+              Ajouter une condition / boucle
+            </button>
+          </>
+        ) : (
+          <button className="rounded-2xl bg-stone-950 px-4 py-3 text-left text-sm font-semibold text-white" type="button" onClick={onAddClass}>
+            Ajouter une boite UML
+          </button>
+        )}
         <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={onAddRelation}>
-          Ajouter une fleche / relation
+          {diagramType === 'activity' ? 'Ajouter une fleche de flux' : 'Ajouter une fleche / relation'}
         </button>
         <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={onAddText}>
           Ajouter une zone de texte
@@ -88,7 +107,9 @@ export default function UmlStudioPalette({
       </div>
 
       <div className="mt-6 rounded-[24px] border border-dashed border-black/12 bg-[rgba(247,240,226,0.62)] p-4 text-sm leading-7 text-stone-700">
-        Clique sur un element pour l editer. Les boites et annotations se deplacent par glisser-deposer, et le carre en bas a droite sert au redimensionnement.
+        {diagramType === 'activity'
+          ? 'Clique sur un element pour l editer. Les etapes et annotations se deplacent par glisser-deposer. Utilise l inspecteur d une fleche pour ajouter plusieurs points intermediaires et creer des angles.'
+          : 'Clique sur un element pour l editer. Les boites et annotations se deplacent par glisser-deposer, et le carre en bas a droite sert au redimensionnement.'}
       </div>
     </aside>
   )

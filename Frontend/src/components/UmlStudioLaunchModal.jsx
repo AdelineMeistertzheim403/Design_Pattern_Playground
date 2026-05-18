@@ -15,6 +15,7 @@ export default function UmlStudioLaunchModal({
 }) {
   const [mode, setMode] = useState('blank')
   const [editorType, setEditorType] = useState('uml')
+  const [umlDiagramType, setUmlDiagramType] = useState('class')
   const [selectedPatternCode, setSelectedPatternCode] = useState(patterns[0]?.code ?? '')
   const [selectedSavedId, setSelectedSavedId] = useState('')
   const [remoteSavedDocuments, setRemoteSavedDocuments] = useState([])
@@ -77,6 +78,12 @@ export default function UmlStudioLaunchModal({
     }
   }, [canUseRemoteSavedDocuments, editorType])
 
+  useEffect(() => {
+    if (editorType === 'uml' && umlDiagramType === 'activity' && mode === 'template') {
+      setMode('blank')
+    }
+  }, [editorType, mode, umlDiagramType])
+
   return (
     <VisualizationModal title="Ouvrir l editeur UML" onClose={onClose}>
       <section className="rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.98),rgba(247,240,226,0.94))] p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] sm:p-8">
@@ -109,6 +116,20 @@ export default function UmlStudioLaunchModal({
           ))}
         </div>
 
+        {editorType === 'uml' ? (
+          <label className="mt-6 flex flex-col gap-2 text-sm text-stone-700">
+            <span className="font-semibold text-stone-900">Type de diagramme UML</span>
+            <select
+              className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none"
+              value={umlDiagramType}
+              onChange={(event) => setUmlDiagramType(event.target.value)}
+            >
+              <option value="class">Diagramme de classe</option>
+              <option value="activity">Diagramme d activite</option>
+            </select>
+          </label>
+        ) : null}
+
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {[
             {
@@ -119,30 +140,51 @@ export default function UmlStudioLaunchModal({
             {
               id: 'template',
               title: 'Depuis un template',
-              description: editorType === 'svg-scene' ? 'Partir d une scene SVG de design pattern existante.' : 'Partir d un diagramme de design pattern existant.',
+              description: editorType === 'svg-scene'
+                ? 'Partir d une scene SVG de design pattern existante.'
+                : umlDiagramType === 'activity'
+                  ? 'Les templates UML concernent pour l instant les diagrammes de classe.'
+                  : 'Partir d un diagramme de design pattern existant.',
             },
             {
               id: 'saved',
               title: 'Ouvrir un diagramme',
               description: editorType === 'svg-scene' ? 'Reprendre une scene sauvegardee en base ou localement.' : 'Reprendre un diagramme sauvegarde en base ou localement.',
             },
-          ].map((option) => (
+          ].map((option) => {
+            const isDisabled = option.id === 'template' && editorType === 'uml' && umlDiagramType === 'activity'
+
+            return (
             <button
               key={option.id}
               className={`rounded-[28px] border p-5 text-left transition ${
-                mode === option.id
-                  ? 'border-stone-950 bg-stone-950 text-white'
-                  : 'border-black/10 bg-white/88 text-stone-800 hover:border-black/20'
+                isDisabled
+                  ? 'cursor-not-allowed border-black/8 bg-stone-100/80 text-stone-400'
+                  : mode === option.id
+                    ? 'border-stone-950 bg-stone-950 text-white'
+                    : 'border-black/10 bg-white/88 text-stone-800 hover:border-black/20'
               }`}
+              disabled={isDisabled}
               type="button"
-              onClick={() => setMode(option.id)}
+              onClick={() => {
+                if (!isDisabled) {
+                  setMode(option.id)
+                }
+              }}
             >
               <p className="text-lg font-semibold">{option.title}</p>
-              <p className={`mt-2 text-sm leading-6 ${mode === option.id ? 'text-white/80' : 'text-stone-600'}`}>
+              <p className={`mt-2 text-sm leading-6 ${
+                mode === option.id
+                  ? 'text-white/80'
+                  : isDisabled
+                    ? 'text-stone-400'
+                    : 'text-stone-600'
+              }`}>
                 {option.description}
               </p>
             </button>
-          ))}
+            )
+          })}
         </div>
 
         {mode === 'template' ? (
@@ -160,6 +202,12 @@ export default function UmlStudioLaunchModal({
               ))}
             </select>
           </label>
+        ) : null}
+
+        {editorType === 'uml' && umlDiagramType === 'activity' && mode === 'template' ? (
+          <p className="mt-4 rounded-2xl border border-dashed border-black/12 bg-white/80 px-4 py-4 text-sm text-stone-600">
+            Les templates UML disponibles alimentent encore uniquement le diagramme de classe. Pour un diagramme d activite, ouvre un canvas vide ou un diagramme sauvegarde.
+          </p>
         ) : null}
 
         {mode === 'saved' ? (
@@ -208,21 +256,21 @@ export default function UmlStudioLaunchModal({
             type="button"
             onClick={() => {
               if (mode === 'blank') {
-                onCreateBlank(editorType)
+                onCreateBlank(editorType, umlDiagramType)
                 return
               }
 
-              if (mode === 'template' && effectivePatternCode) {
-                onOpenTemplate(editorType, effectivePatternCode)
+              if (mode === 'template' && effectivePatternCode && !(editorType === 'uml' && umlDiagramType === 'activity')) {
+                onOpenTemplate(editorType, effectivePatternCode, umlDiagramType)
                 return
               }
 
               if (selectedSavedId) {
                 const [storage, documentId] = selectedSavedId.split(':')
-                onOpenSaved({ editorType, storage, id: documentId })
+                onOpenSaved({ editorType, storage, id: documentId, diagramType: umlDiagramType })
               }
             }}
-            disabled={(mode === 'template' && !effectivePatternCode) || (mode === 'saved' && !selectedSavedId && savedDocuments.length > 0)}
+            disabled={(mode === 'template' && (!effectivePatternCode || (editorType === 'uml' && umlDiagramType === 'activity'))) || (mode === 'saved' && !selectedSavedId && savedDocuments.length > 0)}
           >
             Ouvrir l editeur
           </button>

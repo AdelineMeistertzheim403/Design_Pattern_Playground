@@ -353,8 +353,8 @@ export default function App() {
             currentUser={currentUser}
             patterns={patterns}
             onClose={() => setIsUmlStudioLaunchOpen(false)}
-            onCreateBlank={(editorType) => {
-              const payload = { editorType, kind: 'blank', requestId: Date.now() }
+            onCreateBlank={(editorType, diagramType = 'class') => {
+              const payload = { editorType, diagramType, kind: 'blank', requestId: Date.now() }
               savePendingUmlStudioLaunch(payload)
               setUmlStudioLaunchRequest(payload)
               setIsUmlStudioLaunchOpen(false)
@@ -367,8 +367,8 @@ export default function App() {
               setIsUmlStudioLaunchOpen(false)
               navigate(editorType === 'svg-scene' ? buildSvgSceneStudioPath() : buildUmlStudioPath())
             }}
-            onOpenTemplate={(editorType, patternCode) => {
-              const payload = { editorType, kind: 'template', code: patternCode, requestId: Date.now() }
+            onOpenTemplate={(editorType, patternCode, diagramType = 'class') => {
+              const payload = { editorType, diagramType, kind: 'template', code: patternCode, requestId: Date.now() }
               savePendingUmlStudioLaunch(payload)
               setUmlStudioLaunchRequest(payload)
               setIsUmlStudioLaunchOpen(false)
