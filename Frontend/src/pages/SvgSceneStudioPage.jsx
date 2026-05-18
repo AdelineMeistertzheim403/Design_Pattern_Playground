@@ -18,6 +18,7 @@ import {
   moveArrayItem,
   parseStoredDraft,
   parseViewBox,
+  slugify,
 } from '../components/svgSceneStudio/svgSceneStudioDocument'
 import SvgSceneStudioInspector from '../components/svgSceneStudio/SvgSceneStudioInspector'
 import SvgSceneStudioPalette from '../components/svgSceneStudio/SvgSceneStudioPalette'
