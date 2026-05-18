@@ -10,9 +10,12 @@ export default function UmlStudioCanvas({
   boxesById,
   defsId,
   draft,
+  isPlacingRelationAngle,
   onBackgroundPointerDown,
   onClassMoveStart,
   onClassResizeStart,
+  onRelationPointPointerDown,
+  onRelationPlacementClick,
   onClassSelect,
   onRelationEndpointPointerDown,
   onRelationSelect,
@@ -27,13 +30,15 @@ export default function UmlStudioCanvas({
   viewBox,
   zoom,
 }) {
+  const isActivityDiagram = draft.diagramType === 'activity'
+
   return (
     <section className="rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.99),rgba(247,240,226,0.95))] p-4 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
       <div className="rounded-[28px] border border-black/10 bg-[#fffaf2] p-3">
         <div className="max-h-[72vh] overflow-auto rounded-[24px] border border-black/8 bg-[rgba(255,250,242,0.88)]">
           <svg
             ref={svgRef}
-            className="block rounded-[24px] bg-[radial-gradient(circle_at_top,rgba(231,198,167,0.18),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.88),rgba(244,235,220,0.92))]"
+            className={`block rounded-[24px] bg-[radial-gradient(circle_at_top,rgba(231,198,167,0.18),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.88),rgba(244,235,220,0.92))] ${isPlacingRelationAngle ? 'cursor-crosshair' : ''}`}
             viewBox={draft.viewBox}
             style={{ width: `${Math.round(viewBox.width * zoom)}px`, height: `${Math.round(viewBox.height * zoom)}px` }}
             preserveAspectRatio="xMinYMin meet"
@@ -83,8 +88,14 @@ export default function UmlStudioCanvas({
                     fill="none"
                     stroke="transparent"
                     strokeWidth="18"
-                    className="cursor-pointer"
-                    onPointerDown={(event) => onRelationSelect(event, relation.id)}
+                    className={isPlacingRelationAngle && isActive ? 'cursor-crosshair' : 'cursor-pointer'}
+                    onPointerDown={(event) => {
+                      if (isPlacingRelationAngle && isActive) {
+                        onRelationPlacementClick(event, relation)
+                        return
+                      }
+                      onRelationSelect(event, relation.id)
+                    }}
                   />
                   <path
                     d={pathData.d}
@@ -101,6 +112,20 @@ export default function UmlStudioCanvas({
                   </text>
                   {isActive ? (
                     <>
+                      {(relation.points ?? []).map((point, index) => (
+                        <circle
+                          key={`${relation.id}-point-${index}`}
+                          cx={point.x}
+                          cy={point.y}
+                          r="8"
+                          fill="#fffaf2"
+                          stroke={relation.color}
+                          strokeWidth="3"
+                          className="cursor-grab"
+                          data-editor-only="true"
+                          onPointerDown={(event) => onRelationPointPointerDown(event, relation, index)}
+                        />
+                      ))}
                       {/* End handles only appear on the selected relation so the canvas stays readable. */}
                       <circle
                         cx={pathData.start.x}
@@ -130,7 +155,7 @@ export default function UmlStudioCanvas({
               )
             })}
 
-            {draft.classes.map((box) => {
+            {(isActivityDiagram ? draft.activityNodes : draft.classes).map((box) => {
               const isActive = selectedClass?.id === box.id
               const attributesStartY = CLASS_HEADER_HEIGHT + 14
               const methodsStartY = CLASS_HEADER_HEIGHT + box.attributesHeight + 14
@@ -142,53 +167,112 @@ export default function UmlStudioCanvas({
                   transform={`translate(${box.x} ${box.y})`}
                   onPointerDown={(event) => onClassSelect(event, box.id)}
                 >
-                  <rect
-                    width={box.width}
-                    height={box.height}
-                    rx="18"
-                    fill={box.fillColor}
-                    stroke={box.borderColor}
-                    strokeWidth={isActive ? '3.2' : '2.4'}
-                    className="cursor-move"
-                    onPointerDown={(event) => onClassMoveStart(event, box)}
-                  />
-                  {/* The class body stays intentionally compact in canvas mode; detailed editing happens in the inspector. */}
-                  <text x={box.width / 2} y="20" textAnchor="middle" fontSize="10" fontWeight="700" letterSpacing="0.18em" fill={box.textColor} pointerEvents="none">
-                    {`<<${box.stereotype}>>`}
-                  </text>
-                  <text x={box.width / 2} y="46" textAnchor="middle" fontSize="18" fontWeight="700" fill={box.textColor} pointerEvents="none">
-                    {box.title}
-                  </text>
-                  <line
-                    x1="12"
-                    y1={CLASS_HEADER_HEIGHT}
-                    x2={box.width - 12}
-                    y2={CLASS_HEADER_HEIGHT}
-                    stroke={box.borderColor}
-                    strokeOpacity="0.45"
-                    strokeWidth="1.4"
-                    pointerEvents="none"
-                  />
-                  <line
-                    x1="12"
-                    y1={methodsDividerY}
-                    x2={box.width - 12}
-                    y2={methodsDividerY}
-                    stroke={box.borderColor}
-                    strokeOpacity="0.35"
-                    strokeWidth="1.2"
-                    pointerEvents="none"
-                  />
-                  {box.fields.slice(0, 4).map((line, index) => (
-                    <text key={`${box.id}-field-${index}`} x="18" y={attributesStartY + index * 18} fontSize="12" fill={box.textColor} pointerEvents="none">
-                      {line}
-                    </text>
-                  ))}
-                  {box.methods.slice(0, 4).map((line, index) => (
-                    <text key={`${box.id}-method-${index}`} x="18" y={Math.min(box.height - 18, methodsStartY + index * 18)} fontSize="12" fill={box.textColor} pointerEvents="none">
-                      {line}
-                    </text>
-                  ))}
+                  {isActivityDiagram ? (
+                    <>
+                      {box.kind === 'decision' ? (
+                        <polygon
+                          points={`${box.width / 2},0 ${box.width},${box.height / 2} ${box.width / 2},${box.height} 0,${box.height / 2}`}
+                          fill={box.fillColor}
+                          stroke={box.borderColor}
+                          strokeWidth={isActive ? '3.2' : '2.4'}
+                          className="cursor-move"
+                          onPointerDown={(event) => onClassMoveStart(event, box)}
+                        />
+                      ) : box.kind === 'start' || box.kind === 'end' ? (
+                        <>
+                          <circle
+                            cx={box.width / 2}
+                            cy={box.height / 2}
+                            r={Math.min(box.width, box.height) / 2 - 2}
+                            fill={box.kind === 'end' ? '#fffaf2' : box.fillColor}
+                            stroke={box.borderColor}
+                            strokeWidth={box.kind === 'end' ? '5' : isActive ? '3.2' : '2.4'}
+                            className="cursor-move"
+                            onPointerDown={(event) => onClassMoveStart(event, box)}
+                          />
+                          {box.kind === 'end' ? (
+                            <circle
+                              cx={box.width / 2}
+                              cy={box.height / 2}
+                              r={Math.min(box.width, box.height) / 2 - 12}
+                              fill={box.borderColor}
+                              pointerEvents="none"
+                            />
+                          ) : null}
+                        </>
+                      ) : (
+                        <rect
+                          width={box.width}
+                          height={box.height}
+                          rx="18"
+                          fill={box.fillColor}
+                          stroke={box.borderColor}
+                          strokeWidth={isActive ? '3.2' : '2.4'}
+                          className="cursor-move"
+                          onPointerDown={(event) => onClassMoveStart(event, box)}
+                        />
+                      )}
+                      {box.kind !== 'start' && box.kind !== 'end' ? (
+                        <text x={box.width / 2} y={box.height / 2 + 6} textAnchor="middle" fontSize="17" fontWeight="700" fill={box.textColor} pointerEvents="none">
+                          {box.label}
+                        </text>
+                      ) : (
+                        <text x={box.width / 2} y={box.height + 22} textAnchor="middle" fontSize="12" fontWeight="700" fill={box.textColor} pointerEvents="none">
+                          {box.label}
+                        </text>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <rect
+                        width={box.width}
+                        height={box.height}
+                        rx="18"
+                        fill={box.fillColor}
+                        stroke={box.borderColor}
+                        strokeWidth={isActive ? '3.2' : '2.4'}
+                        className="cursor-move"
+                        onPointerDown={(event) => onClassMoveStart(event, box)}
+                      />
+                      {/* The class body stays intentionally compact in canvas mode; detailed editing happens in the inspector. */}
+                      <text x={box.width / 2} y="20" textAnchor="middle" fontSize="10" fontWeight="700" letterSpacing="0.18em" fill={box.textColor} pointerEvents="none">
+                        {`<<${box.stereotype}>>`}
+                      </text>
+                      <text x={box.width / 2} y="46" textAnchor="middle" fontSize="18" fontWeight="700" fill={box.textColor} pointerEvents="none">
+                        {box.title}
+                      </text>
+                      <line
+                        x1="12"
+                        y1={CLASS_HEADER_HEIGHT}
+                        x2={box.width - 12}
+                        y2={CLASS_HEADER_HEIGHT}
+                        stroke={box.borderColor}
+                        strokeOpacity="0.45"
+                        strokeWidth="1.4"
+                        pointerEvents="none"
+                      />
+                      <line
+                        x1="12"
+                        y1={methodsDividerY}
+                        x2={box.width - 12}
+                        y2={methodsDividerY}
+                        stroke={box.borderColor}
+                        strokeOpacity="0.35"
+                        strokeWidth="1.2"
+                        pointerEvents="none"
+                      />
+                      {box.fields.slice(0, 4).map((line, index) => (
+                        <text key={`${box.id}-field-${index}`} x="18" y={attributesStartY + index * 18} fontSize="12" fill={box.textColor} pointerEvents="none">
+                          {line}
+                        </text>
+                      ))}
+                      {box.methods.slice(0, 4).map((line, index) => (
+                        <text key={`${box.id}-method-${index}`} x="18" y={Math.min(box.height - 18, methodsStartY + index * 18)} fontSize="12" fill={box.textColor} pointerEvents="none">
+                          {line}
+                        </text>
+                      ))}
+                    </>
+                  )}
                   <rect
                     x={box.width - 14}
                     y={box.height - 14}

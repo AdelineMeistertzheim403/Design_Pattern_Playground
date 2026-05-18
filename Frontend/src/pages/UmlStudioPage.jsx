@@ -14,11 +14,14 @@ import {
   buildViewBox,
   clamp,
   cloneDocument,
+  createActivityNode,
   createBox,
   createEmptyDocument,
   createTextBlock,
   exportFile,
   findAttachmentTarget,
+  getDiagramNodes,
+  insertRelationPoint,
   normalizeDocument,
   parseViewBox,
   slugify,
@@ -37,12 +40,14 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
   const [zoom, setZoom] = useState(1)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [savePending, setSavePending] = useState(false)
+  const [placingRelationPoint, setPlacingRelationPoint] = useState(null)
   const svgRef = useRef(null)
   const dragStateRef = useRef(null)
 
   const viewBox = parseViewBox(draft.viewBox)
   const defsId = `uml-studio-${draft.id}`
-  const boxesById = useMemo(() => Object.fromEntries(draft.classes.map((box) => [box.id, box])), [draft.classes])
+  const diagramNodes = useMemo(() => getDiagramNodes(draft), [draft])
+  const boxesById = useMemo(() => Object.fromEntries(diagramNodes.map((box) => [box.id, box])), [diagramNodes])
 
   useEffect(() => {
     let ignore = false
@@ -52,10 +57,10 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
       if (pendingLaunch?.kind === 'blank') {
         if (!ignore) {
-          setDraft(createEmptyDocument())
+          setDraft(createEmptyDocument(pendingLaunch.diagramType ?? 'class'))
           setSelectedItem(null)
           setUndoStack([])
-          setNotice('Canvas UML vide initialise.')
+          setNotice(`Canvas UML ${pendingLaunch.diagramType === 'activity' ? 'd activite' : 'de classe'} vide initialise.`)
         }
         return
       }
@@ -72,6 +77,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
         const pattern = patterns.find((item) => item.code === pendingLaunch.code)
         setDraft(normalizeDocument({
           ...template,
+          diagramType: pendingLaunch.diagramType ?? 'class',
           id: `uml-${Date.now()}`,
           name: pattern ? `${pattern.name} - copie` : 'Template UML',
           texts: [],
@@ -172,15 +178,36 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           endpoint: dragState.endpoint,
           relationId: dragState.id,
           pointer: currentPoint,
-          target: findAttachmentTarget(currentPoint, draft.classes),
+          target: findAttachmentTarget(currentPoint, diagramNodes),
         })
+        return
+      }
+
+      if (dragState.kind === 'relation-point-move') {
+        setDraft((currentDraft) => normalizeDocument({
+          ...currentDraft,
+          relations: currentDraft.relations.map((relation) => {
+            if (relation.id !== dragState.id) {
+              return relation
+            }
+
+            return {
+              ...relation,
+              points: (relation.points ?? []).map((point, index) => (
+                index === dragState.pointIndex
+                  ? { x: Math.round(currentPoint.x), y: Math.round(currentPoint.y) }
+                  : point
+              )),
+            }
+          }),
+        }))
         return
       }
 
       if (dragState.kind === 'class-move' || dragState.kind === 'class-resize') {
         setDraft((currentDraft) => normalizeDocument({
           ...currentDraft,
-          classes: currentDraft.classes.map((box) => {
+          [currentDraft.diagramType === 'activity' ? 'activityNodes' : 'classes']: getDiagramNodes(currentDraft).map((box) => {
             if (box.id !== dragState.id) {
               return box
             }
@@ -264,6 +291,15 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
         return
       }
 
+      if (dragState.kind === 'relation-point-move') {
+        if (JSON.stringify(dragState.originDraft) !== JSON.stringify(draft)) {
+          setUndoStack((currentStack) => [...currentStack.slice(-49), dragState.originDraft])
+        }
+        dragStateRef.current = null
+        setAttachPreview(null)
+        return
+      }
+
       if (JSON.stringify(dragState.originDraft) !== JSON.stringify(draft)) {
         setUndoStack((currentStack) => [...currentStack.slice(-49), dragState.originDraft])
       }
@@ -280,7 +316,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
   }, [attachPreview, draft, viewBox.height, viewBox.minX, viewBox.minY, viewBox.width])
 
   const selectedClass = selectedItem?.type === 'class'
-    ? draft.classes.find((box) => box.id === selectedItem.id) ?? null
+    ? diagramNodes.find((box) => box.id === selectedItem.id) ?? null
     : null
   const selectedText = selectedItem?.type === 'text'
     ? draft.texts.find((text) => text.id === selectedItem.id) ?? null
@@ -293,7 +329,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
     if (!selectedClass) return
     applyDraftChange((currentDraft) => ({
       ...currentDraft,
-      classes: currentDraft.classes.map((box) => (box.id === selectedClass.id ? updater(box) : box)),
+      [currentDraft.diagramType === 'activity' ? 'activityNodes' : 'classes']: getDiagramNodes(currentDraft).map((box) => (box.id === selectedClass.id ? updater(box) : box)),
     }))
   }
 
@@ -314,12 +350,24 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
   }
 
   function handleAddClass() {
-    const nextBox = createBox(draft.classes.length + 1)
+    const nextBox = draft.diagramType === 'activity'
+      ? createActivityNode('action', diagramNodes.length + 1)
+      : createBox(diagramNodes.length + 1)
     applyDraftChange((currentDraft) => ({
       ...currentDraft,
-      classes: [...currentDraft.classes, nextBox],
+      [currentDraft.diagramType === 'activity' ? 'activityNodes' : 'classes']: [...getDiagramNodes(currentDraft), nextBox],
     }))
     setSelectedItem({ type: 'class', id: nextBox.id })
+  }
+
+  function handleAddActivityNode(kind) {
+    const nextNode = createActivityNode(kind, diagramNodes.length + 1)
+    applyDraftChange((currentDraft) => ({
+      ...currentDraft,
+      activityNodes: [...(currentDraft.activityNodes ?? []), nextNode],
+      diagramType: 'activity',
+    }))
+    setSelectedItem({ type: 'class', id: nextNode.id })
   }
 
   function handleAddText() {
@@ -332,18 +380,18 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
   }
 
   function handleAddRelation() {
-    if (draft.classes.length < 2) {
-      setNotice('Ajoute au moins deux boites avant de creer une relation.')
+    if (diagramNodes.length < 2) {
+      setNotice(`Ajoute au moins deux ${draft.diagramType === 'activity' ? 'etapes' : 'boites'} avant de creer une relation.`)
       return
     }
 
-    const fromBox = selectedClass ?? draft.classes[0]
-    const toBox = draft.classes.find((box) => box.id !== fromBox.id) ?? draft.classes[1]
+    const fromBox = selectedClass ?? diagramNodes[0]
+    const toBox = diagramNodes.find((box) => box.id !== fromBox.id) ?? diagramNodes[1]
     const relation = {
       id: `relation-${Date.now()}`,
       from: fromBox.id,
       to: toBox.id,
-      label: 'depends',
+      label: draft.diagramType === 'activity' ? 'flux' : 'depends',
       marker: 'arrow',
       dashed: false,
       fromSide: 'right',
@@ -372,6 +420,43 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
     setUndoStack((currentStack) => currentStack.slice(0, -1))
     setSelectedItem(null)
     setNotice('Derniere action annulee.')
+  }
+
+  function handleDeleteSelectedItem() {
+    if (!selectedItem) {
+      return
+    }
+
+    applyDraftChange((currentDraft) => {
+      if (selectedItem.type === 'class') {
+        const nextNodes = getDiagramNodes(currentDraft).filter((box) => box.id !== selectedItem.id)
+        return {
+          ...currentDraft,
+          [currentDraft.diagramType === 'activity' ? 'activityNodes' : 'classes']: nextNodes,
+          relations: currentDraft.relations.filter((relation) => relation.from !== selectedItem.id && relation.to !== selectedItem.id),
+        }
+      }
+
+      if (selectedItem.type === 'relation') {
+        return {
+          ...currentDraft,
+          relations: currentDraft.relations.filter((relation) => relation.id !== selectedItem.id),
+        }
+      }
+
+      if (selectedItem.type === 'text') {
+        return {
+          ...currentDraft,
+          texts: currentDraft.texts.filter((text) => text.id !== selectedItem.id),
+        }
+      }
+
+      return currentDraft
+    })
+
+    setPlacingRelationPoint(null)
+    setSelectedItem(null)
+    setNotice('Element supprime.')
   }
 
   async function handleSave() {
@@ -465,17 +550,20 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
   function handleCanvasBackgroundPointerDown(event) {
     if (event.target === event.currentTarget) {
+      setPlacingRelationPoint(null)
       setSelectedItem(null)
     }
   }
 
   function handleRelationSelect(event, relationId) {
     event.stopPropagation()
+    setPlacingRelationPoint(null)
     setSelectedItem({ type: 'relation', id: relationId })
   }
 
   function handleRelationEndpointPointerDown(event, relation, endpoint) {
     event.stopPropagation()
+    setPlacingRelationPoint(null)
     const startPoint = getSvgPoint(event)
     if (!startPoint) return
     dragStateRef.current = {
@@ -489,12 +577,58 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
       relationId: relation.id,
       endpoint,
       pointer: startPoint,
-      target: findAttachmentTarget(startPoint, draft.classes),
+      target: findAttachmentTarget(startPoint, diagramNodes),
     })
+  }
+
+  function handleBeginRelationPointPlacement() {
+    if (!selectedRelation) {
+      return
+    }
+    setPlacingRelationPoint(selectedRelation.id)
+    setNotice('Clique sur la fleche selectionnee pour placer un angle.')
+  }
+
+  function handleRelationPlacementClick(event, relation) {
+    event.stopPropagation()
+    const point = getSvgPoint(event)
+    if (!point) {
+      return
+    }
+
+    applyDraftChange((currentDraft) => ({
+      ...currentDraft,
+      relations: currentDraft.relations.map((currentRelation) => (
+        currentRelation.id === relation.id
+          ? { ...currentRelation, points: insertRelationPoint(currentRelation, boxesById, point) }
+          : currentRelation
+      )),
+    }))
+    setPlacingRelationPoint(null)
+    setNotice('Angle ajoute. Tu peux maintenant le deplacer directement sur la fleche.')
+    setSelectedItem({ type: 'relation', id: relation.id })
+  }
+
+  function handleRelationPointPointerDown(event, relation, pointIndex) {
+    event.stopPropagation()
+    const startPoint = getSvgPoint(event)
+    if (!startPoint) {
+      return
+    }
+
+    dragStateRef.current = {
+      kind: 'relation-point-move',
+      id: relation.id,
+      pointIndex,
+      startPoint,
+      originDraft: cloneDocument(draft),
+    }
+    setSelectedItem({ type: 'relation', id: relation.id })
   }
 
   function handleClassSelect(event, boxId) {
     event.stopPropagation()
+    setPlacingRelationPoint(null)
     setSelectedItem({ type: 'class', id: boxId })
   }
 
@@ -516,6 +650,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
   function handleTextSelect(event, textId) {
     event.stopPropagation()
+    setPlacingRelationPoint(null)
     setSelectedItem({ type: 'text', id: textId })
   }
 
@@ -543,7 +678,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Studio UML</p>
-            <h1 className="mt-3 text-4xl text-stone-950">Editeur UML</h1>
+            <h1 className="mt-3 text-4xl text-stone-950">Editeur UML {draft.diagramType === 'activity' ? 'd activite' : ''}</h1>
           </div>
           <UmlStudioHeaderActions
             diagramName={draft.name}
@@ -561,6 +696,8 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
       <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_340px]">
         <UmlStudioPalette
+          diagramType={draft.diagramType}
+          onAddActivityNode={handleAddActivityNode}
           onAddClass={handleAddClass}
           onAddRelation={handleAddRelation}
           onAddText={handleAddText}
@@ -586,9 +723,12 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           boxesById={boxesById}
           defsId={defsId}
           draft={draft}
+          isPlacingRelationAngle={placingRelationPoint === selectedRelation?.id}
           onBackgroundPointerDown={handleCanvasBackgroundPointerDown}
           onClassMoveStart={handleClassMoveStart}
           onClassResizeStart={handleClassResizeStart}
+          onRelationPlacementClick={handleRelationPlacementClick}
+          onRelationPointPointerDown={handleRelationPointPointerDown}
           onClassSelect={handleClassSelect}
           onRelationEndpointPointerDown={handleRelationEndpointPointerDown}
           onRelationSelect={handleRelationSelect}
@@ -606,6 +746,9 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
         <UmlStudioInspector
           draft={draft}
+          isPlacingRelationAngle={placingRelationPoint === selectedRelation?.id}
+          onBeginRelationPointPlacement={handleBeginRelationPointPlacement}
+          onDeleteSelectedItem={handleDeleteSelectedItem}
           selectedClass={selectedClass}
           selectedRelation={selectedRelation}
           selectedText={selectedText}
