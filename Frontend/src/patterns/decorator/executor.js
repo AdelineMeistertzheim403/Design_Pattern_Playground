@@ -21,7 +21,7 @@ export default function executeDecoratorPattern(parameters) {
   })
 
   const logs = [
-    `Creation du composant de base ${characterName} sur le profil ${baseProfile.label}.`,
+    `Création du composant de base ${characterName} sur le profil ${baseProfile.label}.`,
     `Stats de depart : ATK ${baseProfile.stats.attack} / DEF ${baseProfile.stats.defense} / SPD ${baseProfile.stats.speed} / CTRL ${baseProfile.stats.control}.`,
   ]
   const activeEffects = [`Socle de base ${baseProfile.label}`]

@@ -50,11 +50,11 @@ public enum CoreModuleOption {
 			case CAR -> switch (this) {
 				case ELECTRIC -> "Le moteur electrique donne a " + buildName + " des reprises propres et une bonne utilite.";
 				case ARCANE -> "La turbine arcane pousse " + buildName + " vers un profil plus spectaculaire et technique.";
-				case SOLAR -> "Le coeur solaire augmente l autonomie et l identite visuelle du vehicule.";
+				case SOLAR -> "Le coeur solaire augmente l autonomie et l identité visuelle du véhicule.";
 			};
 			case CHARACTER -> switch (this) {
 				case ELECTRIC -> "Le noyau electrique arme " + buildName + " pour des engagements rapides.";
-				case ARCANE -> "Le focus arcane ouvre des capacites de controle et de polyvalence.";
+				case ARCANE -> "Le focus arcane ouvre des capacités de contrôle et de polyvalence.";
 				case SOLAR -> "Le totem solaire stabilise " + buildName + " et renforce son aura.";
 			};
 			case HOUSE -> switch (this) {

@@ -4,7 +4,7 @@ function validateBuilder(config = {}) {
   const requiredFields = ['productType', 'silhouette', 'coreModule', 'addonModule', 'finishStyle']
 
   if (!validateMode(config, 'WITH_BUILDER')) {
-    return { ok: false, summary: 'La construction etape par etape n est pas activee.' }
+    return { ok: false, summary: 'La construction étape par étape n’est pas activée.' }
   }
 
   if (requiredFields.some((fieldName) => !`${config[fieldName] ?? ''}`.trim())) {
@@ -16,25 +16,25 @@ function validateBuilder(config = {}) {
 
 function validateFactory(config = {}) {
   if (!validateMode(config, 'WITH_FACTORY')) {
-    return { ok: false, summary: 'La creation n est pas centralisee dans une factory.' }
+    return { ok: false, summary: 'La création n’est pas centralisée dans une factory.' }
   }
 
   if (!`${config.vehicleType ?? ''}`.trim()) {
-    return { ok: false, summary: 'Aucun produit concret n est selectionne.' }
+    return { ok: false, summary: 'Aucun produit concret n’est sélectionné.' }
   }
 
-  return { ok: true, summary: 'La creation passe bien par une fabrique dediee.' }
+  return { ok: true, summary: 'La création passe bien par une fabrique dédiée.' }
 }
 
 function validateSingleton(config = {}) {
   const clients = toList(config.clients)
 
   if (!validateMode(config, 'WITH_SINGLETON')) {
-    return { ok: false, summary: 'La meme instance partagee n est pas activee.' }
+    return { ok: false, summary: 'La même instance partagée n’est pas activée.' }
   }
 
   if (clients.length < 2) {
-    return { ok: false, summary: 'Plusieurs clients sont necessaires pour verifier le partage de reference.' }
+    return { ok: false, summary: 'Plusieurs clients sont nécessaires pour vérifier le partage de référence.' }
   }
 
   return { ok: true, summary: 'Une instance centrale est visible par plusieurs clients.' }

@@ -58,8 +58,8 @@ public class CommandPatternDemo implements DesignPatternDemo {
 			"command",
 			"Command",
 			PatternType.BEHAVIORAL,
-			"Encapsule une action dans un objet pour la declencher, la historiser et la rejouer sans coupler l interface au receiver.",
-			"Construire un simulateur undo / redo avec historique de commandes, piles de controle et receiver isole.",
+			"Encapsule une action dans un objet pour la déclencher, l'historiser et la rejouer sans coupler l'interface au receiver.",
+			"Construire un simulateur undo / redo avec historique de commandes, piles de contrôle et receiver isolé.",
 			"INTERMEDIATE"
 		);
 	}
@@ -93,7 +93,7 @@ public class CommandPatternDemo implements DesignPatternDemo {
 
 		if (useCommand) {
 			CommandInvoker invoker = new CommandInvoker(board);
-			logs.add("Creation du receiver " + board.boardName() + " pour " + board.actorName() + ".");
+			logs.add("Création du receiver " + board.boardName() + " pour " + board.actorName() + ".");
 			logs.add("Initialisation du CommandInvoker avec deux piles : undo et redo.");
 
 			history = new ArrayList<>();
@@ -112,8 +112,8 @@ public class CommandPatternDemo implements DesignPatternDemo {
 			undoStack = invoker.undoStackEntries();
 			redoStack = invoker.redoStackEntries();
 		} else {
-			logs.add("Mode sans Command : le controleur modifie directement le receiver.");
-			logs.add("Aucune pile de commandes n est maintenue, donc undo et redo ne peuvent pas fonctionner.");
+			logs.add("Mode sans Command : le contrôleur modifie directement le receiver.");
+			logs.add("Aucune pile de commandes n'est maintenue, donc undo et redo ne peuvent pas fonctionner.");
 			history = executeWithoutCommand(board, config.actions(), logs);
 			undoStack = List.of();
 			redoStack = List.of();
@@ -152,8 +152,8 @@ public class CommandPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useCommand
-				? "Command encapsule chaque action dans un objet autonome. L invoker peut donc conserver un historique, annuler et rejouer des operations."
-				: "Sans Command, l interface appelle directement le receiver. Les actions partent, mais aucune pile n existe pour les annuler proprement.",
+				? "Command encapsule chaque action dans un objet autonome. L invoker peut donc conserver un historique, annuler et rejouer des opérations."
+				: "Sans Command, l'interface appelle directement le receiver. Les actions partent, mais aucune pile n existe pour les annuler proprement.",
 			logs,
 			output,
 			buildVisualization(useCommand, board, undoStack, redoStack)
@@ -177,7 +177,7 @@ public class CommandPatternDemo implements DesignPatternDemo {
 					action.label(),
 					"BLOCKED",
 					false,
-					"Le controleur direct ne stocke aucune commande : " + action.label().toLowerCase() + " est impossible.",
+					"Le contrôleur direct ne stocke aucune commande : " + action.label().toLowerCase() + " est impossible.",
 					board.x(),
 					board.y(),
 					board.beaconCount(),
@@ -253,7 +253,7 @@ public class CommandPatternDemo implements DesignPatternDemo {
 			),
 			new VisualizationNode(
 				"result",
-				"Etat final",
+				"État final",
 				"output",
 				Map.of("message", "x=" + board.x() + " y=" + board.y() + " balises=" + board.beaconCount())
 			)
@@ -274,7 +274,7 @@ public class CommandPatternDemo implements DesignPatternDemo {
 		map.put("index", step.index());
 		map.put("actionCode", step.actionCode());
 		map.put("actionLabel", step.actionLabel());
-		map.put("operationType", step.operationType());
+			map.put("operationType", step.operationType());
 		map.put("accepted", step.accepted());
 		map.put("detail", step.detail());
 		map.put("positionX", step.positionX());
@@ -302,7 +302,7 @@ public class CommandPatternDemo implements DesignPatternDemo {
 			case MOVE_UP -> new MoveUpCommand();
 			case MOVE_LEFT -> new MoveLeftCommand();
 			case DELETE_BEACON -> new DeleteBeaconCommand();
-			case UNDO, REDO -> throw new InvalidPatternConfigurationException("UNDO et REDO ne creent pas de commande concrete.");
+			case UNDO, REDO -> throw new InvalidPatternConfigurationException("UNDO et REDO ne créent pas de commande concrète.");
 		};
 	}
 
@@ -313,24 +313,24 @@ public class CommandPatternDemo implements DesignPatternDemo {
 			case MOVE_UP -> board.moveUp();
 			case MOVE_LEFT -> board.moveLeft();
 			case DELETE_BEACON -> board.deleteBeacon();
-			case UNDO, REDO -> throw new InvalidPatternConfigurationException("Action de controle non supportee en direct : " + action.code());
+			case UNDO, REDO -> throw new InvalidPatternConfigurationException("Action de contrôle non supportee en direct : " + action.code());
 		}
 	}
 
 	private String directDetail(CommandBoard board, CommandAction action) {
 		return switch (action) {
-			case ADD_BEACON -> board.actorName() + " ajoute directement une balise sans objet commande intermediaire.";
-			case MOVE_RIGHT -> board.actorName() + " est deplace a droite par le controleur direct.";
-			case MOVE_UP -> board.actorName() + " est deplace vers le haut par le controleur direct.";
-			case MOVE_LEFT -> board.actorName() + " est deplace a gauche par le controleur direct.";
+			case ADD_BEACON -> board.actorName() + " ajoute directement une balise sans objet commande intermédiaire.";
+			case MOVE_RIGHT -> board.actorName() + " est deplace a droite par le contrôleur direct.";
+			case MOVE_UP -> board.actorName() + " est deplace vers le haut par le contrôleur direct.";
+			case MOVE_LEFT -> board.actorName() + " est deplace a gauche par le contrôleur direct.";
 			case DELETE_BEACON -> board.actorName() + " supprime une balise par appel direct.";
-			case UNDO, REDO -> "Action de controle non disponible.";
+			case UNDO, REDO -> "Action de contrôle non disponible.";
 		};
 	}
 
 	private CommandConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = normalizeMode(parameters.get("mode"));

@@ -291,7 +291,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "create",
-          "label": "Creer des objets"
+          "label": "Créer des objets"
         },
         {
           "id": "route",
@@ -513,7 +513,7 @@ export const fallbackQuiz = {
       "type": "QCM_SINGLE",
       "difficulty": "MEDIUM",
       "points": 0,
-      "explanation": "Il rejette la requete et la chaine s arrete avant le traitement metier.",
+      "explanation": "Il rejette la requete et la chaine s arrete avant le traitement métier.",
       "choices": [
         {
           "id": "ignore",

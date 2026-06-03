@@ -2,46 +2,46 @@ import { toList, validateMode } from './helpers'
 
 function validateChain(config = {}) {
   if (!validateMode(config, 'WITH_CHAIN')) {
-    return { ok: false, summary: 'Le pipeline structure par handlers n est pas active.' }
+    return { ok: false, summary: 'Le pipeline structuré par handlers n’est pas actif.' }
   }
 
   if (`${config.tokenState ?? ''}` !== 'VALID' || `${config.payloadState ?? ''}` !== 'VALID') {
-    return { ok: false, summary: 'La requete ne traverse pas correctement tout le pipeline de validation.' }
+    return { ok: false, summary: 'La requête ne traverse pas correctement tout le pipeline de validation.' }
   }
 
-  return { ok: true, summary: 'La requete parcourt bien les maillons specialises jusqu au traitement final.' }
+  return { ok: true, summary: 'La requête parcourt bien les maillons spécialisés jusqu’au traitement final.' }
 }
 
 function validateCommand(config = {}) {
   const actions = toList(config.actions)
 
   if (!validateMode(config, 'WITH_COMMAND')) {
-    return { ok: false, summary: 'Les actions ne sont pas encapsulees comme commandes.' }
+    return { ok: false, summary: 'Les actions ne sont pas encapsulées comme commandes.' }
   }
 
   if (actions.length < 4) {
-    return { ok: false, summary: 'La sequence est trop courte pour montrer un historique utile.' }
+    return { ok: false, summary: 'La séquence est trop courte pour montrer un historique utile.' }
   }
 
   if (!actions.includes('UNDO') && !actions.includes('REDO')) {
-    return { ok: false, summary: 'La sequence doit montrer un undo ou redo pour valider le systeme.' }
+    return { ok: false, summary: 'La séquence doit montrer un undo ou redo pour valider le système.' }
   }
 
-  return { ok: true, summary: 'Les actions sont historisables et le retour arriere est exploitable.' }
+  return { ok: true, summary: 'Les actions sont historisables et le retour arrière est exploitable.' }
 }
 
 function validateInterpreter(config = {}) {
   const scriptLines = toList(config.scriptLines)
 
   if (!validateMode(config, 'WITH_INTERPRETER')) {
-    return { ok: false, summary: 'Le mini langage n est pas interprete comme une vraie structure.' }
+    return { ok: false, summary: 'Le mini-langage n’est pas interprété comme une vraie structure.' }
   }
 
   if (scriptLines.length < 3) {
-    return { ok: false, summary: 'Le script est trop court pour montrer un vrai moteur d interpretation.' }
+    return { ok: false, summary: 'Le script est trop court pour montrer un vrai moteur d’interprétation.' }
   }
 
-  return { ok: true, summary: 'Le script fournit une base credible pour une execution interpretee.' }
+  return { ok: true, summary: 'Le script fournit une base crédible pour une exécution interprétée.' }
 }
 
 function validateMediator(config = {}) {
@@ -49,15 +49,15 @@ function validateMediator(config = {}) {
   const senderName = `${config.senderName ?? ''}`.trim()
 
   if (!validateMode(config, 'WITH_MEDIATOR')) {
-    return { ok: false, summary: 'La coordination centrale n est pas activee.' }
+    return { ok: false, summary: 'La coordination centrale n’est pas activée.' }
   }
 
   if (participants.length < 3) {
-    return { ok: false, summary: 'Le reseau est trop petit pour justifier la mediation.' }
+    return { ok: false, summary: 'Le réseau est trop petit pour justifier la médiation.' }
   }
 
   if (!participants.includes(senderName)) {
-    return { ok: false, summary: "L expediteur n appartient pas au groupe coordonne." }
+    return { ok: false, summary: "L’expéditeur n’appartient pas au groupe coordonné." }
   }
 
   return { ok: true, summary: 'Les interactions passent bien par un hub central.' }
@@ -65,39 +65,39 @@ function validateMediator(config = {}) {
 
 function validateMemento(config = {}) {
   if (!validateMode(config, 'WITH_MEMENTO')) {
-    return { ok: false, summary: 'La restauration par snapshot n est pas activee.' }
+    return { ok: false, summary: 'La restauration par snapshot n’est pas activée.' }
   }
 
   if (!`${config.restoreTarget ?? ''}`.trim()) {
-    return { ok: false, summary: 'Aucun checkpoint n est selectionne pour la restauration.' }
+    return { ok: false, summary: 'Aucun checkpoint n’est sélectionné pour la restauration.' }
   }
 
-  return { ok: true, summary: 'Un checkpoint stable peut etre restaure proprement.' }
+  return { ok: true, summary: 'Un checkpoint stable peut être restauré proprement.' }
 }
 
 function validateObserver(config = {}) {
   const observers = toList(config.observers)
 
   if (!validateMode(config, 'WITH_OBSERVER')) {
-    return { ok: false, summary: 'La diffusion vers des abonnes n est pas activee.' }
+    return { ok: false, summary: 'La diffusion vers des abonnés n’est pas activée.' }
   }
 
   if (observers.length < 3) {
-    return { ok: false, summary: 'Le reseau d abonnes est trop faible pour valider la diffusion.' }
+    return { ok: false, summary: 'Le réseau d’abonnés est trop faible pour valider la diffusion.' }
   }
 
-  return { ok: true, summary: 'L evenement se diffuse correctement vers plusieurs abonnes.' }
+  return { ok: true, summary: 'L’événement se diffuse correctement vers plusieurs abonnés.' }
 }
 
 function validateState(config = {}) {
   const actions = toList(config.actions)
 
   if (!validateMode(config, 'WITH_STATE')) {
-    return { ok: false, summary: 'Le contexte ne s appuie pas sur une machine a etats explicite.' }
+    return { ok: false, summary: 'Le contexte ne s’appuie pas sur une machine à états explicite.' }
   }
 
   if (actions.length < 3) {
-    return { ok: false, summary: 'La sequence d actions est trop courte pour montrer de vraies transitions.' }
+    return { ok: false, summary: 'La séquence d’actions est trop courte pour montrer de vraies transitions.' }
   }
 
   return { ok: true, summary: 'Les transitions sont suffisamment explicites pour structurer le cycle de vie.' }
@@ -105,26 +105,26 @@ function validateState(config = {}) {
 
 function validateStrategy(config = {}) {
   if (!validateMode(config, 'WITH_STRATEGY')) {
-    return { ok: false, summary: 'Le comportement variable n est pas active.' }
+    return { ok: false, summary: 'Le comportement variable n’est pas actif.' }
   }
 
   if (!`${config.strategy ?? ''}`.trim()) {
-    return { ok: false, summary: 'Aucune strategie concrete n est choisie.' }
+    return { ok: false, summary: 'Aucune stratégie concrète n’est choisie.' }
   }
 
-  return { ok: true, summary: 'L algorithme choisi peut varier sans casser le contexte.' }
+  return { ok: true, summary: 'L’algorithme choisi peut varier sans casser le contexte.' }
 }
 
 function validateVisitor(config = {}) {
   if (!validateMode(config, 'WITH_VISITOR')) {
-    return { ok: false, summary: 'Le traitement specialise n est pas active sur la structure.' }
+    return { ok: false, summary: 'Le traitement spécialisé n’est pas actif sur la structure.' }
   }
 
   if (!`${config.visitorType ?? ''}`.trim()) {
-    return { ok: false, summary: 'Aucun visitor concret n est selectionne.' }
+    return { ok: false, summary: 'Aucun visitor concret n’est sélectionné.' }
   }
 
-  return { ok: true, summary: 'La structure accueille correctement un traitement specialise externe.' }
+  return { ok: true, summary: 'La structure accueille correctement un traitement spécialisé externe.' }
 }
 
 export const behavioralValidators = {

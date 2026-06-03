@@ -18,7 +18,7 @@ public class SpeedDecorator extends CharacterDecorator {
 
 	@Override
 	public String effectLabel() {
-		return "Ajoute un buff de mobilite visible immediatement dans les stats.";
+		return "Ajoute un buff de mobilité visible immédiatement dans les stats.";
 	}
 
 	@Override

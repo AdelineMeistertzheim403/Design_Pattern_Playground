@@ -14,6 +14,6 @@ public class Car implements Vehicle {
 
 	@Override
 	public String description() {
-		return "Vehicule routier cree pour des scenarios urbains ou longue distance.";
+		return "Véhicule routier crée pour des scénarios urbains ou longue distance.";
 	}
 }

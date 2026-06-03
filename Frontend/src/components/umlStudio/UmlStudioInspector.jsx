@@ -41,16 +41,16 @@ export default function UmlStudioInspector({
             {isActivityDiagram ? (
               <>
                 <label className="flex flex-col gap-2 text-sm text-stone-700">
-                  <span className="font-semibold text-stone-900">Type d etape</span>
+                  <span className="font-semibold text-stone-900">Type d'étape</span>
                   <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedClass.kind} onChange={(event) => updateSelectedClass((box) => ({ ...box, kind: event.target.value }))}>
-                    <option value="start">Depart</option>
-                    <option value="end">Arrivee</option>
+                    <option value="start">Départ</option>
+                    <option value="end">Arrivée</option>
                     <option value="action">Action utilisateur</option>
                     <option value="decision">Condition / boucle</option>
                   </select>
                 </label>
                 <label className="flex flex-col gap-2 text-sm text-stone-700">
-                  <span className="font-semibold text-stone-900">Libelle</span>
+                  <span className="font-semibold text-stone-900">Libellé</span>
                   <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedClass.label} onChange={(event) => updateSelectedClass((box) => ({ ...box, label: event.target.value }))} />
                 </label>
               </>
@@ -61,7 +61,7 @@ export default function UmlStudioInspector({
                   <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedClass.title} onChange={(event) => updateSelectedClass((box) => ({ ...box, title: event.target.value }))} />
                 </label>
                 <label className="flex flex-col gap-2 text-sm text-stone-700">
-                  <span className="font-semibold text-stone-900">Stereotype</span>
+                  <span className="font-semibold text-stone-900">Stéréotype</span>
                   <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedClass.stereotype} onChange={(event) => updateSelectedClass((box) => ({ ...box, stereotype: event.target.value }))} />
                 </label>
               </>
@@ -87,7 +87,7 @@ export default function UmlStudioInspector({
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm text-stone-700">
-                  <span className="font-semibold text-stone-900">Hauteur methodes</span>
+                  <span className="font-semibold text-stone-900">Hauteur méthodes</span>
                   <input
                     className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none"
                     type="number"
@@ -115,7 +115,7 @@ export default function UmlStudioInspector({
             {!isActivityDiagram ? (
               <>
                 <TextAreaField label="Attributs" value={selectedClass.fields} placeholder="+ field: Type" onChange={(fields) => updateSelectedClass((box) => ({ ...box, fields }))} />
-                <TextAreaField label="Methodes" value={selectedClass.methods} placeholder="+ operation(): void" onChange={(methods) => updateSelectedClass((box) => ({ ...box, methods }))} />
+                <TextAreaField label="Méthodes" value={selectedClass.methods} placeholder="+ operation(): void" onChange={(methods) => updateSelectedClass((box) => ({ ...box, methods }))} />
               </>
             ) : null}
             <button className="rounded-full border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" type="button" onClick={onDeleteSelectedItem}>
@@ -129,7 +129,7 @@ export default function UmlStudioInspector({
           // (marker, stroke style, curvature) without reopening the creation flow.
           <div className="mt-4 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Etiquette</span>
+              <span className="font-semibold text-stone-900">Étiquette</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedRelation.label} onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, label: event.target.value }))} />
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -152,7 +152,7 @@ export default function UmlStudioInspector({
                 </select>
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Entree</span>
+                <span className="font-semibold text-stone-900">Entrée</span>
                 <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedRelation.toSide} onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, toSide: event.target.value }))}>
                   {SIDE_OPTIONS.map((side) => <option key={side} value={side}>{side}</option>)}
                 </select>
@@ -160,7 +160,7 @@ export default function UmlStudioInspector({
               <label className="flex flex-col gap-2 text-sm text-stone-700">
                 <span className="font-semibold text-stone-900">Marqueur</span>
                 <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedRelation.marker} onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, marker: event.target.value }))}>
-                  <option value="arrow">Fleche</option>
+                  <option value="arrow">Flèche</option>
                   <option value="triangle">Triangle</option>
                   <option value="diamond">Diamond</option>
                 </select>
@@ -179,13 +179,13 @@ export default function UmlStudioInspector({
             </label>
             <div className="flex flex-col gap-3 rounded-2xl border border-black/8 bg-[rgba(247,240,226,0.58)] p-4">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-semibold text-stone-900">Points intermediaires</span>
+                <span className="text-sm font-semibold text-stone-900">Points intermédiaires</span>
                 <button
                   className={`rounded-full border px-3 py-2 text-xs font-semibold ${isPlacingRelationAngle ? 'border-stone-950 bg-stone-950 text-white' : 'border-black/10 bg-white text-stone-800'}`}
                   type="button"
                   onClick={onBeginRelationPointPlacement}
                 >
-                  {isPlacingRelationAngle ? 'Clique sur la fleche...' : 'Ajouter un angle'}
+                  {isPlacingRelationAngle ? 'Clique sur la flèche...' : 'Ajouter un angle'}
                 </button>
               </div>
               {(selectedRelation.points ?? []).length ? (
@@ -209,15 +209,15 @@ export default function UmlStudioInspector({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-stone-600">Ajoute un ou plusieurs points pour plier la fleche et creer des angles.</p>
+                <p className="text-sm text-stone-600">Ajoute un ou plusieurs points pour plier la flèche et créer des angles.</p>
               )}
             </div>
             <label className="flex items-center gap-3 text-sm text-stone-700">
               <input checked={selectedRelation.dashed} type="checkbox" onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, dashed: event.target.checked }))} />
-              Trait pointille
+              Trait pointillé
             </label>
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Couleur de la fleche</span>
+              <span className="font-semibold text-stone-900">Couleur de la flèche</span>
               <input className="h-11 w-full rounded-2xl border border-black/10 bg-white p-1" type="color" value={selectedRelation.color} onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, color: event.target.value }))} />
             </label>
             <button className="rounded-full border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" type="button" onClick={onDeleteSelectedItem}>
@@ -264,7 +264,7 @@ export default function UmlStudioInspector({
 
         {!selectedClass && !selectedRelation && !selectedText ? (
           <p className="mt-4 text-sm leading-7 text-stone-700">
-            Selectionne une boite, une fleche ou une zone de texte pour afficher ses proprietes.
+            Sélectionne une boîte, une flèche ou une zone de texte pour afficher ses propriétés.
           </p>
         ) : null}
       </section>

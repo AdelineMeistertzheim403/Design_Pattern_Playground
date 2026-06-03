@@ -154,7 +154,7 @@ export default function executeTemplatePattern(parameters) {
       templateUsed ? 'WorkflowTemplate' : 'ManualWorkflow',
       finalizationGuaranteed ? 'STABLE' : 'WARNING',
       finalizationGuaranteed
-        ? 'Le workflow reste lisible : memes etapes communes, variation concentree sur execute().'
+        ? 'Le workflow reste lisible : memes étapes communes, variation concentree sur execute().'
         : 'Le workflow aboutit, mais la fin de sequence n est plus garantie et la duplication augmente le risque de derive.',
       false,
     ),

@@ -22,10 +22,10 @@ export default function UmlStudioPalette({
         {diagramType === 'activity' ? (
           <>
             <button className="rounded-2xl bg-stone-950 px-4 py-3 text-left text-sm font-semibold text-white" type="button" onClick={() => onAddActivityNode('start')}>
-              Ajouter un point de depart
+              Ajouter un point de départ
             </button>
             <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={() => onAddActivityNode('end')}>
-              Ajouter un point d arrivee
+              Ajouter un point d'arrivée
             </button>
             <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={() => onAddActivityNode('action')}>
               Ajouter une action utilisateur
@@ -36,11 +36,11 @@ export default function UmlStudioPalette({
           </>
         ) : (
           <button className="rounded-2xl bg-stone-950 px-4 py-3 text-left text-sm font-semibold text-white" type="button" onClick={onAddClass}>
-            Ajouter une boite UML
+            Ajouter une boîte UML
           </button>
         )}
         <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={onAddRelation}>
-          {diagramType === 'activity' ? 'Ajouter une fleche de flux' : 'Ajouter une fleche / relation'}
+          {diagramType === 'activity' ? 'Ajouter une flèche de flux' : 'Ajouter une flèche / relation'}
         </button>
         <button className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm font-semibold text-stone-800" type="button" onClick={onAddText}>
           Ajouter une zone de texte
@@ -108,8 +108,8 @@ export default function UmlStudioPalette({
 
       <div className="mt-6 rounded-[24px] border border-dashed border-black/12 bg-[rgba(247,240,226,0.62)] p-4 text-sm leading-7 text-stone-700">
         {diagramType === 'activity'
-          ? 'Clique sur un element pour l editer. Les etapes et annotations se deplacent par glisser-deposer. Utilise l inspecteur d une fleche pour ajouter plusieurs points intermediaires et creer des angles.'
-          : 'Clique sur un element pour l editer. Les boites et annotations se deplacent par glisser-deposer, et le carre en bas a droite sert au redimensionnement.'}
+          ? "Clique sur un élément pour l'éditer. Les étapes et annotations se déplacent par glisser-déposer. Utilise l'inspecteur d'une flèche pour ajouter plusieurs points intermédiaires et créer des angles."
+          : "Clique sur un élément pour l'éditer. Les boîtes et annotations se déplacent par glisser-déposer, et le carré en bas à droite sert au redimensionnement."}
       </div>
     </aside>
   )

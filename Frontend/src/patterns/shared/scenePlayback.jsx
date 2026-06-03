@@ -123,11 +123,11 @@ export function ScenePlaybackControls({ playback, className = '' }) {
         type="button"
         onClick={() => playback.setPlayMode('STEP')}
       >
-        Pas a pas
+        Pas à pas
       </button>
       {playback.playMode === 'AUTO' ? (
         <label className="ml-1 flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-          Delai
+          Délai
           <input
             className="h-2 w-28 accent-stone-900"
             type="range"
@@ -141,10 +141,10 @@ export function ScenePlaybackControls({ playback, className = '' }) {
         </label>
       ) : null}
       <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={playback.handleLaunchDemo}>
-        {playback.playMode === 'AUTO' ? (playback.isPlaying ? 'Animation...' : 'Animer la scene') : 'Etape suivante'}
+        {playback.playMode === 'AUTO' ? (playback.isPlaying ? 'Animation...' : 'Animer la scène') : 'Étape suivante'}
       </button>
       <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={playback.handlePrevious} disabled={playback.currentFrameIndex === 0}>
-        Precedent
+        Précédent
       </button>
       <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={playback.handleNext} disabled={playback.currentFrameIndex >= playback.frames.length - 1}>
         Suivant
@@ -154,8 +154,8 @@ export function ScenePlaybackControls({ playback, className = '' }) {
       </button>
       <p className="ml-auto text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
         {playback.currentFrame.currentStepIndex >= 0
-          ? `Step ${playback.currentFrame.currentStepIndex + 1} / ${Math.max(0, playback.frames.length - 1)}`
-          : 'Etat initial'}
+          ? `Étape ${playback.currentFrame.currentStepIndex + 1} / ${Math.max(0, playback.frames.length - 1)}`
+          : 'État initial'}
       </p>
     </div>
   )

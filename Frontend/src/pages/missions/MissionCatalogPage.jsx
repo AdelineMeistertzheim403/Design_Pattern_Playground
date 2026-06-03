@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
+import { buildHelpPath } from '../../app/playgroundUtils'
 import CollapsiblePanel from '../../components/CollapsiblePanel'
+import SpaLink from '../../components/SpaLink'
 import { missionSteps, MissionCard } from './missionPageShared'
 
 const PAGE_SIZE = 3
-const difficultyOrder = ['Debutant', 'Intermediaire', 'Avance']
+const difficultyOrder = ['Débutant', 'Intermédiaire', 'Avancé']
 
 function uniqueInOrder(values) {
   const seen = new Set()
@@ -14,7 +16,7 @@ function uniqueInOrder(values) {
   })
 }
 
-export default function MissionCatalogPage({ missions, onOpenMission }) {
+export default function MissionCatalogPage({ missions, onNavigateHelp, onOpenMission }) {
   const [filters, setFilters] = useState({
     mode: 'ALL',
     difficulty: 'ALL',
@@ -75,16 +77,27 @@ export default function MissionCatalogPage({ missions, onOpenMission }) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(36,107,94,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(194,87,55,0.2),transparent_35%)]" />
         <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-stone-600">Mode mission</p>
-            <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Architecte logiciel en conditions reelles</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs uppercase tracking-[0.24em] text-stone-600">Mode mission</p>
+              <SpaLink
+                aria-label="Ouvrir l’aide du mode mission"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white/90 text-sm font-bold text-stone-800 shadow-[0_10px_20px_rgba(47,37,22,0.08)] transition hover:-translate-y-0.5 hover:border-black/20"
+                href={buildHelpPath('missions')}
+                title="Aide du mode mission"
+                onNavigate={onNavigateHelp}
+              >
+                ?
+              </SpaLink>
+            </div>
+            <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Architecte logiciel en conditions réelles</h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700 sm:text-lg">
-              Choisis un scenario, puis ouvre sa page dediee pour composer la solution, configurer les patterns et verifier le systeme dans une scene SVG specifique a la mission.
+              Choisis un scénario, puis ouvre sa page dédiée pour composer la solution, configurer les patterns et vérifier le système dans une scène SVG spécifique à la mission.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {missionSteps.map((step, index) => (
                 <div key={step} className="rounded-[20px] border border-black/10 bg-white/80 px-4 py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">Etape {index + 1}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">Étape {index + 1}</p>
                   <p className="mt-1 text-sm font-semibold text-stone-900">{step}</p>
                 </div>
               ))}
@@ -95,13 +108,13 @@ export default function MissionCatalogPage({ missions, onOpenMission }) {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Principe</p>
             <ul className="mt-3 grid gap-3 text-sm leading-7 text-stone-700">
               <li className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3">
-                1. Choisir un scenario metier.
+                1. Choisir un scénario métier.
               </li>
               <li className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3">
-                2. Ouvrir sa page dediee pour composer la solution.
+                2. Ouvrir sa page dédiée pour composer la solution.
               </li>
               <li className="rounded-2xl border border-black/10 bg-[var(--panel)] px-4 py-3">
-                3. Configurer et verifier la mission dans une scene SVG specifique.
+                3. Configurer et vérifier la mission dans une scène SVG spécifique.
               </li>
             </ul>
           </div>
@@ -110,8 +123,8 @@ export default function MissionCatalogPage({ missions, onOpenMission }) {
 
       <CollapsiblePanel
         eyebrow="Missions"
-        title="Choisir un scenario"
-        description="Le catalogue sert uniquement a choisir une mission. Le clic ouvre ensuite une page detail distincte pour travailler sur ce scenario."
+        title="Choisir un scénario"
+        description="Le catalogue sert uniquement à choisir une mission. Le clic ouvre ensuite une page détail distincte pour travailler sur ce scénario."
         bodyClassName="grid gap-3"
       >
         <div className="grid gap-4 lg:grid-cols-3">
@@ -172,7 +185,7 @@ export default function MissionCatalogPage({ missions, onOpenMission }) {
             ))
           ) : (
             <div className="rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600 lg:col-span-2">
-              Aucun scenario ne correspond au filtre courant.
+              Aucun scénario ne correspond au filtre courant.
             </div>
           )}
         </div>
@@ -185,7 +198,7 @@ export default function MissionCatalogPage({ missions, onOpenMission }) {
               disabled={currentPage === 1}
               onClick={() => setPage(currentPage - 1)}
             >
-              Page precedente
+              Page précédente
             </button>
 
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (

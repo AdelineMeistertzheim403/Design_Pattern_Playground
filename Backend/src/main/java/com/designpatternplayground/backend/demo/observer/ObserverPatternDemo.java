@@ -44,8 +44,8 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 			"observer",
 			"Observer",
 			PatternType.BEHAVIORAL,
-			"Definit une dependance un vers plusieurs afin qu un sujet notifie automatiquement ses abonnes.",
-			"Diffuser un evenement produit a plusieurs modules abonnes comme une app mobile, un back office ou un journal d audit.",
+			"Définit une dépendance un vers plusieurs afin qu'un sujet notifie automatiquement ses abonnés.",
+			"Diffuser un événement produit à plusieurs modules abonnés comme une app mobile, un back office ou un journal d'audit.",
 			"INTERMEDIATE"
 		);
 	}
@@ -84,7 +84,7 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 
 		if (useObserver) {
 			NotificationPublisher publisher = new NotificationPublisher(config.subjectName());
-			logs.add("Creation du sujet : " + publisher.name() + ".");
+			logs.add("Création du sujet : " + publisher.name() + ".");
 
 			List<NotificationObserver> subscribers = config.observers().stream()
 				.map(SubscriberObserver::new)
@@ -96,20 +96,20 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 				logs.add("Abonnement de " + observer.name() + ".");
 			}
 
-			logs.add("Emission de l evenement : " + config.message() + ".");
+			logs.add("Émission de l événement : " + config.message() + ".");
 			deliveries = publisher.notifyObservers(config.message());
 			logs.add("Le sujet notifie " + deliveries.size() + " observer(s).");
 		} else {
 			logs.add("Mode sans Observer : le sujet connait explicitement toutes les cibles.");
-			logs.add("Creation du module emetteur : " + config.subjectName() + ".");
+			logs.add("Création du module émetteur : " + config.subjectName() + ".");
 			deliveries = config.observers().stream()
 				.map(observer -> new NotificationReceipt(
 					observer,
 					observer + " recoit la notification de " + config.subjectName() + " : " + config.message()
 				))
 				.toList();
-			logs.add("Emission de l evenement : " + config.message() + ".");
-			logs.add("Boucle manuelle sur " + deliveries.size() + " dependance(s) concretes.");
+			logs.add("Émission de l événement : " + config.message() + ".");
+			logs.add("Boucle manuelle sur " + deliveries.size() + " dépendance(s) concrètes.");
 		}
 
 		for (NotificationReceipt delivery : deliveries) {
@@ -134,7 +134,7 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 		nodes.add(new VisualizationNode("subject", config.subjectName(), "subject", Map.of("active", true)));
 		nodes.add(new VisualizationNode(
 			"event",
-			useObserver ? "Evenement" : "Manual loop",
+			useObserver ? "Événement" : "Manual loop",
 			"event",
 			Map.of("message", useObserver ? config.message() : "couplage direct")
 		));
@@ -158,8 +158,8 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useObserver
-				? "Observer relie un sujet a plusieurs abonnes afin qu ils soient tous prevenus lorsqu un evenement survient."
-				: "Sans Observer, l emetteur appelle directement chaque cible concrete et augmente son couplage.",
+				? "Observer relie un sujet à plusieurs abonnés afin qu ils soient tous prévenus lorsqu un événement survient."
+				: "Sans Observer, l émetteur appelle directement chaque cible concrète et augmente son couplage.",
 			logs,
 			output,
 			new VisualizationGraph(nodes, edges)
@@ -168,7 +168,7 @@ public class ObserverPatternDemo implements DesignPatternDemo {
 
 	private ObserverConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = normalizeMode(parameters.get("mode"));

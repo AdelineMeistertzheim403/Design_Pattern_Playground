@@ -16,8 +16,8 @@ public class AuthenticationHandler extends RequestHandler {
 
 		return HandlerEvaluation.reject(
 			request.tokenState() == RequestTokenState.EXPIRED
-				? "Token expire : la requete est arretee des le controle d authentification."
-				: "Aucun token fourni : la requete est rejetee avant toute validation metier.",
+				? "Token expiré : la requête est arrêtee des le contrôle d authentification."
+				: "Aucun token fourni : la requête est rejetee avant toute validation métier.",
 			label(),
 			code()
 		);

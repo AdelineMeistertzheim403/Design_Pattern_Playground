@@ -14,7 +14,7 @@ export function evaluatePattern(patternCode, config) {
   if (!validator) {
     return {
       ok: false,
-      summary: 'Ce pattern n est pas encore evalue par le moteur mission.',
+      summary: 'Ce pattern n’est pas encore évalué par le moteur mission.',
     }
   }
 

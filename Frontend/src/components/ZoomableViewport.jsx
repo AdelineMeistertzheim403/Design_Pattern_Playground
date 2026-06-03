@@ -113,7 +113,7 @@ export default function ZoomableViewport({
     <div className={viewportClassName}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-black/10 bg-white/72 px-4 py-3 text-xs text-stone-600">
         <p className="font-medium leading-6">
-          Roulette pour zoomer, glisser pour deplacer la vue.
+          Roulette pour zoomer, glisser pour déplacer la vue.
         </p>
         <div className="flex items-center gap-2">
           <button

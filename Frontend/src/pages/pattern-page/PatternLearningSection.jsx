@@ -6,20 +6,20 @@ export default function PatternLearningSection({
 }) {
   return (
     <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
-      <CollapsiblePanel eyebrow="Pedagogie" title="Comment lire cette page">
+      <CollapsiblePanel eyebrow="Pédagogie" title="Comment lire cette page">
         <div className="grid gap-4 md:grid-cols-2">
           <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Guide De Lecture</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Guide de lecture</p>
             <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.readingGuide}</p>
           </article>
 
           <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle Etudiant</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle étudiant</p>
             <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.studentAngle}</p>
           </article>
 
           <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle Developpeur</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Angle développeur</p>
             <p className="mt-3 text-sm leading-7 text-stone-700">{learningContent.developerAngle}</p>
           </article>
 
@@ -30,7 +30,7 @@ export default function PatternLearningSection({
         </div>
       </CollapsiblePanel>
 
-      <CollapsiblePanel eyebrow="Pas A Pas" title="Sequence de comprehension">
+      <CollapsiblePanel eyebrow="Pas à pas" title="Séquence de compréhension">
         <ol className="grid gap-3">
           {learningContent.steps.map((step, index) => (
             <li key={`${selectedPattern.code}-step-${index}`} className="flex gap-4 rounded-[24px] border border-black/10 bg-[var(--panel)] px-5 py-4">

@@ -50,7 +50,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 			"decorator",
 			"Decorator",
 			PatternType.STRUCTURAL,
-			"Ajoute des responsabilites a un objet dynamiquement en l enveloppant dans des decorators successifs.",
+			"Ajoute des responsabilités à un objet dynamiquement en l'enveloppant dans des decorators successifs.",
 			"Construire un personnage avec des power-ups empilables sans multiplier les classes du type PersonnageFeuBouclierVitesse.",
 			"INTERMEDIATE"
 		);
@@ -104,7 +104,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 		List<Map<String, Object>> stack = new ArrayList<>();
 		List<String> activeEffects = new ArrayList<>();
 
-		logs.add("Creation du composant de base " + config.characterName() + " sur le profil " + archetype.label() + ".");
+		logs.add("Création du composant de base " + config.characterName() + " sur le profil " + archetype.label() + ".");
 		logs.add("Stats de depart : " + describeStats(component.stats()) + ".");
 		activeEffects.add("Socle de base " + archetype.label());
 		stack.add(toLayerMap(
@@ -136,7 +136,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 			finalStats = component.stats();
 		} else {
 			CharacterStats runningStats = archetype.baseStats();
-			logs.add("Mode sans Decorator : les effets sont regroupes dans une classe concrete specialisee.");
+			logs.add("Mode sans Decorator : les effets sont regroupes dans une classe concrète spécialisée.");
 
 			for (String decoratorCode : config.decorators()) {
 				String layerLabel = layerLabelFor(decoratorCode);
@@ -153,7 +153,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 					"MONOLITH",
 					archetype.label().replace(" ", "") + "Combo",
 					"Monolithic build",
-					"Toutes les variations sont codees dans une seule classe concrete.",
+					"Toutes les variations sont codees dans une seule classe concrète.",
 					finalStats
 				));
 			}
@@ -187,9 +187,9 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			useDecorator
 				? (config.decorators().isEmpty()
-					? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe specialisee."
-					: "Decorator empile des effets autour du meme composant pour faire evoluer le build sans toucher a la classe d origine.")
-				: "Sans Decorator, les memes effets doivent etre regroupes dans une classe specialisee plus rigide et moins composable.",
+					? "Sans Decorator, le personnage reste un composant de base. Chaque nouvel effet demanderait sinon une nouvelle classe spécialisée."
+					: "Decorator empile des effets autour du même composant pour faire evoluer le build sans toucher à la classe d origine.")
+				: "Sans Decorator, les mêmes effets doivent etre regroupes dans une classe spécialisée plus rigide et moins composable.",
 			logs,
 			output,
 			buildVisualization(archetype, stack, finalStats, challengeMet)
@@ -275,8 +275,8 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 		return switch (decoratorCode) {
 			case "FIRE" -> "Ajoute une aura offensive et des attaques enflammees.";
 			case "SHIELD" -> "Ajoute une surcouche defensive sans toucher au composant de base.";
-			case "SPEED" -> "Ajoute un buff de mobilite visible immediatement dans les stats.";
-			case "ICE" -> "Ajoute du controle de zone et renforce legerement l offense et la defense.";
+			case "SPEED" -> "Ajoute un buff de mobilité visible immédiatement dans les stats.";
+			case "ICE" -> "Ajoute du contrôle de zone et renforce légerement l offense et la defense.";
 			default -> throw new InvalidPatternConfigurationException("Decorator inconnu : " + decoratorCode);
 		};
 	}
@@ -318,7 +318,7 @@ public class DecoratorPatternDemo implements DesignPatternDemo {
 
 	private DecoratorConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String characterName = requireText(parameters.get("characterName"), "characterName");

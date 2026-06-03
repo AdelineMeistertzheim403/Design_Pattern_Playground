@@ -69,6 +69,19 @@ export function buildPageSeoPayload({
     }
   }
 
+  if (pageKind === 'help') {
+    return {
+      canonicalUrl,
+      description: "Centre d'aide pour configurer les design patterns, utiliser le mode mission et construire des diagrammes dans l'editeur UML.",
+      imageUrl,
+      imageWidth: '1020',
+      imageHeight: '235',
+      robots: 'index,follow',
+      title: `Aide et fiches pedagogiques | ${SITE_NAME}`,
+      type: 'website',
+    }
+  }
+
   if (pageKind === 'legalNotice') {
     return {
       canonicalUrl,

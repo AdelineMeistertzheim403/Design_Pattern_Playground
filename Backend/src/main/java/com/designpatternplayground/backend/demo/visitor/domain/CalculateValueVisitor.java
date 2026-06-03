@@ -32,7 +32,7 @@ public final class CalculateValueVisitor implements StructureVisitor {
 	public VisitFeedback visitFile(WorkspaceFile file) {
 		totalSizeMb += file.sizeMb();
 		pricedFiles++;
-		return new VisitFeedback(false, file.sizeMb() + " MB ajoutes a la valeur totale.");
+		return new VisitFeedback(false, file.sizeMb() + " MB ajoutes à la valeur totale.");
 	}
 
 	@Override

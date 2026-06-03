@@ -41,7 +41,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 			"Adapter",
 			PatternType.STRUCTURAL,
 			"Traduit une interface incompatible vers le contrat attendu par le client sans modifier le composant legacy.",
-			"Connecter un systeme historique a une cible moderne en convertissant le protocole, le connecteur ou le format de message.",
+			"Connecter un système historique à une cible moderne en convertissant le protocole, le connecteur ou le format de message.",
 			"INTERMEDIATE"
 		);
 	}
@@ -52,7 +52,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_ADAPTER, WITHOUT_ADAPTER), WITH_ADAPTER),
 			new PatternField(
 				"scenario",
-				"Scenario",
+				"Scénario",
 				FieldType.SELECT,
 				true,
 				List.of("VGA_TO_HDMI", "SERIAL_TO_REST", "XML_TO_JSON"),
@@ -75,7 +75,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 		steps.add(new AdaptationStep(
 			1,
 			"SOURCE_EMIT",
-			"Emission source",
+			"Émission source",
 			scenario.sourceSystem(),
 			scenario.sourceProtocol(),
 			sourceSignal,
@@ -90,7 +90,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 				"ADAPT",
 				"Conversion",
 				scenario.adapterClassName(),
-				"Target -> Adaptee bridge",
+				"Target -> Adaptée bridge",
 				adaptedSignal,
 				scenario.adapterRole(),
 				true
@@ -125,7 +125,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 		boolean compatible = useAdapter;
 		String compatibilityLabel = compatible ? "Compatibilite obtenue" : "Connexion refusee";
 		String summary = compatible
-			? "Adapter traduit l interface legacy vers le contrat attendu par la cible sans toucher ni au client ni a l adaptee."
+			? "Adapter traduit l'interface legacy vers le contrat attendu par la cible sans toucher ni au client ni à l'adaptée."
 			: "Sans Adapter, la source et la cible restent incompatibles. Le client tente de brancher deux contrats qui ne se comprennent pas.";
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
@@ -217,7 +217,7 @@ public class AdapterPatternDemo implements DesignPatternDemo {
 
 	private AdapterConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Adapter sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Adapter sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);

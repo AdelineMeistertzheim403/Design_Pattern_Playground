@@ -56,19 +56,19 @@ export function evaluateMissionSolution({
       .map((report) => `${report.patternName}: ${report.summary}`),
     ...unexpectedPatterns.map((patternCode) => {
       const definition = patternsByCode[patternCode]
-      return `${definition?.name ?? patternCode}: ce choix ajoute de la complexite sans couvrir le coeur du probleme.`
+      return `${definition?.name ?? patternCode}: ce choix ajoute de la complexité sans couvrir le cœur du problème.`
     }),
   ]
 
   const feedback = success
-    ? 'La mission tient la route: la combinaison choisie couvre bien le probleme et la simulation confirme la qualite de la solution.'
+    ? 'La mission tient la route : la combinaison choisie couvre bien le problème et la simulation confirme la qualité de la solution.'
     : score >= 70
-      ? 'La direction est bonne, mais la solution reste incomplete ou trop fragile sur certains points.'
-      : 'La mission n est pas encore resolue. Le choix ou la configuration restent trop eloignes du probleme cible.'
+      ? 'La direction est bonne, mais la solution reste incomplète ou trop fragile sur certains points.'
+      : 'La mission n’est pas encore résolue. Le choix ou la configuration restent trop éloignés du problème cible.'
 
   const logs = [
-    `Mission analysee: ${mission.title}`,
-    `Patterns selectionnes: ${selectedPatterns.length ? selectedPatterns.join(', ') : 'aucun'}`,
+    `Mission analysée : ${mission.title}`,
+    `Patterns sélectionnés : ${selectedPatterns.length ? selectedPatterns.join(', ') : 'aucun'}`,
     ...patternReports.map((report) => `${report.patternName}: ${report.summary}`),
   ]
 

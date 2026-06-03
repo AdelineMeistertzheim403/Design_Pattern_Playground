@@ -213,7 +213,7 @@ function buildLegacyFlyweightTextReplacements(execution) {
     [/Cout frame simule : 13,7 ms/g, `Cout frame simule : ${formatLocale(output.simulatedFrameCostMs ?? 0)} ms`],
     [/POOL PARTAGE/g, resolveComputedTemplate('computed.flyweight.poolTitle', execution)],
     [/INSTANCE STORM/g, resolveComputedTemplate('computed.flyweight.poolTitle', execution)],
-    [/6 instance\(s\) reelle\(s\)/g, `${realInstances} instance(s) reelle(s)`],
+    [/6 instance\(s\) reelle\(s\)/g, `${realInstances} instance(s) réelle(s)`],
     [/6 variante\(s\) alimentent toute la foule/g, resolveComputedTemplate('computed.flyweight.poolSubtitle', execution)],
     [/Chaque objet conserve son propre etat intrinsique/g, resolveComputedTemplate('computed.flyweight.poolSubtitle', execution)],
     [/instance partagee/g, output.mode === 'WITHOUT_FLYWEIGHT' ? 'copies regroupees' : 'instance partagee'],
@@ -305,9 +305,9 @@ export default function EditableSvgScene({
       {hasSteps && interactive ? (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Pas a pas</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Pas à pas</p>
             <p className="mt-1 text-sm font-semibold text-stone-900">
-              {renderTemplate(normalizedScene.steps[activeStepIndex]?.label ?? `Etape ${activeStepIndex + 1}`, execution)}
+              {renderTemplate(normalizedScene.steps[activeStepIndex]?.label ?? `Étape ${activeStepIndex + 1}`, execution)}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -317,7 +317,7 @@ export default function EditableSvgScene({
               type="button"
               onClick={() => setActiveStepIndex((current) => Math.max(0, current - 1))}
             >
-              Precedent
+              Précédent
             </button>
             <button
               className="rounded-full bg-stone-950 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"

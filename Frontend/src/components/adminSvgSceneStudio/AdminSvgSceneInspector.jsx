@@ -18,11 +18,11 @@ export default function AdminSvgSceneInspector({
           <div className="mt-4 flex flex-col gap-4">
             {selectedElementIds.length > 1 ? (
               <p className="rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">
-                {selectedElementIds.length} elements selectionnes
+                {selectedElementIds.length} éléments sélectionnés
               </p>
             ) : null}
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Libelle</span>
+              <span className="font-semibold text-stone-900">Libellé</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedElement.label} onChange={(event) => updateSelectedElement((element) => ({ ...element, label: event.target.value }))} />
             </label>
             {selectedElement.type !== 'text' ? (
@@ -47,7 +47,7 @@ export default function AdminSvgSceneInspector({
             </div>
             {selectedElement.type === 'raw' ? (
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Markup SVG de l element</span>
+                <span className="font-semibold text-stone-900">Markup SVG de l'élément</span>
                 <textarea
                   className="min-h-40 rounded-2xl border border-black/10 bg-[#241f18] px-3 py-3 font-mono text-[11px] leading-5 text-[#fffaf2] outline-none"
                   value={selectedElement.rawMarkup ?? ''}
@@ -60,7 +60,7 @@ export default function AdminSvgSceneInspector({
         ) : selectedArrow ? (
           <div className="mt-4 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Etiquette</span>
+              <span className="font-semibold text-stone-900">Étiquette</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedArrow.label} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, label: event.target.value }))} />
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -73,7 +73,7 @@ export default function AdminSvgSceneInspector({
             </div>
             <label className="flex items-center gap-3 text-sm text-stone-700">
               <input checked={selectedArrow.dashed} type="checkbox" onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, dashed: event.target.checked }))} />
-              Trait pointille
+              Trait pointillé
             </label>
             <label className="flex flex-col gap-2 text-sm text-stone-700">
               <span className="font-semibold text-stone-900">Courbure</span>
@@ -131,11 +131,11 @@ export default function AdminSvgSceneInspector({
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Duree</span>
+                <span className="font-semibold text-stone-900">Durée</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" min="0.2" step="0.1" type="number" value={selectedArrow.animation?.durationSeconds ?? 1.8} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, animation: { ...(arrow.animation ?? {}), durationSeconds: Number(event.target.value) } }))} />
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Etape</span>
+                <span className="font-semibold text-stone-900">Étape</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" min="0" type="number" value={selectedArrow.stepIndex ?? 0} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, stepIndex: Number(event.target.value) }))} />
               </label>
             </div>
@@ -147,7 +147,7 @@ export default function AdminSvgSceneInspector({
           </div>
         ) : (
           <p className="mt-4 text-sm leading-7 text-stone-700">
-            Selectionne une forme, un texte ou une fleche pour modifier ses proprietes.
+            Sélectionne une forme, un texte ou une flèche pour modifier ses propriétés.
           </p>
         )}
       </section>

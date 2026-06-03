@@ -17,6 +17,7 @@ export default function MissionPage({
   currentUser,
   initialMissionId,
   patterns,
+  onNavigateHelp,
   onNavigateMission,
   onNavigatePattern,
 }) {
@@ -31,6 +32,7 @@ export default function MissionPage({
       <Suspense fallback={<MissionSectionFallback />}>
         <MissionCatalogPage
           missions={missions}
+          onNavigateHelp={onNavigateHelp}
           onOpenMission={(missionId) => onNavigateMission(missionId)}
         />
       </Suspense>
@@ -44,6 +46,7 @@ export default function MissionPage({
         currentUser={currentUser}
         mission={selectedMission}
         patterns={patterns}
+        onNavigateHelp={onNavigateHelp}
         onNavigateMission={onNavigateMission}
         onNavigatePattern={onNavigatePattern}
       />

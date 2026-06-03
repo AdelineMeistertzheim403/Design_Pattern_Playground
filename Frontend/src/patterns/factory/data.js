@@ -181,7 +181,7 @@ export const fallbackQuiz = {
         },
         {
           "id": "create",
-          "label": "Creer des objets"
+          "label": "Créer des objets"
         },
         {
           "id": "delete",
@@ -347,7 +347,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "behavioral",
@@ -437,7 +437,7 @@ export const fallbackQuiz = {
         },
         {
           "id": "vehicle",
-          "label": "Creation de vehicules"
+          "label": "Création de véhicules"
         },
         {
           "id": "logs",

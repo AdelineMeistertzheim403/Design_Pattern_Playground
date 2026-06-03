@@ -43,8 +43,8 @@ public class MementoPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Memento",
 			PatternType.BEHAVIORAL,
-			"Capture et restaure un etat interne sans exposer directement les details de cet etat au client.",
-			"Sauvegarder une scene, appliquer des mutations risquees puis restaurer proprement un checkpoint comme dans un jeu ou un editeur.",
+			"Capture et restaure un état interne sans exposer directement les détails de cet état au client.",
+			"Sauvegarder une scène, appliquer des mutations risquées puis restaurer proprement un checkpoint comme dans un jeu ou un éditeur.",
 			"INTERMEDIATE"
 		);
 	}
@@ -55,7 +55,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_MEMENTO, WITHOUT_MEMENTO), WITH_MEMENTO),
 			new PatternField(
 				"presetCode",
-				"Scene",
+				"Scène",
 				FieldType.SELECT,
 				true,
 				List.of("PIXEL_GARDEN", "ARCADE_HUB", "CONTROL_ROOM"),
@@ -93,7 +93,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 			SNAPSHOT_ALPHA,
 			"Checkpoint Alpha",
 			3,
-			"Capture juste apres la personnalisation de la scene.",
+			"Capture juste après la personnalisation de la scène.",
 			styledState
 		);
 		MementoWorkspaceState boostedState = new MementoWorkspaceState(
@@ -139,9 +139,9 @@ public class MementoPatternDemo implements DesignPatternDemo {
 			new MementoStep(
 				1,
 				"INIT",
-				"Etat initial",
+				"État initial",
 				"SceneEditor",
-				"Le workspace charge la scene de base et expose l etat courant a l originator.",
+				"Le workspace charge la scène de base et expose l'état courant à l'originator.",
 				false,
 				null,
 				initialState
@@ -162,7 +162,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 				"Sauvegarde Alpha",
 				useMemento ? "Caretaker" : "Client notes",
 				useMemento
-					? "Le caretaker stocke un memento complet sans exposer l interieur de la scene."
+					? "Le caretaker stocke un memento complet sans exposer l'intérieur de la scène."
 					: "Le client note quelques valeurs visibles, mais pas un snapshot fiable.",
 				true,
 				checkpointAlpha.code(),
@@ -173,7 +173,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 				"BOOST",
 				"Mutation avancee",
 				"SceneEditor",
-				"La scene gagne des couches et de l energie avant un second snapshot.",
+				"La scène gagne des couches et de l'énergie avant un second snapshot.",
 				false,
 				null,
 				boostedState
@@ -184,7 +184,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 				"Sauvegarde Beta",
 				useMemento ? "Caretaker" : "Client notes",
 				useMemento
-					? "Un second memento capture exactement l etat juste avant la mutation critique."
+					? "Un second memento capture exactement l'état juste avant la mutation critique."
 					: "Le client enregistre un deuxieme checkpoint partiel base sur des notes visibles.",
 				true,
 				checkpointBeta.code(),
@@ -195,7 +195,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 				"CRASH",
 				"Mutation critique",
 				"SceneEditor",
-				"Une mutation risquee pousse la scene dans un etat critique avec energie basse et annotations surchargees.",
+				"Une mutation risquée pousse la scène dans un état critique avec énergie basse et annotations surchargées.",
 				false,
 				null,
 				emergencyState
@@ -206,7 +206,7 @@ public class MementoPatternDemo implements DesignPatternDemo {
 				"Restauration",
 				useMemento ? "Originator" : "Client rewind",
 				useMemento
-					? "L originator recharge le snapshot choisi et revient exactement a l etat capture."
+					? "L'originator recharge le snapshot choisi et revient exactement à l'état capturé."
 					: preset.manualDriftDetail(),
 				false,
 				restoreTarget.code(),
@@ -218,12 +218,12 @@ public class MementoPatternDemo implements DesignPatternDemo {
 		List<String> logs = List.of(
 			config.workspaceName() + " ouvre " + preset.label() + ".",
 			useMemento
-				? "Les savepoints passent par caretaker + memento, sans exposer la structure interne de la scene."
-				: "Sans Memento, le client essaie de memoriser l etat via des notes partielles.",
+				? "Les savepoints passent par caretaker + memento, sans exposer la structure interne de la scène."
+				: "Sans Memento, le client essaie de mémoriser l'état via des notes partielles.",
 			"Checkpoint Alpha capture " + checkpointAlpha.snapshotState().theme() + " avec " + checkpointAlpha.snapshotState().annotationCount() + " annotation(s).",
 			"Checkpoint Beta capture " + checkpointBeta.snapshotState().layerCount() + " couches avant la mutation critique.",
 			useMemento
-				? "La restauration sur " + restoreTarget.label() + " revient exactement a l etat capture."
+				? "La restauration sur " + restoreTarget.label() + " revient exactement à l'état capturé."
 				: preset.manualDriftDetail()
 		);
 
@@ -250,8 +250,8 @@ public class MementoPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useMemento
-				? "Memento isole la capture d etat dans un objet snapshot. Le caretaker empile les savepoints et l originator peut restaurer exactement un ancien etat."
-				: "Sans Memento, le client tente de rejouer un ancien etat avec des notes partielles. La restauration semble marcher, mais plusieurs champs restent derives.",
+				? "Memento isole la capture d'état dans un objet snapshot. Le caretaker empile les savepoints et l'originator peut restaurer exactement un ancien état."
+				: "Sans Memento, le client tente de rejouer un ancien état avec des notes partielles. La restauration semble marcher, mais plusieurs champs restent dérivés.",
 			logs,
 			output,
 			buildVisualization(useMemento, restoreTarget, restoredState)

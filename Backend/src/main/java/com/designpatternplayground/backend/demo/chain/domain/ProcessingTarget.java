@@ -6,8 +6,8 @@ import com.designpatternplayground.backend.common.exception.InvalidPatternConfig
 
 public enum ProcessingTarget {
 
-	REPORT_EXPORT("REPORT_EXPORT", "Export de rapport", "Le service de reporting genere le fichier demande."),
-	BULK_IMPORT("BULK_IMPORT", "Import en masse", "Le service d import planifie le traitement des donnees."),
+	REPORT_EXPORT("REPORT_EXPORT", "Export de rapport", "Le service de reporting génère le fichier demande."),
+	BULK_IMPORT("BULK_IMPORT", "Import en masse", "Le service d import planifie le traitement des données."),
 	PASSWORD_RESET("PASSWORD_RESET", "Reinitialisation de mot de passe", "Le service IAM emet un jeton de reinitialisation.");
 
 	private final String code;

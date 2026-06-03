@@ -326,7 +326,7 @@ export default function IteratorScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Traversal Explorer')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -355,7 +355,7 @@ export default function IteratorScene({
             type="button"
             onClick={() => setPlayMode('STEP')}
           >
-            Pas a pas
+            Pas à pas
           </button>
         </div>
 
@@ -376,10 +376,10 @@ export default function IteratorScene({
           ) : null}
 
           <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>
-            Animer la scene
+            Animer la scène
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>
-            Precedent
+            Précédent
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleNext} disabled={currentFrameIndex >= frames.length - 1}>
             Suivant
@@ -517,7 +517,7 @@ export default function IteratorScene({
             Timeline de parcours
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
-            {visibleSteps.length}/{model.steps.length} etapes · curseur sur {resultLabel}
+            {visibleSteps.length}/{model.steps.length} étapes · curseur sur {resultLabel}
           </text>
 
           {model.steps.map((step, index) => {

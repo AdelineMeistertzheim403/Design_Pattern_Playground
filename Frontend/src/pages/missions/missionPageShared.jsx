@@ -1,13 +1,41 @@
 import { useState } from 'react'
 
 export const missionSteps = [
-  'Probleme',
+  'Problème',
   'Analyse',
   'Composition de la solution',
   'Configuration',
   'Simulation',
-  'Resultat',
+  'Résultat',
 ]
+
+export function MissionBrief({ mission, compact = false }) {
+  return (
+    <div className={`grid gap-3 ${compact ? '' : 'lg:grid-cols-3'}`}>
+      <article className="rounded-[18px] border border-black/10 bg-[var(--panel)] px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">1. Comprendre</p>
+        <p className="mt-1 text-sm leading-6 text-stone-700">{mission.context}</p>
+      </article>
+
+      <article className="rounded-[18px] border border-black/10 bg-[var(--panel)] px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">2. Diagnostiquer</p>
+        <ul className="mt-1 grid gap-1.5 text-sm leading-6 text-stone-700">
+          {mission.problems.map((problem) => (
+            <li key={problem}>- {problem}</li>
+          ))}
+        </ul>
+      </article>
+
+      <article className="rounded-[18px] border border-black/10 bg-[var(--panel)] px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">3. Décider</p>
+        <p className="mt-1 text-sm leading-6 text-stone-700">{mission.objective}</p>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          Choisis le ou les patterns qui couvrent ce besoin, puis configure seulement ce qui permet de le prouver.
+        </p>
+      </article>
+    </div>
+  )
+}
 
 export function MissionCard({ mission, onOpen }) {
   return (
@@ -23,7 +51,10 @@ export function MissionCard({ mission, onOpen }) {
         </span>
       </div>
       <h3 className="mt-2 text-xl">{mission.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-stone-700">{mission.objective}</p>
+      <p className="mt-2 text-sm leading-6 text-stone-700">{mission.description}</p>
+      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+        {mission.expectedPatterns?.length > 1 ? 'Solution à composer' : 'Pattern à identifier'}
+      </p>
     </button>
   )
 }
@@ -61,7 +92,7 @@ export async function executeMissionPattern({ backendStatus, patternCode, parame
   return executeFallbackPattern(patternCode, parameters)
 }
 
-export function CandidatePatternCard({ pattern, missionPrompt, onAdd }) {
+export function CandidatePatternCard({ pattern, onAdd }) {
   function handleDragStart(event) {
     event.dataTransfer.setData('text/plain', pattern.code)
     event.dataTransfer.effectAllowed = 'copy'
@@ -79,7 +110,7 @@ export function CandidatePatternCard({ pattern, missionPrompt, onAdd }) {
           {pattern.type}
         </span>
       </div>
-      <p className="mt-2 text-sm leading-6 text-stone-600">{missionPrompt ?? pattern.useCase}</p>
+      <p className="mt-2 text-sm leading-6 text-stone-600">{pattern.description ?? pattern.useCase}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"

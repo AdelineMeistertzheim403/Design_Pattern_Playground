@@ -34,14 +34,14 @@ export default function SvgSceneStudioPalette({
       <section className="rounded-[30px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Palette</p>
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={() => onAddElement('rect')}>Boite</button>
-          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={() => onAddElement('ellipse')}>Noeud</button>
+          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={() => onAddElement('rect')}>Boîte</button>
+          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={() => onAddElement('ellipse')}>Nœud</button>
           <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={() => onAddElement('text')}>Texte</button>
-          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={onAddArrow}>Fleche</button>
+          <button className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-stone-800" type="button" onClick={onAddArrow}>Flèche</button>
         </div>
 
         <label className="mt-5 flex flex-col gap-2 text-sm text-stone-700">
-          <span className="font-semibold text-stone-900">Importer des elements de scene</span>
+          <span className="font-semibold text-stone-900">Importer des éléments de scène</span>
           <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={importPatternCodeValue} onChange={(event) => onImportPatternCodeChange(event.target.value)}>
             {patterns.map((pattern) => (
               <option key={pattern.code} value={pattern.code}>{pattern.name}</option>
@@ -49,13 +49,13 @@ export default function SvgSceneStudioPalette({
           </select>
         </label>
         <button className="mt-3 w-full rounded-full border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-stone-800 disabled:opacity-60" type="button" disabled={loadPending} onClick={onImportPatternScene}>
-          {loadPending ? 'Chargement...' : 'Charger les elements du pattern'}
+          {loadPending ? 'Chargement...' : 'Charger les éléments du pattern'}
         </button>
 
         {importedPatternElements.length ? (
           <div className="mt-4 flex flex-col gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-              Elements disponibles
+              Éléments disponibles
             </p>
             <div className="max-h-72 overflow-y-auto rounded-2xl border border-black/10 bg-[#fffaf2] p-3">
               <div className="flex flex-col gap-3">
@@ -101,10 +101,10 @@ export default function SvgSceneStudioPalette({
         </label>
 
         <label className="mt-4 flex flex-col gap-2 text-sm text-stone-700">
-          <span className="font-semibold text-stone-900">Mode d animation</span>
+          <span className="font-semibold text-stone-900">Mode d'animation</span>
           <select className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={playbackMode} onChange={(event) => onPlaybackModeChange(event.target.value)}>
             <option value="auto">Animation automatique</option>
-            <option value="step">Pas a pas</option>
+            <option value="step">Pas à pas</option>
           </select>
         </label>
       </section>

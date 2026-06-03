@@ -223,7 +223,7 @@ export default function useMissionDetail({ backendStatus, currentUser, mission, 
       return true
     } catch (requestError) {
       setResult(null)
-      setError(requestError.message ?? "L execution de la mission a echoue.")
+      setError(requestError.message ?? "L’exécution de la mission a échoué.")
       return false
     } finally {
       setExecutionPending(false)

@@ -170,7 +170,7 @@ export default function FlyweightScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Memory Battle')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -333,7 +333,7 @@ export default function FlyweightScene({
             {model.useFlyweight ? 'POOL PARTAGE' : 'INSTANCE STORM'}
           </text>
           <text x={statsX + 24} y={poolY + 62} fontSize="26" fontWeight="700" fill="#241f18">
-            {model.realInstances.toLocaleString('fr-FR')} instance(s) reelle(s)
+            {model.realInstances.toLocaleString('fr-FR')} instance(s) réelle(s)
           </text>
           <text x={statsX + 24} y={poolY + 90} fontSize="14" fill="#5f5548">
             {model.useFlyweight

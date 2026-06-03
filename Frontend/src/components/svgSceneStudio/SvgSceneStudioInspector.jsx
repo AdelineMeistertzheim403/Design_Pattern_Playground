@@ -15,7 +15,7 @@ export default function SvgSceneStudioInspector({
         {selectedElement ? (
           <div className="mt-4 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Libelle</span>
+              <span className="font-semibold text-stone-900">Libellé</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedElement.label} onChange={(event) => updateSelectedElement((element) => ({ ...element, label: event.target.value }))} />
             </label>
             {selectedElement.type !== 'text' ? (
@@ -41,11 +41,11 @@ export default function SvgSceneStudioInspector({
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center gap-3 text-sm text-stone-700">
                 <input checked={selectedElement.animation?.enabled !== false} type="checkbox" onChange={(event) => updateSelectedElement((element) => ({ ...element, animation: { ...normalizeElementAnimation(element.animation), enabled: event.target.checked } }))} />
-                Animation d apparition
+                Animation d'apparition
               </label>
               <div />
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Etape d apparition</span>
+                <span className="font-semibold text-stone-900">Étape d'apparition</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0" value={selectedElement.animation?.stepIndex ?? 0} onChange={(event) => updateSelectedElement((element) => ({ ...element, animation: { ...normalizeElementAnimation(element.animation), stepIndex: Math.max(0, Number(event.target.value) || 0) } }))} />
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
@@ -53,7 +53,7 @@ export default function SvgSceneStudioInspector({
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0.1" step="0.1" value={selectedElement.animation?.fadeInSeconds ?? 0.45} onChange={(event) => updateSelectedElement((element) => ({ ...element, animation: { ...normalizeElementAnimation(element.animation), fadeInSeconds: clampNumber(event.target.value, 0.45, 0.1) } }))} />
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Delai (s)</span>
+                <span className="font-semibold text-stone-900">Délai (s)</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0" step="0.1" value={selectedElement.animation?.delaySeconds ?? 0} onChange={(event) => updateSelectedElement((element) => ({ ...element, animation: { ...normalizeElementAnimation(element.animation), delaySeconds: clampNumber(event.target.value, 0, 0) } }))} />
               </label>
             </div>
@@ -76,19 +76,19 @@ export default function SvgSceneStudioInspector({
         ) : selectedArrow ? (
           <div className="mt-4 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Etiquette</span>
+              <span className="font-semibold text-stone-900">Étiquette</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" value={selectedArrow.label} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, label: event.target.value }))} />
             </label>
             <label className="flex items-center gap-3 text-sm text-stone-700">
               <input checked={selectedArrow.dashed} type="checkbox" onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, dashed: event.target.checked }))} />
-              Trait pointille
+              Trait pointillé
             </label>
             <label className="flex flex-col gap-2 text-sm text-stone-700">
               <span className="font-semibold text-stone-900">Courbure</span>
               <input min="-300" max="300" step="10" type="range" value={selectedArrow.curvature ?? 0} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, curvature: Number(event.target.value) }))} />
             </label>
             <label className="flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Ordre animation / etape</span>
+                <span className="font-semibold text-stone-900">Ordre animation / étape</span>
               <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0" value={selectedArrow.stepIndex ?? 0} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, stepIndex: Math.max(0, Number(event.target.value) || 0) }))} />
             </label>
             <label className="flex items-center gap-3 text-sm text-stone-700">
@@ -97,7 +97,7 @@ export default function SvgSceneStudioInspector({
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Duree (s)</span>
+                <span className="font-semibold text-stone-900">Durée (s)</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0.2" step="0.1" value={selectedArrow.animation?.durationSeconds ?? 1.8} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, animation: { ...arrow.animation, durationSeconds: Number(event.target.value) || 1.8 } }))} />
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
@@ -109,7 +109,7 @@ export default function SvgSceneStudioInspector({
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="1" step="1" value={selectedArrow.animation?.pointRadius ?? 5} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, animation: { ...normalizeArrowAnimation(arrow.animation), pointRadius: clampNumber(event.target.value, 5, 1) } }))} />
               </label>
               <label className="flex flex-col gap-2 text-sm text-stone-700">
-                <span className="font-semibold text-stone-900">Delai animation (s)</span>
+                <span className="font-semibold text-stone-900">Délai animation (s)</span>
                 <input className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none" type="number" min="0" step="0.1" value={selectedArrow.animation?.delaySeconds ?? 0} onChange={(event) => updateSelectedArrow((arrow) => ({ ...arrow, animation: { ...normalizeArrowAnimation(arrow.animation), delaySeconds: clampNumber(event.target.value, 0, 0) } }))} />
               </label>
             </div>
@@ -117,7 +117,7 @@ export default function SvgSceneStudioInspector({
           </div>
         ) : (
           <p className="mt-4 rounded-2xl border border-dashed border-black/12 bg-white/80 px-4 py-4 text-sm text-stone-600">
-            Selectionne un element ou une fleche pour modifier ses proprietes.
+            Sélectionne un élément ou une flèche pour modifier ses propriétés.
           </p>
         )}
       </section>

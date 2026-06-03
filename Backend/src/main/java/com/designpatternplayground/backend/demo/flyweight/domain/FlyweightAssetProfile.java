@@ -20,7 +20,7 @@ public record FlyweightAssetProfile(
 			"Arbres",
 			48,
 			6,
-			"Chaque arbre partage le meme mesh, la meme texture et la meme palette."
+			"Chaque arbre partage le même mesh, la même texture et la même palette."
 		),
 		"PARTICLE",
 		new FlyweightAssetProfile(
@@ -28,7 +28,7 @@ public record FlyweightAssetProfile(
 			"Particules",
 			18,
 			3,
-			"Chaque particule partage ses donnees de rendu mais garde sa position et sa vitesse."
+			"Chaque particule partage ses données de rendu mais garde sa position et sa vitesse."
 		),
 		"BULLET",
 		new FlyweightAssetProfile(
@@ -36,7 +36,7 @@ public record FlyweightAssetProfile(
 			"Projectiles",
 			12,
 			2,
-			"Chaque projectile partage son sprite et sa collision mais garde son etat de trajectoire."
+			"Chaque projectile partage son sprite et sa collision mais garde son état de trajectoire."
 		)
 	);
 

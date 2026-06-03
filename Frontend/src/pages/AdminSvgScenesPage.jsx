@@ -32,12 +32,12 @@ import {
 
 function AccessMessage({ currentUser, onNavigateHome }) {
   const isAdmin = currentUser?.role === 'ADMIN'
-  const title = !currentUser ? 'Edition SVG reservee' : isAdmin ? 'Mode Admin SVG indisponible' : 'Acces admin requis'
+  const title = !currentUser ? 'Édition SVG réservée' : isAdmin ? 'Mode Admin SVG indisponible' : 'Accès admin requis'
   const message = !currentUser
-    ? 'Cette page necessite une session authentifiee avec un compte admin.'
+    ? 'Cette page nécessite une session authentifiée avec un compte admin.'
     : isAdmin
-      ? 'Le backend doit etre actif pour charger et enregistrer les scenes SVG.'
-      : 'Le compte courant n a pas le role ADMIN.'
+      ? 'Le backend doit être actif pour charger et enregistrer les scènes SVG.'
+      : "Le compte courant n'a pas le rôle ADMIN."
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
@@ -47,7 +47,7 @@ function AccessMessage({ currentUser, onNavigateHome }) {
         <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">{message}</p>
         {!currentUser ? (
           <button className="mt-6 rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white" type="button" onClick={onNavigateHome}>
-            Retour a l accueil
+            Retour à l'accueil
           </button>
         ) : null}
       </section>
@@ -203,7 +203,7 @@ export default function AdminSvgScenesPage({
             execution,
             SceneComponent,
           })
-          setNotice('Import de la scene SVG existante en cours...')
+          setNotice('Import de la scène SVG existante en cours...')
         } else {
           setDraft(await createDraftFromPatternExecution(
             selectedCode,
@@ -249,13 +249,13 @@ export default function AdminSvgScenesPage({
 
         const svg = sourceSceneRef.current?.querySelector('svg')
         if (!svg) {
-          setNotice('Impossible de trouver le SVG rendu par la scene existante.')
+          setNotice('Impossible de trouver le SVG rendu par la scène existante.')
           return
         }
 
         setDraft(createDraftFromRenderedSvg(svg, sceneName || selectedCode, renderedSource.execution))
         clearSelection()
-        setNotice('Scene SVG existante importee depuis le rendu du pattern.')
+        setNotice('Scène SVG existante importée depuis le rendu du pattern.')
       }, 0)
     })
 
@@ -461,7 +461,7 @@ export default function AdminSvgScenesPage({
     const element = {
       id: `element-${Date.now()}`,
       type,
-      label: type === 'text' ? 'Texte' : type === 'ellipse' ? 'Noeud' : 'Element',
+      label: type === 'text' ? 'Texte' : type === 'ellipse' ? 'Nœud' : 'Élément',
       subtitle: type === 'rect' ? 'detail' : '',
       x: 160 + draft.elements.length * 28,
       y: 140 + draft.elements.length * 24,
@@ -527,7 +527,7 @@ export default function AdminSvgScenesPage({
     const code = slugify(newSceneCode)
     const name = newSceneName.trim()
     if (!code || !name) {
-      setNotice('Renseigne un code et un nom pour creer une scene.')
+      setNotice('Renseigne un code et un nom pour créer une scène.')
       return
     }
 
@@ -535,12 +535,12 @@ export default function AdminSvgScenesPage({
     setSceneName(name)
     setDraft(createDefaultDraft(name))
     clearSelection()
-    setNotice('Nouvelle scene initialisee. Tu peux maintenant la composer dans le canvas.')
+    setNotice('Nouvelle scène initialisée. Tu peux maintenant la composer dans le canvas.')
   }
 
   async function handleReimportPatternScene() {
     if (!selectedCode) {
-      setNotice('Choisis un pattern avant de reimporter sa scene SVG.')
+      setNotice('Choisis un pattern avant de réimporter sa scène SVG.')
       return
     }
 
@@ -563,7 +563,7 @@ export default function AdminSvgScenesPage({
           execution,
           SceneComponent,
         })
-        setNotice('Reimport de la scene SVG existante en cours...')
+        setNotice('Réimport de la scène SVG existante en cours...')
       } else {
         setRenderedSource(null)
         setDraft(await createDraftFromPatternExecution(
@@ -574,7 +574,7 @@ export default function AdminSvgScenesPage({
           normalizeParameters,
           buildInitialParameters,
         ))
-        setNotice('Scene reconstruite depuis la visualisation du pattern.')
+        setNotice('Scène reconstruite depuis la visualisation du pattern.')
       }
       clearSelection()
     } catch (error) {
@@ -586,7 +586,7 @@ export default function AdminSvgScenesPage({
 
   async function handleSave() {
     if (!selectedCode) {
-      setNotice('Choisis une scene ou cree un nouveau code avant de sauvegarder.')
+      setNotice('Choisis une scène ou crée un nouveau code avant de sauvegarder.')
       return
     }
 
@@ -603,7 +603,7 @@ export default function AdminSvgScenesPage({
       setStoredScenes(freshIndex ?? [])
       setSceneName(saved.name)
       setDraft(parseStoredDraft(saved.svgMarkup, saved.name))
-      setNotice(`Scene SVG enregistree par ${saved.updatedBy}.`)
+      setNotice(`Scène SVG enregistrée par ${saved.updatedBy}.`)
     } catch (error) {
       setNotice(error.message)
     } finally {
@@ -622,7 +622,7 @@ export default function AdminSvgScenesPage({
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Admin SVG</p>
           <h1 className="mt-3 text-4xl text-stone-950">Changement de mot de passe requis</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-            Le compte admin par defaut doit d abord changer son mot de passe initial depuis la fenetre Compte.
+            Le compte admin par défaut doit d'abord changer son mot de passe initial depuis la fenêtre Compte.
           </p>
         </section>
       </div>
@@ -652,9 +652,9 @@ export default function AdminSvgScenesPage({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Admin SVG</p>
         <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-4xl text-stone-950">Editeur visuel de scenes SVG</h1>
+            <h1 className="text-4xl text-stone-950">Éditeur visuel de scènes SVG</h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-700">
-              Compose la scene dans le canvas, deplace les elements, redimensionne-les, ajuste les fleches et sauvegarde le SVG en base.
+              Compose la scène dans le canvas, déplace les éléments, redimensionne-les, ajuste les flèches et sauvegarde le SVG en base.
             </p>
           </div>
           <button
@@ -683,7 +683,7 @@ export default function AdminSvgScenesPage({
           onNewSceneCodeChange={setNewSceneCode}
           onNewSceneNameChange={setNewSceneName}
           onReimportPatternScene={handleReimportPatternScene}
-          onResetCanvas={() => setDraft(createDefaultDraft(sceneName || selectedCode || 'Scene SVG'))}
+          onResetCanvas={() => setDraft(createDefaultDraft(sceneName || selectedCode || 'Scène SVG'))}
           onSceneNameChange={setSceneName}
           onSelectCode={setSelectedCode}
           onWidthChange={(width) => setDraft((currentDraft) => ({ ...currentDraft, viewBox: formatViewBox({ ...parseViewBox(currentDraft.viewBox), width }) }))}

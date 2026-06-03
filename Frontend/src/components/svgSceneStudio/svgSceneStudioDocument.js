@@ -186,7 +186,7 @@ export function moveArrayItem(items, fromIndex, toIndex) {
   return nextItems
 }
 
-export function createDefaultDraft(name = 'Scene SVG', code = '') {
+export function createDefaultDraft(name = 'Scène SVG', code = '') {
   const seed = Date.now()
   return normalizeSceneDraft({
     code: code || `scene-svg-${seed}`,
@@ -196,7 +196,7 @@ export function createDefaultDraft(name = 'Scene SVG', code = '') {
     elements: [
       { id: `element-${seed}-1`, type: 'rect', label: 'Client', subtitle: 'source', x: 140, y: 220, width: 240, height: 120, fontSize: 24, tone: 'amber', animation: { enabled: true, stepIndex: 0, fadeInSeconds: 0.45, delaySeconds: 0 } },
       { id: `element-${seed}-2`, type: 'rect', label: name, subtitle: 'orchestration', x: 470, y: 220, width: 260, height: 120, fontSize: 24, tone: 'mint', animation: { enabled: true, stepIndex: 1, fadeInSeconds: 0.45, delaySeconds: 0 } },
-      { id: `element-${seed}-3`, type: 'rect', label: 'Resultat', subtitle: 'retour', x: 820, y: 220, width: 220, height: 120, fontSize: 24, tone: 'paper', animation: { enabled: true, stepIndex: 2, fadeInSeconds: 0.45, delaySeconds: 0 } },
+      { id: `element-${seed}-3`, type: 'rect', label: 'Résultat', subtitle: 'retour', x: 820, y: 220, width: 220, height: 120, fontSize: 24, tone: 'paper', animation: { enabled: true, stepIndex: 2, fadeInSeconds: 0.45, delaySeconds: 0 } },
     ],
     arrows: [
       { id: `arrow-${seed}-1`, label: 'flow', x1: 380, y1: 280, x2: 470, y2: 280, dashed: false, curvature: 0, fromElementId: undefined, toElementId: undefined, stepIndex: 0, animation: { enabled: true, durationSeconds: 1.8, color: '#246b5e', pointRadius: 5, delaySeconds: 0 } },
@@ -206,7 +206,7 @@ export function createDefaultDraft(name = 'Scene SVG', code = '') {
   })
 }
 
-export function parseStoredDraft(svgMarkup, fallbackName = 'Scene SVG', fallbackCode = '') {
+export function parseStoredDraft(svgMarkup, fallbackName = 'Scène SVG', fallbackCode = '') {
   if (!svgMarkup) {
     return createDefaultDraft(fallbackName, fallbackCode)
   }
@@ -235,7 +235,7 @@ export function parseStoredDraft(svgMarkup, fallbackName = 'Scene SVG', fallback
   return createDraftFromMarkup(svgMarkup, fallbackName, fallbackCode)
 }
 
-export function createDraftFromMarkup(svgMarkup, fallbackName = 'Scene SVG', fallbackCode = '') {
+export function createDraftFromMarkup(svgMarkup, fallbackName = 'Scène SVG', fallbackCode = '') {
   try {
     const document = new DOMParser().parseFromString(svgMarkup, 'image/svg+xml')
     const svg = document.querySelector('svg')
@@ -324,10 +324,10 @@ export function buildImportedElementLabel(element, index) {
   const typeLabel = element.type === 'raw'
     ? 'Element SVG'
     : element.type === 'ellipse'
-      ? 'Noeud'
+      ? 'Nœud'
       : element.type === 'text'
         ? 'Texte'
-        : 'Boite'
+        : 'Boîte'
 
   return `${typeLabel} ${index + 1}`
 }

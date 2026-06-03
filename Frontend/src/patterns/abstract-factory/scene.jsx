@@ -36,7 +36,7 @@ function extractModel(execution) {
     ? output.steps.map((step, index) => ({
         index: safeNumber(step.index, index + 1),
         stageCode: `${step.stageCode ?? ''}`.trim().toUpperCase(),
-        title: `${step.title ?? 'Etape'}`.trim(),
+        title: `${step.title ?? 'Étape'}`.trim(),
         actorLabel: `${step.actorLabel ?? ''}`.trim(),
         detail: `${step.detail ?? ''}`.trim(),
         coherentFamily: Boolean(step.coherentFamily),
@@ -47,7 +47,7 @@ function extractModel(execution) {
   return {
     mode: `${output.mode ?? 'WITH_ABSTRACT_FACTORY'}`.trim().toUpperCase(),
     modeLabel: `${output.modeLabel ?? 'Avec Abstract Factory'}`.trim(),
-    generatorLabel: `${output.generatorLabel ?? 'Theme Generator'}`.trim(),
+    generatorLabel: `${output.generatorLabel ?? 'Générateur de thème'}`.trim(),
     themeCode: `${output.themeCode ?? 'SCI_FI'}`.trim().toUpperCase(),
     themeLabel: `${output.themeLabel ?? 'Sci-Fi'}`.trim(),
     factoryClassName: `${output.factoryClassName ?? 'ThemeFactory'}`.trim(),
@@ -117,7 +117,7 @@ export default function AbstractFactoryScene({
 }) {
   const model = useMemo(() => extractModel(execution), [execution])
   const playbackFrames = useMemo(
-    () => buildPlaybackFrames(model?.steps ?? [], 'Theme selected'),
+    () => buildPlaybackFrames(model?.steps ?? [], 'Thème sélectionné'),
     [model],
   )
   const playback = useScenePlayback(playbackFrames, 900)
@@ -163,11 +163,11 @@ export default function AbstractFactoryScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(
             TitleTag,
             { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' },
-            'Theme Generator',
+            'Générateur de thème',
           )}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -201,12 +201,12 @@ export default function AbstractFactoryScene({
             {model.resultLabel}
           </text>
           <text x={metrics.x + metrics.width - 26} y={metrics.y + 86} textAnchor="end" fontSize="13" fill="#5f5548">
-            {model.familySize} produits · {model.manualTouchCount} point(s) de creation
+            {model.familySize} produits · {model.manualTouchCount} point(s) de création
           </text>
 
           <rect x={graph.x} y={graph.y} width={graph.width} height={graph.height} rx="34" fill="rgba(255,250,242,0.96)" stroke="rgba(36,31,24,0.1)" strokeWidth="2" />
           <text x={graph.x + 24} y={graph.y + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
-            FAMILY GENERATION FLOW
+            FLUX DE GÉNÉRATION
           </text>
 
           <g>
@@ -223,20 +223,20 @@ export default function AbstractFactoryScene({
           <g>
             <rect x={factoryCard.x} y={factoryCard.y} width={factoryCard.width} height={factoryCard.height} rx="30" fill="#241f18" stroke="#241f18" strokeWidth="2" className="scene-node-shadow" />
             <text x={factoryCard.x + 18} y={factoryCard.y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill="rgba(255,248,238,0.64)">
-              {model.coherentFamily ? 'ABSTRACT FACTORY' : 'MANUAL ASSEMBLY'}
+              {model.coherentFamily ? 'ABSTRACT FACTORY' : 'ASSEMBLAGE MANUEL'}
             </text>
             <text x={factoryCard.x + 18} y={factoryCard.y + 60} fontSize="24" fontWeight="700" fill="#fff8ee">
               {model.coherentFamily ? model.factoryClassName : 'ThemePickerClient'}
             </text>
             <text x={factoryCard.x + 18} y={factoryCard.y + 88} fontSize="12" fill="rgba(255,248,238,0.74)">
-              {model.coherentFamily ? 'family creation contract' : 'concrete picks'}
+              {model.coherentFamily ? 'contrat de création de famille' : 'sélections concrètes'}
             </text>
             <foreignObject x={factoryCard.x + 16} y={factoryCard.y + 102} width={factoryCard.width - 32} height={factoryCard.height - 118}>
               <div className="h-full overflow-hidden text-[12px] leading-5 text-white/80" xmlns="http://www.w3.org/1999/xhtml">
                 <p className="m-0">
                   {model.coherentFamily
-                    ? 'Une seule factory concrete cree hero, transport et relique sans fuite de classes concretes.'
-                    : `Le client choisit chaque produit separement et peut melanger ${model.themeLabel} avec ${model.driftThemeLabel}.`}
+                    ? 'Une seule factory concrète crée héros, transport et relique sans fuite de classes concrètes.'
+                    : `Le client choisit chaque produit séparément et peut mélanger ${model.themeLabel} avec ${model.driftThemeLabel}.`}
                 </p>
               </div>
             </foreignObject>
@@ -249,7 +249,7 @@ export default function AbstractFactoryScene({
           <g>
             <rect x={resultCard.x} y={resultCard.y} width={resultCard.width} height={resultCard.height} rx="26" fill={model.coherentFamily ? 'rgba(214,228,241,0.92)' : 'rgba(245,227,210,0.96)'} stroke={accentStroke} strokeWidth="2" />
             <text x={resultCard.x + 18} y={resultCard.y + 24} fontSize="10" fontWeight="700" letterSpacing="0.18em" fill={model.coherentFamily ? '#547086' : '#8b5b49'}>
-              RESULT
+              RÉSULTAT
             </text>
             <text x={resultCard.x + 18} y={resultCard.y + 58} fontSize="22" fontWeight="700" fill={titleFill}>
               {model.resultLabel}
@@ -258,8 +258,8 @@ export default function AbstractFactoryScene({
               <div className="h-full overflow-hidden text-[12px] leading-5" style={{ color: model.coherentFamily ? '#3e5d77' : '#7a4634' }} xmlns="http://www.w3.org/1999/xhtml">
                 <p className="m-0">
                   {model.coherentFamily
-                    ? 'Les trois objets viennent du meme theme et peuvent evoluer ensemble.'
-                    : `${model.transport.label} introduit une derive de famille et casse le theme global.`}
+                    ? 'Les trois objets viennent du même thème et peuvent évoluer ensemble.'
+                    : `${model.transport.label} introduit une dérive de famille et casse le thème global.`}
                 </p>
               </div>
             </foreignObject>
@@ -286,13 +286,13 @@ export default function AbstractFactoryScene({
 
           <rect x={timelineX} y={timelineY} width={timelineWidth} height={timelineHeight} rx="34" fill="rgba(255,250,242,0.96)" stroke="rgba(36,31,24,0.1)" strokeWidth="2" />
           <text x={timelineX + 24} y={timelineY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">
-            GENERATION FEED
+            FIL DE GÉNÉRATION
           </text>
           <text x={timelineX + 24} y={timelineY + 60} fontSize="24" fontWeight="700" fill="#241f18">
-            {model.steps.length} etape(s)
+            {model.steps.length} étape(s)
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
-            suis le point ou la coherence de famille est garantie ou perdue
+            suis le point où la cohérence de famille est garantie ou perdue
           </text>
 
           <foreignObject x={timelineX + 16} y={timelineY + 102} width={timelineWidth - 32} height={timelineHeight - 118}>
@@ -309,7 +309,7 @@ export default function AbstractFactoryScene({
                     style={{ visibility: index < visibleStepCount || index === currentStepIndex ? 'visible' : 'hidden' }}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">Step {step.index}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">Étape {step.index}</p>
                       <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${step.coherentFamily ? 'text-emerald-800' : 'text-orange-900'}`}>
                         {step.coherentFamily ? 'MATCH' : 'DRIFT'}
                       </p>

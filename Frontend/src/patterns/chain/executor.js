@@ -118,7 +118,7 @@ export default function executeChainPattern(parameters) {
           'Inline validation check',
           'REJECTED',
           false,
-          'Le controller refuse le payload avant le traitement metier.',
+          'Le controller refuse le payload avant le traitement métier.',
         ))
       }
     }
@@ -136,7 +136,7 @@ export default function executeChainPattern(parameters) {
   }
 
   steps.forEach((step) => {
-    logs.push(`Etape ${step.index} - ${step.handlerLabel} : ${step.detail}`)
+    logs.push(`Étape ${step.index} - ${step.handlerLabel} : ${step.detail}`)
   })
 
   const lastStep = steps[steps.length - 1]

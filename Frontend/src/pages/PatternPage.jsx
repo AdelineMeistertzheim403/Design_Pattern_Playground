@@ -74,7 +74,7 @@ export default function PatternPage({
         fallback={(
           <DeferredSectionPlaceholder
             className="min-h-[320px]"
-            description="Le rendu visuel et le diagramme UML sont charges dans un chunk dedie a la page pattern."
+            description="Le rendu visuel et le diagramme UML sont chargés dans un chunk dédié à la page pattern."
             title="Chargement de la visualisation"
           />
         )}
@@ -93,8 +93,8 @@ export default function PatternPage({
       <Suspense
         fallback={(
           <DeferredSectionPlaceholder
-            description="Les logs et la synthese d execution sont charges separement du shell de la page."
-            title="Chargement du retour d execution"
+            description="Les logs et la synthèse d’exécution sont chargés séparément du shell de la page."
+            title="Chargement du retour d’exécution"
           />
         )}
       >
@@ -108,8 +108,8 @@ export default function PatternPage({
       <Suspense
         fallback={(
           <DeferredSectionPlaceholder
-            description="Le contenu pedagogique et le pas a pas sont charges dans un chunk dedie."
-            title="Chargement du contenu pedagogique"
+            description="Le contenu pédagogique et le pas à pas sont chargés dans un chunk dédié."
+            title="Chargement du contenu pédagogique"
           />
         )}
       >

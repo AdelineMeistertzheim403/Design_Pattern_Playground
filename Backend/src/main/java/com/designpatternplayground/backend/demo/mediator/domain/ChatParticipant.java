@@ -23,7 +23,7 @@ public class ChatParticipant {
 
 	public List<ChatDelivery> sendThroughMediator(String message) {
 		if (mediator == null) {
-			throw new InvalidPatternConfigurationException("Aucun mediator n est associe a " + name + ".");
+			throw new InvalidPatternConfigurationException("Aucun mediator n'est associe a " + name + ".");
 		}
 		return mediator.broadcast(this, message);
 	}

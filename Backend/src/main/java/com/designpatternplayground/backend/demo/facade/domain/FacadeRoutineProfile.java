@@ -10,18 +10,18 @@ public enum FacadeRoutineProfile {
 	CINEMA_MODE(
 		"CINEMA_MODE",
 		"Cinema Mode",
-		"Lance une seance en une seule action en coordonnant audio surround, lumiere tamisee et securite perimetrique.",
+		"Lance une seance en une seule action en coordonnant audio surround, lumière tamisee et sécurité perimetrique.",
 		"immersive focus",
 		"Passe en surround 7.1 et baisse les notifications.",
-		"Tamise la piece a 18% avec une teinte ambre.",
+		"Tamise la pièce a 18% avec une teinte ambre.",
 		"Verrouille le perimetre en mode silencieux.",
 		"SECURITY",
-		"La lumiere et le son sont prets, mais la securite reste oubliee si le client pilote les modules a la main."
+		"La lumière et le son sont prêts, mais la sécurité reste oubliee si le client pilote les modules à la main."
 	),
 	NIGHT_SHUTDOWN(
 		"NIGHT_SHUTDOWN",
 		"Night Shutdown",
-		"Coupe la maison pour la nuit avec extinction des medias, lumiere de circulation minimale et armement complet.",
+		"Coupe la maison pour la nuit avec extinction des medias, lumière de circulation minimale et armêment complet.",
 		"quiet safe",
 		"Place l audio en veille complete.",
 		"Eteint les zones principales et garde un chemin lumineux doux.",
@@ -32,13 +32,13 @@ public enum FacadeRoutineProfile {
 	PARTY_STARTUP(
 		"PARTY_STARTUP",
 		"Party Startup",
-		"Declenche une ambiance festive avec preset audio, lumiere dynamique et securite adaptee aux invites.",
+		"Déclenche une ambiance festive avec preset audio, lumière dynamique et sécurité adaptée aux invites.",
 		"open social",
 		"Charge une playlist energique avec bass boost.",
-		"Active des scenes couleur pulsees dans les espaces communs.",
-		"Basculle la securite sur acces invites supervise.",
+		"Active des scènes couleur pulsees dans les espaces communs.",
+		"Basculle la sécurité sur accès invites supervise.",
 		"SECURITY",
-		"Sans facade, l acces invites reste souvent non configure et casse l experience des arrivants."
+		"Sans facade, l accès invites reste souvent non configure et casse l experience des arrivants."
 	);
 
 	private final String code;

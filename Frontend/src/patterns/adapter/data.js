@@ -192,7 +192,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "create",
-          "label": "Creer plus d objets"
+          "label": "Créer plus d objets"
         },
         {
           "id": "translate",
@@ -248,7 +248,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",

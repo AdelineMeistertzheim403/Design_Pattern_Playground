@@ -18,7 +18,7 @@ public class IceDecorator extends CharacterDecorator {
 
 	@Override
 	public String effectLabel() {
-		return "Ajoute du controle de zone et renforce legerement l offense et la defense.";
+		return "Ajoute du contrôle de zone et renforce légerement l offense et la defense.";
 	}
 
 	@Override

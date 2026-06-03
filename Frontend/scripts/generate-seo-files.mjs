@@ -61,6 +61,7 @@ function buildRobotsTxt(siteUrl, usesPlaceholder) {
 function buildSitemapXml(siteUrl, usesPlaceholder) {
   const urls = [
     { path: '/', priority: '1.0', changefreq: 'weekly' },
+    { path: '/aide', priority: '0.7', changefreq: 'monthly' },
     { path: '/mentions-legales', priority: '0.3', changefreq: 'yearly' },
     ...fallbackPatterns.map((pattern) => ({
       path: `/patterns/${pattern.code}`,

@@ -23,18 +23,18 @@ function getListFieldOrderLabel(patternCode, field) {
 
 function getListFieldEmptyMessage(patternCode, field) {
   if (patternCode === 'command' && field.name === 'actions') {
-    return "Aucune action selectionnee. La demo ne pourra pas illustrer la pile de commandes."
+    return "Aucune action sélectionnée. La démo ne pourra pas illustrer la pile de commandes."
   }
 
-  return 'Aucun element selectionne pour cette liste.'
+  return 'Aucun élément sélectionné pour cette liste.'
 }
 
 function getListFieldHint(patternCode, field) {
   if (patternCode === 'command' && field.name === 'actions') {
-    return "Clique pour ajouter une action a la sequence. Tu peux repeter plusieurs fois la meme action, puis retirer chaque etape individuellement."
+    return "Clique pour ajouter une action à la séquence. Tu peux répéter plusieurs fois la même action, puis retirer chaque étape individuellement."
   }
 
-  return "Clique pour ajouter ou retirer des elements. L ordre affiche correspond a l ordre courant de la liste."
+  return "Clique pour ajouter ou retirer des éléments. L'ordre affiché correspond à l'ordre courant de la liste."
 }
 
 function moveListValue(values, fromIndex, toIndex) {
@@ -90,7 +90,7 @@ export default function PatternFormField({
         ) : null}
         {isReadOnly ? (
           <span className="rounded-full border border-black/10 bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-600">
-            Verrouille mission
+            Verrouillé mission
           </span>
         ) : null}
       </div>

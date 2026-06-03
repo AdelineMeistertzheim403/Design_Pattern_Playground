@@ -54,8 +54,8 @@ public class InterpreterPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Interpreter",
 			PatternType.BEHAVIORAL,
-			"Interprete un mini langage en transformant chaque instruction en expression executable sur un contexte.",
-			"Ecrire un petit script MOVE / TURN / ATTACK / REPEAT puis voir si le personnage atteint la cible selon qu un interprete complet existe ou non.",
+			"Interprète un mini langage en transformant chaque instruction en expression exécutable sur un contexte.",
+			"Écrire un petit script MOVE / TURN / ATTACK / REPEAT puis voir si le personnage atteint la cible selon qu'un interprète complet existe ou non.",
 			"ADVANCED"
 		);
 	}
@@ -111,17 +111,17 @@ public class InterpreterPatternDemo implements DesignPatternDemo {
 			treeNodes = buildTreeNodes(expressions);
 			skippedLines = List.of();
 
-			logs.add("Le client confie le script a un parseur qui construit un arbre d expressions executable.");
-			logs.add("Les blocs REPEAT sont composes, puis rejoues " + countRepeatExecutions(expressions) + " fois sans dupliquer le code client.");
-			logs.add("Chaque expression interprete le meme contexte de mission avec position, orientation et cible.");
+			logs.add("Le client confie le script à un parseur qui construit un arbre d expressions exécutable.");
+			logs.add("Les blocs REPEAT sont composés, puis rejoues " + countRepeatExecutions(expressions) + " fois sans dupliquer le code client.");
+			logs.add("Chaque expression interprète le même contexte de mission avec position, orientation et cible.");
 		} else {
 			ManualExecutionResult manualResult = executeWithoutInterpreter(config.scriptLines(), context);
 			steps = manualResult.steps();
 			treeNodes = manualResult.treeNodes();
 			skippedLines = manualResult.skippedLines();
 
-			logs.add("Sans Interpreter, le client parcourt les lignes a la main avec une suite de conditions.");
-			logs.add("Les lignes REPEAT et les accolades sont ignorees car aucune structure de langage n est comprise.");
+			logs.add("Sans Interpreter, le client parcourt les lignes à la main avec une suite de conditions.");
+			logs.add("Les lignes REPEAT et les accolades sont ignorees car aucune structure de langage n'est comprise.");
 			logs.add("Le mini langage devient vite fragile : une simple extension casse la lecture imperative.");
 		}
 
@@ -164,7 +164,7 @@ public class InterpreterPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useInterpreter
-				? "Interpreter transforme un mini langage en arbre d expressions executables. Le client manipule alors le langage, pas la logique de chaque commande."
+				? "Interpreter transforme un mini langage en arbre d expressions exécutables. Le client manipule alors le langage, pas la logique de chaque commande."
 				: "Sans Interpreter, le script est lu ligne par ligne par du code manuel. Les structures du langage comme REPEAT restent alors incomprises et la mission se degrade.",
 			logs,
 			output,

@@ -16,21 +16,21 @@ public record BridgeRenderPreset(
 			"Vector Engine",
 			"VectorRenderEngine",
 			"Contours nets, lignes propres et rendu lisible sur toutes les tailles.",
-			"L abstraction garde la meme forme pendant que l implementation change proprement de moteur."
+			"L abstraction garde la même forme pendant que l implémentation change proprement de moteur."
 		),
 		new BridgeRenderPreset(
 			"PIXEL_ENGINE",
 			"Pixel Engine",
 			"PixelRenderEngine",
 			"Blocs retro, grille marquee et rendu arcade a faible resolution.",
-			"Bridge injecte un moteur retro sans reecrire la logique metier de la forme."
+			"Bridge injecte un moteur retro sans reecrire la logique métier de la forme."
 		),
 		new BridgeRenderPreset(
 			"GLOW_ENGINE",
 			"Glow Engine",
 			"GlowRenderEngine",
 			"Aura lumineuse, halo dynamique et accent fort sur la presence visuelle.",
-			"Une nouvelle implementation se branche sans exploser le nombre de sous-classes."
+			"Une nouvelle implémentation se branche sans exploser le nombre de sous-classes."
 		)
 	);
 

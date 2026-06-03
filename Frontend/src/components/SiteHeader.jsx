@@ -1,4 +1,4 @@
-import { buildAdminSvgScenesPath, buildAdminUmlPath, buildMissionPath, buildProgressPath, buildUmlStudioPath } from '../app/playgroundUtils'
+import { buildAdminSvgScenesPath, buildAdminUmlPath, buildHelpPath, buildMissionPath, buildProgressPath, buildUmlStudioPath } from '../app/playgroundUtils'
 import SpaLink from './SpaLink'
 
 export default function SiteHeader({
@@ -6,6 +6,7 @@ export default function SiteHeader({
   routeName,
   onNavigateHome,
   onNavigateProgress,
+  onNavigateHelp,
   onOpenUmlStudio,
   onNavigateAdminSvgScenes,
   onNavigateAdminUml,
@@ -57,6 +58,18 @@ export default function SiteHeader({
             Ma progression
           </SpaLink>
 
+          <SpaLink
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              routeName === 'help'
+                ? 'border-stone-950 bg-stone-950 text-white'
+                : 'border-black/10 bg-white/84 text-stone-800 hover:border-black/20'
+            }`}
+            href={buildHelpPath()}
+            onNavigate={onNavigateHelp}
+          >
+            Aide
+          </SpaLink>
+
           <button
             className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
               routeName === 'umlStudio'
@@ -67,7 +80,7 @@ export default function SiteHeader({
             onClick={onOpenUmlStudio}
             data-href={buildUmlStudioPath()}
           >
-            Editeur UML
+            Éditeur UML
           </button>
 
           {isAdmin ? (
@@ -107,7 +120,7 @@ export default function SiteHeader({
                 type="button"
                 onClick={onLogout}
               >
-                Deconnexion
+                Déconnexion
               </button>
             </>
           ) : (

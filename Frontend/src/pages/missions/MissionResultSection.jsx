@@ -8,7 +8,7 @@ const MissionExecutionScene = lazy(() => import('./MissionExecutionScene'))
 function MissionSceneFallback() {
   return (
     <div className="rounded-[24px] border border-black/10 bg-white px-4 py-8 text-sm leading-7 text-stone-600">
-      Chargement de la scene mission...
+      Chargement de la scène mission...
     </div>
   )
 }
@@ -29,9 +29,9 @@ export default function MissionResultSection({
     <section className="grid content-start gap-4">
       <article className="rounded-[24px] border border-black/10 bg-white p-4 shadow-[0_12px_34px_rgba(47,37,22,0.08)]">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Simulation</p>
-        <h2 className="mt-2 text-2xl text-stone-950">Execution de mission</h2>
+        <h2 className="mt-2 text-2xl text-stone-950">Exécution de mission</h2>
         <p className="mt-1 text-sm leading-7 text-stone-700">
-          Le score combine le choix des patterns et la qualite de leur configuration.
+          Le score combine le choix des patterns et la qualité de leur configuration.
         </p>
       </article>
 
@@ -40,16 +40,16 @@ export default function MissionResultSection({
           <RewardToast reward={rewardToast} onDismiss={dismissRewardToast} />
 
           <article className="rounded-[24px] border border-black/10 bg-white p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Lecture du resultat</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Lecture du résultat</p>
             <p className="mt-2 text-sm leading-7 text-stone-700">{result.feedback}</p>
 
             <div className="mt-4 flex flex-wrap gap-2">
               <ResultPill tone={result.success ? 'success' : 'danger'}>
-                {result.success ? 'Solution coherente' : 'Solution incomplete'}
+                {result.success ? 'Solution cohérente' : 'Solution incomplète'}
               </ResultPill>
               {result.unexpectedPatterns.map((patternCode) => (
                 <ResultPill key={patternCode} tone="danger">
-                  Hors cible: {patternsByCode[patternCode]?.name ?? patternCode}
+                  Hors cible : {patternsByCode[patternCode]?.name ?? patternCode}
                 </ResultPill>
               ))}
             </div>
@@ -60,7 +60,7 @@ export default function MissionResultSection({
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Simulation</p>
                 <p className="mt-1 text-sm leading-7 text-stone-600">
-                  Clique sur une brique pour la mettre au centre de la scene mission.
+                  Clique sur une brique pour la mettre au centre de la scène mission.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -97,7 +97,7 @@ export default function MissionResultSection({
         </>
       ) : (
         <div className="rounded-[24px] border border-dashed border-black/15 bg-[var(--panel)] px-4 py-8 text-sm leading-7 text-stone-600">
-          Compose une solution, configure-la puis lance la mission pour afficher la scene SVG dediee au scenario.
+          Compose une solution, configure-la puis lance la mission pour afficher la scène SVG dédiée au scénario.
         </div>
       )}
     </section>

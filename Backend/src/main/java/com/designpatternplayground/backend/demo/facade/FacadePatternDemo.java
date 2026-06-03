@@ -41,8 +41,8 @@ public class FacadePatternDemo implements DesignPatternDemo {
 			"facade",
 			"Facade",
 			PatternType.STRUCTURAL,
-			"Expose une entree simple vers un systeme compose de plusieurs sous-systemes et masque la choregraphie detaillee.",
-			"Declencher une routine domotique audio + lumiere + securite en un clic au lieu de piloter chaque module a la main.",
+			"Expose une entrée simple vers un système composé de plusieurs sous-systèmes et masque la chorégraphie détaillée.",
+			"Déclencher une routine domotique audio + lumière + sécurité en un clic au lieu de piloter chaque module à la main.",
 			"BEGINNER"
 		);
 	}
@@ -105,8 +105,8 @@ public class FacadePatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useFacade
-				? "Facade condense la routine dans une seule methode. Le client appuie sur Start et laisse la facade choregraphier audio, lumiere et securite."
-				: "Sans Facade, le client diffuse lui-meme les appels vers chaque sous-systeme. Le flux reste plus verbeux et un module peut facilement etre oublie.",
+				? "Facade condense la routine dans une seule methode. Le client appuie sur Start et laisse la facade chorégraphier audio, lumière et sécurité."
+				: "Sans Facade, le client diffuse lui-même les appels vers chaque sous-système. Le flux reste plus verbeux et un module peut facilement etre oublie.",
 			logs,
 			output,
 			buildVisualization(useFacade, audioReady, lightReady, securityReady, systemsReady)
@@ -142,23 +142,23 @@ public class FacadePatternDemo implements DesignPatternDemo {
 				"Orchestration",
 				"SmartHomeFacade",
 				"ORCHESTRATING",
-				"La facade decompose la routine en trois appels lisibles vers audio, lumiere et securite."
+				"La facade decomposé la routine en trois appels lisibles vers audio, lumière et sécurité."
 			));
 		}
 
 		steps.add(subsystemStep(useFacade, nextIndex++, "AUDIO", "AudioSystem", "Preset audio", routine.audioAction(), audioReady, routine.manualMissedDetail()));
-		steps.add(subsystemStep(useFacade, nextIndex++, "LIGHT", "LightSystem", "Scene lumiere", routine.lightAction(), lightReady, routine.manualMissedDetail()));
-		steps.add(subsystemStep(useFacade, nextIndex++, "SECURITY", "SecuritySystem", "Mode securite", routine.securityAction(), securityReady, routine.manualMissedDetail()));
+		steps.add(subsystemStep(useFacade, nextIndex++, "LIGHT", "LightSystem", "Scène lumière", routine.lightAction(), lightReady, routine.manualMissedDetail()));
+		steps.add(subsystemStep(useFacade, nextIndex++, "SECURITY", "SecuritySystem", "Mode sécurité", routine.securityAction(), securityReady, routine.manualMissedDetail()));
 		steps.add(new FacadeStep(
 			nextIndex,
 			"RESULT",
 			"RESULT",
-			"Etat global",
+			"État global",
 			useFacade ? "SmartHomeFacade" : "HomeAutomationClient",
 			systemsReady ? "READY" : "PARTIAL",
 			systemsReady
-				? "La routine demarre completement depuis un point d entree unique."
-				: "Le systeme reste partiel car une coordination manuelle a laisse un sous-systeme a l ecart."
+				? "La routine demarre completement depuis un point d entrée unique."
+				: "Le système reste partiel car une coordination manuelle a laisse un sous-système à l'ecart."
 		));
 		return steps;
 	}
@@ -181,7 +181,7 @@ public class FacadePatternDemo implements DesignPatternDemo {
 			actorLabel,
 			ready ? "READY" : "MISSED",
 			ready
-				? (useFacade ? "Declenche par la facade. " : "Declenche directement par le client. ") + action
+				? (useFacade ? "Déclenche par la facade. " : "Déclenche directement par le client. ") + action
 				: manualMissedDetail
 		);
 	}
@@ -198,9 +198,9 @@ public class FacadePatternDemo implements DesignPatternDemo {
 		logs.add("Le client appuie sur " + triggerLabel + " pour lancer " + routine.label() + ".");
 
 		if (useFacade) {
-			logs.add("SmartHomeFacade expose une seule methode et orchestre les trois sous-systemes.");
+			logs.add("SmartHomeFacade expose une seule methode et orchestre les trois sous-systèmes.");
 		} else {
-			logs.add("Sans facade, le client manipule chaque sous-systeme directement.");
+			logs.add("Sans facade, le client manipule chaque sous-système directement.");
 		}
 
 		logs.add("AudioSystem -> " + (audioReady ? routine.audioAction() : routine.manualMissedDetail()));
@@ -215,10 +215,10 @@ public class FacadePatternDemo implements DesignPatternDemo {
 			missed.add("Audio");
 		}
 		if (!lightReady) {
-			missed.add("Lumiere");
+			missed.add("Lumière");
 		}
 		if (!securityReady) {
-			missed.add("Securite");
+			missed.add("Sécurité");
 		}
 		return missed;
 	}
@@ -273,7 +273,7 @@ public class FacadePatternDemo implements DesignPatternDemo {
 
 	private FacadeConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Facade sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Facade sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);
