@@ -103,7 +103,7 @@ export function normalizeDocument(document) {
     activityNodes: sourceActivityNodes.map((node, index) => ({
       id: node?.id ?? `activity-${index + 1}`,
       kind: ['start', 'end', 'action', 'decision'].includes(node?.kind) ? node.kind : 'action',
-      label: node?.label ?? `Etape ${index + 1}`,
+      label: node?.label ?? `Étape ${index + 1}`,
       x: Number.isFinite(Number(node?.x)) ? Number(node.x) : 120 + index * 240,
       y: Number.isFinite(Number(node?.y)) ? Number(node.y) : 120,
       width: Number.isFinite(Number(node?.width)) ? Number(node.width) : ACTIVITY_DEFAULTS.width,
@@ -182,7 +182,7 @@ export function createActivityNode(kind, index) {
   const base = {
     id: `activity-${Date.now()}-${index}`,
     kind,
-    label: kind === 'start' ? 'Depart' : kind === 'end' ? 'Fin' : kind === 'decision' ? 'Condition' : 'Action',
+    label: kind === 'start' ? 'Départ' : kind === 'end' ? 'Fin' : kind === 'decision' ? 'Condition' : 'Action',
     x: 140 + index * 24,
     y: 120 + index * 24,
     width: kind === 'decision' ? 150 : kind === 'start' || kind === 'end' ? 48 : ACTIVITY_DEFAULTS.width,

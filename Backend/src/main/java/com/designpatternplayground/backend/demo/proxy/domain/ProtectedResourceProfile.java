@@ -44,7 +44,7 @@ public record ProtectedResourceProfile(
 		new ProtectedResourceProfile(
 			"LIVE_DASHBOARD",
 			"Live Dashboard",
-			"Tableau temps reel leger et public, utile pour voir un acces presque immediat.",
+			"Tableau temps reel léger et public, utile pour voir un accès presque immédiat.",
 			"RealtimeGateway",
 			"delta metrics",
 			64,

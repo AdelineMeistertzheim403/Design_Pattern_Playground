@@ -43,8 +43,8 @@ public class StrategyPatternDemo implements DesignPatternDemo {
 			"strategy",
 			"Strategy",
 			PatternType.BEHAVIORAL,
-			"Permet de changer d algorithme a l execution sans modifier le contexte appelant.",
-			"Choisir dynamiquement un mode de paiement tout en gardant le meme workflow.",
+			"Permet de changer d'algorithme à l'exécution sans modifier le contexte appelant.",
+			"Choisir dynamiquement un mode de paiement tout en gardant le même workflow.",
 			"INTERMEDIATE"
 		);
 	}
@@ -84,11 +84,11 @@ public class StrategyPatternDemo implements DesignPatternDemo {
 		List<VisualizationEdge> edges = new ArrayList<>();
 
 		if (useStrategy) {
-			logs.add("Creation du contexte de paiement.");
+			logs.add("Création du contexte de paiement.");
 			logs.add("Selection de la strategie : " + strategy.label() + ".");
 
 			PaymentContext context = new PaymentContext(strategy);
-			logs.add("Execution du workflow de paiement avec un algorithme interchangeable.");
+			logs.add("Exécution du workflow de paiement avec un algorithme interchangeable.");
 
 			message = context.execute(config.amount());
 			logs.add("Resultat : " + message);
@@ -135,7 +135,7 @@ public class StrategyPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useStrategy
-				? "Strategy laisse le contexte deleguer l execution a l algorithme selectionne."
+				? "Strategy laisse le contexte délèguer l'exécution à l'algorithme sélectionne."
 				: "Sans Strategy, le service garde les branches conditionnelles en son sein et perd en lisibilite des variantes.",
 			logs,
 			output,
@@ -145,7 +145,7 @@ public class StrategyPatternDemo implements DesignPatternDemo {
 
 	private StrategyConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		Object modeValue = parameters.get("mode");

@@ -40,8 +40,8 @@ public class BridgePatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Bridge",
 			PatternType.STRUCTURAL,
-			"Separe une abstraction de son implementation pour les faire varier independamment sans explosion de sous-classes.",
-			"Piloter la meme forme avec plusieurs moteurs de rendu comme Shape + RenderEngine dans une UI ou un moteur graphique.",
+			"Sépare une abstraction de son implémentation pour les faire varier indépendamment sans explosion de sous-classes.",
+			"Piloter la même forme avec plusieurs moteurs de rendu comme Shape + RenderEngine dans une UI ou un moteur graphique.",
 			"INTERMEDIATE"
 		);
 	}
@@ -53,7 +53,7 @@ public class BridgePatternDemo implements DesignPatternDemo {
 			new PatternField("shapeCode", "Abstraction", FieldType.SELECT, true, List.of("CIRCLE", "TRIANGLE", "BANNER"), "CIRCLE"),
 			new PatternField(
 				"renderCode",
-				"Implementation",
+				"Implémentation",
 				FieldType.SELECT,
 				true,
 				List.of("VECTOR_ENGINE", "PIXEL_ENGINE", "GLOW_ENGINE"),
@@ -95,10 +95,10 @@ public class BridgePatternDemo implements DesignPatternDemo {
 				3,
 				"BIND",
 				"Assemblage runtime",
-				useBridge ? "Shape(renderEngine)" : "ConcreteComboSubclass",
+				useBridge ? "Shape(renderEngine)" : "ConcrèteComboSubclass",
 				useBridge
-					? "L abstraction recoit son moteur au runtime et reste ouverte a d autres implementations."
-					: "Sans Bridge, la combinaison " + shape.label() + " + " + render.label() + " force une sous-classe concrete dediee.",
+					? "L abstraction recoit son moteur au runtime et reste ouverte a d autres implémentations."
+					: "Sans Bridge, la combinaison " + shape.label() + " + " + render.label() + " force une sous-classe concrète dediee.",
 				useBridge,
 				useBridge
 			),
@@ -109,7 +109,7 @@ public class BridgePatternDemo implements DesignPatternDemo {
 				config.objectName(),
 				useBridge
 					? render.bridgeBenefit()
-					: "Chaque nouveau moteur multiplie les variantes de formes et grossit la hierarchie concrete.",
+					: "Chaque nouveau moteur multiplie les variantes de formes et grossit la hierarchie concrète.",
 				useBridge,
 				useBridge
 			)
@@ -139,14 +139,14 @@ public class BridgePatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useBridge
-				? "Bridge separe Shape de RenderEngine. La forme garde son API et change simplement d implementation concrete au runtime."
-				: "Sans Bridge, chaque combinaison forme + moteur pousse vers une sous-classe concrete differente. La hierarchie grossit vite et le couplage devient rigide.",
+				? "Bridge sépare Shape de RenderEngine. La forme garde son API et change simplement d implémentation concrète au runtime."
+				: "Sans Bridge, chaque combinaison forme + moteur pousse vers une sous-classe concrète differente. La hierarchie grossit vite et le couplage devient rigide.",
 			List.of(
 				config.objectName() + " choisit " + shape.label() + " comme abstraction.",
 				"Le rendu cible utilise " + render.label() + ".",
 				useBridge
 					? "Bridge injecte " + render.engineClassName() + " dans " + shape.abstractionClassName() + " sans changer l abstraction."
-					: "La combinaison doit etre codee dans une classe concrete dediee pour relier forme et rendu.",
+					: "La combinaison doit etre codee dans une classe concrète dediee pour relier forme et rendu.",
 				useBridge
 					? render.bridgeBenefit()
 					: "Le nombre de variantes explose quand on multiplie les formes et les moteurs."
@@ -168,7 +168,7 @@ public class BridgePatternDemo implements DesignPatternDemo {
 				new VisualizationNode("abstraction", shape.abstractionClassName(), "context", Map.of("detail", shape.label(), "active", true)),
 				new VisualizationNode(
 					"bridge",
-					useBridge ? "RenderEngine bridge" : "ConcreteComboSubclass",
+					useBridge ? "RenderEngine bridge" : "ConcrèteComboSubclass",
 					"cluster",
 					Map.of("detail", useBridge ? "runtime binding" : "hard-coded pair")
 				),
@@ -183,7 +183,7 @@ public class BridgePatternDemo implements DesignPatternDemo {
 			List.of(
 				new VisualizationEdge("client", "abstraction", "render"),
 				new VisualizationEdge("abstraction", "bridge", useBridge ? "delegates" : "extends combo"),
-				new VisualizationEdge("bridge", "implementation", useBridge ? "calls engine" : "hard-coded render"),
+				new VisualizationEdge("bridge", "implémentation", useBridge ? "calls engine" : "hard-coded render"),
 				new VisualizationEdge("implementation", "result", useBridge ? "draw" : "single path")
 			)
 		);
@@ -203,7 +203,7 @@ public class BridgePatternDemo implements DesignPatternDemo {
 
 	private BridgeConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Bridge sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Bridge sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);

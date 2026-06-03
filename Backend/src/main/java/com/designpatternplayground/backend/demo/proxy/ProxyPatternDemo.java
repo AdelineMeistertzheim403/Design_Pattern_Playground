@@ -42,8 +42,8 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 			"proxy",
 			"Proxy",
 			PatternType.STRUCTURAL,
-			"Place un intermediaire devant une ressource pour controler l acces, retarder son chargement ou masquer sa nature reelle.",
-			"Filtrer l acces a une ressource sensible, cacher un appel reseau lourd ou activer un lazy loading avant la vraie ressource.",
+			"Place un intermédiaire devant une ressource pour contrôler l'accès, retarder son chargement ou masquer sa nature réelle.",
+			"Filtrer l'accès à une ressource sensible, cacher un appel réseau lourd ou activer un lazy loading avant la vraie ressource.",
 			"INTERMEDIATE"
 		);
 	}
@@ -52,7 +52,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_PROXY, WITHOUT_PROXY), WITH_PROXY),
-			new PatternField("requestLabel", "Nom de la requete", FieldType.TEXT, true, null, "Open premium vault"),
+			new PatternField("requestLabel", "Nom de la requête", FieldType.TEXT, true, null, "Open premium vault"),
 			new PatternField("requesterRole", "Role demandeur", FieldType.SELECT, true, List.of("ADMIN", "MEMBER", "GUEST"), "GUEST"),
 			new PatternField(
 				"resourceCode",
@@ -62,7 +62,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 				List.of("VAULT_VIDEO", "REPORT_ARCHIVE", "LIVE_DASHBOARD"),
 				"VAULT_VIDEO"
 			),
-			new PatternField("cacheState", "Etat du cache", FieldType.SELECT, true, List.of("COLD", "WARM"), "COLD")
+			new PatternField("cacheState", "État du cache", FieldType.SELECT, true, List.of("COLD", "WARM"), "COLD")
 		));
 	}
 
@@ -94,7 +94,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 		} else if (cacheHit && useProxy) {
 			accessDecisionLabel = "Autorise depuis le cache";
 		} else {
-			accessDecisionLabel = "Acces direct";
+			accessDecisionLabel = "Accès direct";
 		}
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
@@ -125,8 +125,8 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useProxy
-				? "Proxy conserve le meme contrat que la ressource reelle tout en ajoutant un controle d acces et un chargement differe quand il devient utile."
-				: "Sans Proxy, le client frappe directement la ressource. Le controle d acces disparait du point d entree et les chargements lourds demarrent sans mediation.",
+				? "Proxy conserve le même contrat que la ressource réelle tout en ajoutant un contrôle d accès et un chargement differe quand il devient utile."
+				: "Sans Proxy, le client frappe directement la ressource. Le contrôle d accès disparait du point d entrée et les chargements lourds demarrent sans mediation.",
 			logs,
 			output,
 			buildVisualization(useProxy, resource, blocked, accessGranted, lazyLoadTriggered, eagerLoadTriggered, securityLeak)
@@ -175,10 +175,10 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 		steps.add(new ProxyStep(
 			1,
 			"REQUEST",
-			"Emission",
+			"Émission",
 			requesterRole.label(),
 			"SENT",
-			"La requete " + requestLabel + " part du client vers " + (useProxy ? "le proxy" : "la ressource reelle") + ".",
+			"La requête " + requestLabel + " part du client vers " + (useProxy ? "le proxy" : "la ressource réelle") + ".",
 			32
 		));
 
@@ -186,7 +186,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 			steps.add(new ProxyStep(
 				2,
 				"PROXY_GATE",
-				"Controle d acces",
+				"Contrôle d accès",
 				"AccessProxy",
 				accessGranted ? "ALLOWED" : "BLOCKED",
 				accessGranted
@@ -203,7 +203,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 						"Cache hit",
 						"AccessProxy",
 						"READY",
-						"Le proxy sert une version deja preparee sans toucher au " + resource.subjectLabel() + ".",
+						"Le proxy sert une version déjà préparee sans toucher au " + resource.subjectLabel() + ".",
 						24
 					));
 				} else if (lazyLoadTriggered) {
@@ -213,7 +213,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 						"Lazy loading",
 						resource.subjectLabel(),
 						"LOADING",
-						"Le proxy declenche le chargement differe du payload " + resource.payloadLabel() + ".",
+						"Le proxy déclenche le chargement differe du payload " + resource.payloadLabel() + ".",
 						latencyMs - 80
 					));
 				} else {
@@ -223,7 +223,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 						"Forward",
 						resource.subjectLabel(),
 						"FETCH",
-						"Le proxy transmet immediatement vers la ressource reelle.",
+						"Le proxy transmet immédiatement vers la ressource réelle.",
 						120
 					));
 				}
@@ -231,7 +231,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 				steps.add(new ProxyStep(
 					4,
 					"DELIVER",
-					"Livraison controlee",
+					"Livraison contrôlee",
 					"AccessProxy",
 					"DELIVERED",
 					"La reponse retourne au client avec une mediation unique et lisible.",
@@ -242,11 +242,11 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 			steps.add(new ProxyStep(
 				2,
 				"DIRECT_ACCESS",
-				"Acces direct",
+				"Accès direct",
 				resource.subjectLabel(),
 				accessGranted ? "OPEN" : "UNGUARDED",
 				accessGranted
-					? "Le client touche directement la ressource sans garde intermediaire."
+					? "Le client touche directement la ressource sans garde intermédiaire."
 					: "La ressource sensible est atteinte sans verification centralisee.",
 				46
 			));
@@ -293,23 +293,23 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 		List<String> logs = new ArrayList<>();
 		logs.add(requesterRole.label() + " demande " + requestLabel + " sur " + resource.label() + ".");
 		if (useProxy) {
-			logs.add("Le proxy se place devant " + resource.subjectLabel() + " et expose le meme contrat au client.");
+			logs.add("Le proxy se place devant " + resource.subjectLabel() + " et expose le même contrat au client.");
 			if (blocked) {
-				logs.add("Le proxy refuse l acces avant le vrai sujet. Aucun chargement reseau lourd ne demarre.");
+				logs.add("Le proxy refuse l accès avant le vrai sujet. Aucun chargement réseau lourd ne demarre.");
 			} else if (cacheHit) {
-				logs.add("Le proxy sert la reponse depuis son cache et evite de recontacter la ressource reelle.");
+				logs.add("Le proxy sert la reponse depuis son cache et evite de recontacter la ressource réelle.");
 			} else if (lazyLoadTriggered) {
 				logs.add("Le proxy delenche un lazy loading uniquement maintenant, car la ressource est vraiment demandee.");
 			} else {
-				logs.add("Le proxy forwarde directement la demande vers la ressource reelle.");
+				logs.add("Le proxy forwarde directement la demande vers la ressource réelle.");
 			}
 		} else {
 			logs.add("Sans proxy, le client cible directement " + resource.subjectLabel() + ".");
 			if (eagerLoadTriggered) {
-				logs.add("Le chargement commence immediatement, meme si la ressource est lourde.");
+				logs.add("Le chargement commence immédiatement, même si la ressource est lourde.");
 			}
 			if (securityLeak) {
-				logs.add("Comme aucune garde n intercepte la requete, la ressource sensible est exposee a un role non autorise.");
+				logs.add("Comme aucune garde n'intercepte la requête, la ressource sensible est exposee à un role non autorise.");
 			}
 		}
 		return logs;
@@ -407,7 +407,7 @@ public class ProxyPatternDemo implements DesignPatternDemo {
 
 	private ProxyConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Proxy sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Proxy sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);

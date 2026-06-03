@@ -20,7 +20,7 @@ function SceneLoadingPlaceholder({ panelClassName }) {
   return (
     <div className={panelClassName}>
       <div className="flex min-h-[280px] items-center justify-center rounded-[24px] border border-dashed border-black/10 bg-white/70 px-6 py-10 text-sm leading-7 text-stone-600">
-        Chargement de la scene specialisee...
+        Chargement de la scène spécialisée...
       </div>
     </div>
   )
@@ -41,7 +41,7 @@ function PersistedSvgScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
             {customSvgScene.name}
           </TitleTag>
@@ -203,9 +203,9 @@ export default function ExecutionScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           <TitleTag className={isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950'}>
-            Demo visuelle
+            Démo visuelle
           </TitleTag>
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />

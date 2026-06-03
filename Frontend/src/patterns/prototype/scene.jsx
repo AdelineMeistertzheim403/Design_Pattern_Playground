@@ -32,7 +32,7 @@ function normalizeStep(step, index) {
   return {
     index: safeNumber(step?.index, index + 1),
     stepCode: `${step?.stepCode ?? `STEP_${index + 1}`}`.trim().toUpperCase(),
-    title: `${step?.title ?? `Etape ${index + 1}`}`.trim(),
+    title: `${step?.title ?? `Étape ${index + 1}`}`.trim(),
     detail: `${step?.detail ?? ''}`.trim(),
     affectedCloneIds: Array.isArray(step?.affectedCloneIds) ? step.affectedCloneIds.map((id) => `${id}`.trim()) : [],
     visibleCloneCount: safeNumber(step?.visibleCloneCount, 0),
@@ -321,7 +321,7 @@ export default function PrototypeScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Clone Factory')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -350,7 +350,7 @@ export default function PrototypeScene({
             type="button"
             onClick={() => setPlayMode('STEP')}
           >
-            Pas a pas
+            Pas à pas
           </button>
         </div>
 
@@ -375,21 +375,21 @@ export default function PrototypeScene({
             type="button"
             onClick={handleLaunchDemo}
           >
-            Animer la scene
+            Animer la scène
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
             type="button"
             onClick={handlePrevious}
           >
-            Etape precedente
+            Étape précédente
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
             type="button"
             onClick={handleNext}
           >
-            Etape suivante
+            Étape suivante
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
@@ -634,7 +634,7 @@ export default function PrototypeScene({
               {model.propagationCount} clone{model.propagationCount > 1 ? 's' : ''} touche{model.propagationCount > 1 ? 's' : ''}
             </text>
             <text x="24" y="106" fontSize="13" fontWeight="600" fill="#6a5544">
-              {currentFrame.showPropagation ? 'Etat final observe' : 'Etat intermediaire'}
+              {currentFrame.showPropagation ? 'État final observé' : 'État intermédiaire'}
             </text>
 
             <foreignObject x="20" y="130" width={impactPanel.width - 40} height={impactPanel.height - 154}>

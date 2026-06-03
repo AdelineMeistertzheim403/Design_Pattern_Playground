@@ -52,7 +52,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			"builder",
 			"Builder",
 			PatternType.CREATIONAL,
-			"Construit un objet complexe etape par etape au lieu de passer une grappe de parametres a un constructeur geant.",
+			"Construit un objet complexe étape par étape au lieu de passer une grappe de paramètres à un constructeur géant.",
 			"Assembler visuellement une voiture, un personnage ou une maison en posant la structure, le noyau, un module puis la finition.",
 			"INTERMEDIATE"
 		);
@@ -87,7 +87,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"silhouette",
-				"Etape 1 · Structure",
+				"Étape 1 · Structure",
 				FieldType.SELECT,
 				true,
 				codes(SilhouetteOption.values()),
@@ -95,7 +95,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"coreModule",
-				"Etape 2 · Noyau",
+				"Étape 2 · Noyau",
 				FieldType.SELECT,
 				true,
 				codes(CoreModuleOption.values()),
@@ -103,7 +103,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"addonModule",
-				"Etape 3 · Module",
+				"Étape 3 · Module",
 				FieldType.SELECT,
 				true,
 				codes(AddonOption.values()),
@@ -111,7 +111,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"finishStyle",
-				"Etape 4 · Finition",
+				"Étape 4 · Finition",
 				FieldType.SELECT,
 				true,
 				codes(FinishStyleOption.values()),
@@ -171,8 +171,8 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 		output.put("challengeMet", challengeMet);
 		output.put("readyLabel", readyLabel);
 		output.put("monolithicPainPoints", List.of(
-			"Constructeur geant peu lisible",
-			"Ordre implicite des parametres",
+			"Constructeur géant peu lisible",
+			"Ordre implicite des paramètres",
 			"Validation plus difficile a faire evoluer"
 		));
 		output.put("stages", artifact.stages().stream().map(this::toStageMap).toList());
@@ -180,8 +180,8 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useBuilder
-				? "Builder rend la construction progressive et lisible. Le director orchestre les appels, le builder assemble le produit sans exposer un constructeur geant."
-				: "Sans Builder, le client pousse tous les parametres d un bloc. Le produit final apparait, mais le processus de construction est cache et plus rigide.",
+				? "Builder rend la construction progressive et lisible. Le director orchestre les appels, le builder assemble le produit sans exposer un constructeur géant."
+				: "Sans Builder, le client pousse tous les paramètres d'un bloc. Le produit final apparait, mais le processus de construction est cache et plus rigide.",
 			logs,
 			output,
 			buildVisualization(artifact, readyLabel, useBuilder)
@@ -200,13 +200,13 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 		WorkshopArtifactBuilder builder = new WorkshopArtifactBuilder();
 
 		logs.add("Le client demande un " + productType.label().toLowerCase(Locale.ROOT) + " nomme " + buildName + ".");
-		logs.add("Le director orchestre la construction et garde l ordre des etapes stable.");
+		logs.add("Le director orchestre la construction et garde l ordre des étapes stable.");
 
 		director.construct(buildName, productType, silhouette, coreModule, addonModule, finishStyle, builder);
 
 		BuiltArtifact artifact = builder.build();
 		artifact.stages().forEach(stage -> logs.add(
-			"Etape " + stage.index() + " - " + stage.stageLabel() + " : " + stage.optionLabel() + ". " + stage.detail()
+			"Étape " + stage.index() + " - " + stage.stageLabel() + " : " + stage.optionLabel() + ". " + stage.detail()
 		));
 		logs.add("Le builder retourne un produit complet sans exposer le constructeur detaille au client.");
 
@@ -222,13 +222,13 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 		FinishStyleOption finishStyle,
 		List<String> logs
 	) {
-		logs.add("Mode sans Builder : le client instancie directement " + productType.monolithicClassName() + " avec tous les parametres.");
-		logs.add("Parametres passes d un bloc : "
+		logs.add("Mode sans Builder : le client instancie directement " + productType.monolithicClassName() + " avec tous les paramètres.");
+		logs.add("Paramètres passes d'un bloc : "
 			+ silhouette.code() + ", "
 			+ coreModule.code() + ", "
 			+ addonModule.code() + ", "
 			+ finishStyle.code() + ".");
-		logs.add("Le produit final apparait sans director ni etapes explicites dans le code appelant.");
+		logs.add("Le produit final apparait sans director ni étapes explicites dans le code appelant.");
 
 		List<BuildStage> stages = new ArrayList<>();
 		BuildStats runningStats = BuildStats.zero();
@@ -284,7 +284,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 			case "CORE" -> productType.coreStageLabel();
 			case "ADDON" -> productType.addonStageLabel();
 			case "FINISH" -> productType.finishStageLabel();
-			default -> throw new InvalidPatternConfigurationException("Etape Builder inconnue : " + stageCode);
+			default -> throw new InvalidPatternConfigurationException("Étape Builder inconnue : " + stageCode);
 		};
 	}
 
@@ -365,7 +365,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 				"constructor",
 				artifact.productType().monolithicClassName(),
 				"context",
-				Map.of("detail", "constructeur geant")
+				Map.of("detail", "constructeur géant")
 			));
 			edges.add(new VisualizationEdge("client", "constructor", "new(...)"));
 
@@ -401,7 +401,7 @@ public class BuilderPatternDemo implements DesignPatternDemo {
 
 	private BuilderConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Builder sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Builder sont obligatoires.");
 		}
 
 		String mode = String.valueOf(parameters.getOrDefault("mode", WITH_BUILDER)).trim().toUpperCase(Locale.ROOT);

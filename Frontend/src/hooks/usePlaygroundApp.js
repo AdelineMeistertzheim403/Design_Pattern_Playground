@@ -31,8 +31,12 @@ import {
   persistSession,
 } from '../app/playgroundUtils'
 
+function getCurrentRoutePath() {
+  return `${window.location.pathname}${window.location.hash}`
+}
+
 export default function usePlaygroundApp() {
-  const [route, setRoute] = useState(() => parseRoute(window.location.pathname))
+  const [route, setRoute] = useState(() => parseRoute(getCurrentRoutePath()))
   const [patterns, setPatterns] = useState(fallbackPatterns)
   const [schema, setSchema] = useState(emptyPatternSchema)
   const [formValues, setFormValues] = useState({})
@@ -65,7 +69,7 @@ export default function usePlaygroundApp() {
 
   useEffect(() => {
     const handlePopState = () => {
-      setRoute(parseRoute(window.location.pathname))
+      setRoute(parseRoute(getCurrentRoutePath()))
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 

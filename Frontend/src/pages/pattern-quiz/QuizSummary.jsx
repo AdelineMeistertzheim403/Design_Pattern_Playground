@@ -29,13 +29,13 @@ export default function QuizSummary({
       <section className="reveal rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
         <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Resultat du quiz</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Résultat du quiz</p>
             <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">
               {summary.earnedPoints} / {summary.maxPoints} pts
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-              {getMasteryLabel(summary.correctPercent)}. Tu as reussi {summary.correctAnswers} question(s) sur {summary.questionCount},
-              soit {summary.correctPercent}% de bonnes reponses et {summary.pointsPercent}% du score possible.
+              {getMasteryLabel(summary.correctPercent)}. Tu as réussi {summary.correctAnswers} question(s) sur {summary.questionCount},
+              soit {summary.correctPercent}% de bonnes réponses et {summary.pointsPercent}% du score possible.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -58,15 +58,15 @@ export default function QuizSummary({
 
           <div className="grid gap-4 self-start">
             <ProgressCard
-              detail={`Seuil de validation : ${quiz.passingPercent}% de bonnes reponses.`}
+              detail={`Seuil de validation : ${quiz.passingPercent}% de bonnes réponses.`}
               label="Badge"
               tone={summary.badgeUnlocked ? 'success' : 'warning'}
-              value={summary.badgeUnlocked ? quiz.badgeLabel : 'Verrouille'}
+              value={summary.badgeUnlocked ? quiz.badgeLabel : 'Verrouillé'}
             />
             <ProgressCard
               detail={persistedProgress
-                ? `Tentatives enregistrees : ${persistedProgress.attemptsCount}. Meilleur score : ${persistedProgress.bestPoints} pts.`
-                : 'La progression sera visible ici des que la tentative sera enregistree.'}
+                ? `Tentatives enregistrées : ${persistedProgress.attemptsCount}. Meilleur score : ${persistedProgress.bestPoints} pts.`
+                : 'La progression sera visible ici dès que la tentative sera enregistrée.'}
               label="Progression"
               value={persistedProgress ? `${persistedProgress.bestCorrectPercent}% max` : '—'}
             />
@@ -78,8 +78,8 @@ export default function QuizSummary({
         <section className="rounded-[26px] border border-emerald-200 bg-emerald-50 px-5 py-5 shadow-[0_18px_45px_rgba(36,107,94,0.12)]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Recompenses</p>
-              <h2 className="mt-2 text-2xl text-stone-950">Progression mise a jour</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Récompenses</p>
+              <h2 className="mt-2 text-2xl text-stone-950">Progression mise à jour</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-900">
@@ -98,7 +98,7 @@ export default function QuizSummary({
             <div className="mt-4 flex flex-wrap gap-2">
               {submissionResult.progression.newlyUnlockedBadges.map((badge) => (
                 <span key={badge.code} className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-900">
-                  Nouveau badge: {badge.name}
+                  Nouveau badge : {badge.name}
                 </span>
               ))}
             </div>
@@ -120,8 +120,8 @@ export default function QuizSummary({
 
       <CollapsiblePanel
         defaultExpanded
-        description="Chaque question conserve sa correction et le detail des points associes."
-        eyebrow="Debrief"
+        description="Chaque question conserve sa correction et le détail des points associés."
+        eyebrow="Débrief"
         title="Relecture du quiz"
       >
         <div className="grid gap-4">
@@ -141,7 +141,7 @@ export default function QuizSummary({
               <h2 className="mt-2 text-xl text-stone-950">{result.question.label}</h2>
               <p className="mt-3 text-sm leading-7 text-stone-700">{result.explanation}</p>
               <p className={`mt-4 text-sm font-semibold ${result.isCorrect ? 'text-emerald-900' : 'text-amber-900'}`}>
-                {result.isCorrect ? 'Bonne reponse' : 'Reponse incorrecte'}
+                {result.isCorrect ? 'Bonne réponse' : 'Réponse incorrecte'}
               </p>
             </article>
           ))}

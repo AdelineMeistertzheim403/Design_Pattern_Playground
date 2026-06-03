@@ -5,7 +5,7 @@ export const patternDefinition = {
   "name": "Command",
   "type": "BEHAVIORAL",
   "description": "Encapsule une action dans un objet pour pouvoir la declencher, l historiser, l annuler et la rejouer sans coupler l interface au receiver.",
-  "useCase": "Construire un simulateur undo / redo, un editeur ou un mini jeu d actions historisees avec piles de commandes.",
+  "useCase": "Construire un simulateur undo / redo, un éditeur ou un mini jeu d actions historisees avec piles de commandes.",
   "complexityLevel": "INTERMEDIATE"
 }
 
@@ -62,7 +62,7 @@ export const patternLearningContent = {
   "intuition": "Command separe le bouton ou l interface qui demande une action de l objet qui sait reellement l executer. Ce decouplage rend l historique et undo / redo naturels.",
   "readingGuide": "Observe d abord la grille centrale et l etat final du robot. Puis regarde les piles undo / redo et enfin la timeline pour voir a quel moment une action est executee, annulee ou rejouee.",
   "studentAngle": "Le vrai declic est de voir qu une action n est plus juste un clic, mais un objet qu on peut stocker, empiler et reexecuter.",
-  "developerAngle": "Le pattern devient pertinent pour un editeur, un jeu tactique, des macros, une file d actions ou tout systeme qui doit historiser des operations reversibles.",
+  "developerAngle": "Le pattern devient pertinent pour un éditeur, un jeu tactique, des macros, une file d actions ou tout systeme qui doit historiser des operations reversibles.",
   "playfulPrompt": "Compare avec et sans Command, puis regarde ce qu il reste possible quand tu veux faire undo ou redo.",
   "steps": [
     "Le client construit une commande concrete.",
@@ -306,7 +306,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "create",
-          "label": "Creer des objets"
+          "label": "Créer des objets"
         },
         {
           "id": "memory",
@@ -362,7 +362,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",
@@ -528,11 +528,11 @@ export const fallbackQuiz = {
       "type": "QCM_SINGLE",
       "difficulty": "EASY",
       "points": 0,
-      "explanation": "Un editeur avec undo / redo ou un simulateur d actions joueur sont des exemples tres classiques.",
+      "explanation": "Un éditeur avec undo / redo ou un simulateur d actions joueur sont des exemples tres classiques.",
       "choices": [
         {
           "id": "editor",
-          "label": "Editeur avec undo / redo"
+          "label": "Éditeur avec undo / redo"
         },
         {
           "id": "entity",

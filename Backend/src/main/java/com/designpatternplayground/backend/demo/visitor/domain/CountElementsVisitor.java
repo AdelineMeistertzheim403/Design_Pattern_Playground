@@ -15,7 +15,7 @@ public final class CountElementsVisitor implements StructureVisitor {
 
 	@Override
 	public String label() {
-		return "Count Elements";
+		return "Count Éléments";
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public final class CountElementsVisitor implements StructureVisitor {
 		LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 		fields.put("folderCount", folderCount);
 		fields.put("fileCount", fileCount);
-		fields.put("resultLabel", (folderCount + fileCount) + " elements");
+		fields.put("resultLabel", (folderCount + fileCount) + " éléments");
 		fields.put("resultDetail", folderCount + " dossiers analyses et " + fileCount + " fichiers comptes.");
 		return fields;
 	}

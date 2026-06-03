@@ -28,9 +28,9 @@ public enum SilhouetteOption {
 	public String labelFor(BuilderProductType productType) {
 		return switch (productType) {
 			case CAR -> switch (this) {
-				case COMPACT -> "Sprint Chassis";
+				case COMPACT -> "Sprint Châssis";
 				case BALANCED -> "Touring Frame";
-				case GRAND -> "Titan Chassis";
+				case GRAND -> "Titan Châssis";
 			};
 			case CHARACTER -> switch (this) {
 				case COMPACT -> "Agile Silhouette";
@@ -48,7 +48,7 @@ public enum SilhouetteOption {
 	public String detailFor(BuilderProductType productType, String buildName) {
 		return switch (productType) {
 			case CAR -> switch (this) {
-				case COMPACT -> buildName + " recoit un chassis court et nerveux, ideal pour l agilite.";
+				case COMPACT -> buildName + " recoit un châssis court et nerveux, ideal pour l agilite.";
 				case BALANCED -> buildName + " prend un gabarit polyvalent facile a faire evoluer.";
 				case GRAND -> buildName + " adopte une base large, stable et orientee capacite.";
 			};

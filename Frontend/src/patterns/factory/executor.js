@@ -21,7 +21,7 @@ export default function executeFactoryPattern(parameters) {
       : "Sans Factory, le client instancie directement le produit concret et reste couple a son constructeur.",
     logs: useFactory
       ? [
-          'Creation du point d entree factory.',
+          'Création du point d entree factory.',
           `Demande de creation pour le type ${vehicle.type}.`,
           `Instantiation du produit concret ${vehicle.label}.`,
           'Retour du produit sans exposer le constructeur au client.',

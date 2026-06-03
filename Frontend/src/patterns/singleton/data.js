@@ -179,7 +179,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "many",
-          "label": "Creer plusieurs objets"
+          "label": "Créer plusieurs objets"
         },
         {
           "id": "single",
@@ -381,7 +381,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",

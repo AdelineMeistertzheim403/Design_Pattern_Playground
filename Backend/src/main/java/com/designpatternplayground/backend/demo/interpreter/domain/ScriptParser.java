@@ -17,7 +17,7 @@ public final class ScriptParser {
 	public List<ScriptExpression> parse(List<String> lines) {
 		ParseResult result = parseBlock(lines, 0, false);
 		if (result.nextIndex() < lines.size()) {
-			throw new InvalidPatternConfigurationException("Fin de script invalide a la ligne " + (result.nextIndex() + 1));
+			throw new InvalidPatternConfigurationException("Fin de script invalide à la ligne " + (result.nextIndex() + 1));
 		}
 		return result.expressions();
 	}
@@ -37,7 +37,7 @@ public final class ScriptParser {
 
 			if ("}".equals(sourceLine)) {
 				if (!insideRepeat) {
-					throw new InvalidPatternConfigurationException("Accolade fermante inattendue a la ligne " + lineNumber);
+					throw new InvalidPatternConfigurationException("Accolade fermante inattendue à la ligne " + lineNumber);
 				}
 				return new ParseResult(expressions, index + 1);
 			}
@@ -88,7 +88,7 @@ public final class ScriptParser {
 			return new PrimitiveExpression(lineNumber, sourceLine, PrimitiveInstructionType.WAIT, 1);
 		}
 
-		throw new InvalidPatternConfigurationException("Instruction Interpreter inconnue a la ligne " + lineNumber + " : " + sourceLine);
+		throw new InvalidPatternConfigurationException("Instruction Interpreter inconnue à la ligne " + lineNumber + " : " + sourceLine);
 	}
 
 	private record ParseResult(

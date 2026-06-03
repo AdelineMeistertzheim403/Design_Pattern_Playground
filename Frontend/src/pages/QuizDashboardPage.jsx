@@ -14,7 +14,7 @@ function formatDate(value) {
 function getStatus(pattern) {
   if (pattern.badgeUnlocked) {
     return {
-      label: 'Valide',
+      label: 'Validé',
       tone: 'border-emerald-200 bg-emerald-50 text-emerald-900',
     }
   }
@@ -27,7 +27,7 @@ function getStatus(pattern) {
   }
 
   return {
-    label: 'A demarrer',
+    label: 'À démarrer',
     tone: 'border-black/10 bg-white text-stone-700',
   }
 }
@@ -59,7 +59,7 @@ function BadgeCard({ badge }) {
           </p>
         </div>
         <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${badge.unlocked ? 'bg-emerald-600 text-white' : 'bg-stone-100 text-stone-500'}`}>
-          {badge.unlocked ? 'Debloque' : 'Verrouille'}
+          {badge.unlocked ? 'Débloqué' : 'Verrouillé'}
         </span>
       </div>
     </article>
@@ -95,7 +95,7 @@ function buildMissionObjective(dashboard) {
   }
 
   if (multiPatternMissionSuccesses < 1) {
-    return 'Reussis une mission multi-pattern pour debloquer fusion_success.'
+    return 'Réussis une mission multi-pattern pour débloquer fusion_success.'
   }
 
   if (multiPatternMissionSuccesses < 5) {
@@ -103,10 +103,10 @@ function buildMissionObjective(dashboard) {
   }
 
   if (successfulAdvancedMissions < 3) {
-    return `Encore ${3 - successfulAdvancedMissions} mission(s) avancees pour consolider ton niveau expert.`
+    return `Encore ${3 - successfulAdvancedMissions} mission(s) avancées pour consolider ton niveau expert.`
   }
 
-  return 'Toutes les familles de mission sont bien engagees. Tu peux maintenant viser la maitrise complete du playground.'
+  return 'Toutes les familles de mission sont bien engagées. Tu peux maintenant viser la maîtrise complète du playground.'
 }
 
 function DashboardGate({
@@ -119,7 +119,7 @@ function DashboardGate({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Progression utilisateur</p>
         <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Tableau de bord des quiz</h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-          Connecte-toi pour suivre tes scores, tes badges valides et les patterns qu il te reste a consolider.
+          Connecte-toi pour suivre tes scores, tes badges validés et les patterns qu’il te reste à consolider.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button
@@ -134,14 +134,14 @@ function DashboardGate({
             type="button"
             onClick={() => onOpenAuth('register')}
           >
-            Creer un compte
+            Créer un compte
           </button>
           <button
             className="rounded-full border border-black/10 bg-white/84 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-black/20"
             type="button"
             onClick={onNavigateHome}
           >
-            Retour a l accueil
+            Retour à l’accueil
           </button>
         </div>
       </section>
@@ -191,7 +191,7 @@ function PatternProgressCard({
 
       <p className="mt-4 text-sm leading-7 text-stone-700">{pattern.description}</p>
       <p className="mt-4 rounded-[22px] bg-[var(--teal-soft)]/72 px-4 py-4 text-sm leading-7 text-stone-700">
-        Cas d usage : {pattern.useCase}
+        Cas d’usage : {pattern.useCase}
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -201,20 +201,20 @@ function PatternProgressCard({
           <p className="mt-1 text-sm text-stone-600">{pattern.bestPointsPercent}% max</p>
         </div>
         <div className="rounded-[20px] border border-black/10 bg-white px-4 py-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Reponses justes</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Réponses justes</p>
           <p className="mt-2 text-lg font-semibold text-stone-950">{pattern.bestCorrectPercent}%</p>
           <p className="mt-1 text-sm text-stone-600">Seuil badge : {pattern.passingPercent}%</p>
         </div>
         <div className="rounded-[20px] border border-black/10 bg-white px-4 py-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Tentatives</p>
           <p className="mt-2 text-lg font-semibold text-stone-950">{pattern.attemptsCount}</p>
-          <p className="mt-1 text-sm text-stone-600">Derniere : {formatDate(pattern.lastAttemptAt)}</p>
+          <p className="mt-1 text-sm text-stone-600">Dernière : {formatDate(pattern.lastAttemptAt)}</p>
         </div>
         <div className="rounded-[20px] border border-black/10 bg-white px-4 py-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Badge</p>
-          <p className="mt-2 text-lg font-semibold text-stone-950">{pattern.badgeUnlocked ? pattern.badgeLabel : 'Non valide'}</p>
+          <p className="mt-2 text-lg font-semibold text-stone-950">{pattern.badgeUnlocked ? pattern.badgeLabel : 'Non validé'}</p>
           <p className="mt-1 text-sm text-stone-600">
-            {pattern.badgeUnlocked ? `Debloque le ${formatDate(pattern.badgeUnlockedAt)}` : 'A obtenir'}
+            {pattern.badgeUnlocked ? `Débloqué le ${formatDate(pattern.badgeUnlockedAt)}` : 'À obtenir'}
           </p>
         </div>
       </div>
@@ -279,7 +279,7 @@ export default function QuizDashboardPage({
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Progression indisponible</p>
           <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Tableau de bord des quiz</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-            Cette page a besoin d une API connectee pour charger la progression persistante.
+            Cette page a besoin d’une API connectée pour charger la progression persistante.
           </p>
         </section>
       </div>
@@ -298,7 +298,7 @@ export default function QuizDashboardPage({
     return right.bestCorrectPercent - left.bestCorrectPercent
   })
   const totalMissionCount = missionCatalog.length
-  const advancedMissionCount = missionCatalog.filter((mission) => mission.difficulty === 'Avance').length
+  const advancedMissionCount = missionCatalog.filter((mission) => mission.difficulty === 'Avancé').length
   const multiPatternMissionCount = missionCatalog.filter((mission) => mission.expectedPatterns.length > 1).length
   const missionSuccessPercent = totalMissionCount
     ? Math.round(((dashboard?.missions?.successfulMissions ?? 0) * 100) / totalMissionCount)
@@ -322,7 +322,7 @@ export default function QuizDashboardPage({
                 type="button"
                 onClick={onNavigateHome}
               >
-                Retour a l accueil
+                Retour à l’accueil
               </button>
             </div>
 
@@ -332,13 +332,13 @@ export default function QuizDashboardPage({
             </div>
 
             <p className="max-w-3xl text-base leading-7 text-stone-700">
-              Suis ton XP global, tes badges, tes missions reussies et les patterns qu il te reste a maitriser.
+              Suis ton XP global, tes badges, tes missions réussies et les patterns qu’il te reste à maîtriser.
             </p>
           </div>
 
           <div className="grid gap-4 self-start md:grid-cols-2 xl:grid-cols-2">
             <StatCard
-              detail="Niveau global derive de ton experience cumulee."
+              detail="Niveau global dérivé de ton expérience cumulée."
               label="Niveau"
               value={dashboard?.profile ? `${dashboard.profile.level}` : '—'}
             />
@@ -349,12 +349,12 @@ export default function QuizDashboardPage({
               value={dashboard?.profile ? dashboard.profile.rank : '—'}
             />
             <StatCard
-              detail="Experience totale et prochain palier."
+              detail="Expérience totale et prochain palier."
               label="XP"
               value={dashboard?.profile ? `${dashboard.profile.totalXp}` : '—'}
             />
             <StatCard
-              detail="Nombre total de badges deja debloques."
+              detail="Nombre total de badges déjà débloqués."
               label="Badges"
               tone="success"
               value={dashboard?.profile ? `${dashboard.profile.unlockedBadgeCount} / ${dashboard.profile.totalBadgeCount}` : '—'}
@@ -379,19 +379,19 @@ export default function QuizDashboardPage({
         <>
           <section className="grid gap-4 xl:grid-cols-3">
             <StatCard
-              detail="Score cumule sur tes meilleurs passages aux quiz."
+              detail="Score cumulé sur tes meilleurs passages aux quiz."
               label="Score global"
               value={`${dashboard.totalBestPoints} / ${dashboard.totalMaxPoints} pts`}
             />
             <StatCard
-              detail="Missions reussies sur l ensemble du playground."
+              detail="Missions réussies sur l’ensemble du playground."
               label="Missions"
-              value={`${dashboard.missions.successfulMissions} reussies`}
+              value={`${dashboard.missions.successfulMissions} réussies`}
             />
             <StatCard
-              detail="Reussites avancees et multi-pattern memorisees."
-              label="Fusion / avance"
-              value={`${dashboard.missions.successfulAdvancedMissions} avancees · ${dashboard.missions.multiPatternMissionSuccesses} fusion`}
+              detail="Réussites avancées et multi-pattern mémorisées."
+              label="Fusion / avancé"
+              value={`${dashboard.missions.successfulAdvancedMissions} avancées · ${dashboard.missions.multiPatternMissionSuccesses} fusion`}
             />
           </section>
 
@@ -401,26 +401,26 @@ export default function QuizDashboardPage({
               type="button"
               onClick={onOpenActivity}
             >
-              Voir l activite recente
+              Voir l’activité récente
             </button>
           </div>
 
           <CollapsiblePanel
             eyebrow="Missions"
-            title="Campagne et progression scenario"
+            title="Campagne et progression scénario"
             description={`Objectif courant : ${missionObjective}`}
             defaultExpanded
             bodyClassName="grid gap-6"
           >
             <div className="grid gap-4 xl:grid-cols-4">
               <MissionStatCard
-                detail={`${dashboard.missions.attemptedMissions} mission(s) tentee(s) sur ${totalMissionCount}.`}
+                detail={`${dashboard.missions.attemptedMissions} mission(s) tentée(s) sur ${totalMissionCount}.`}
                 label="Campagne"
                 value={`${dashboard.missions.successfulMissions} / ${totalMissionCount}`}
               />
               <MissionStatCard
-                detail={`${advancedMissionCount} mission(s) avancees disponibles.`}
-                label="Avance"
+                detail={`${advancedMissionCount} mission(s) avancées disponibles.`}
+                label="Avancé"
                 value={`${dashboard.missions.successfulAdvancedMissions} / ${advancedMissionCount}`}
               />
               <MissionStatCard
@@ -429,8 +429,8 @@ export default function QuizDashboardPage({
                 value={`${dashboard.missions.multiPatternMissionSuccesses} / ${multiPatternMissionCount}`}
               />
               <MissionStatCard
-                detail="Meilleure serie de reussites consecutives memorisee."
-                label="Serie"
+                detail="Meilleure série de réussites consécutives mémorisée."
+                label="Série"
                 value={`${dashboard.missions.bestSuccessStreak}`}
               />
             </div>
@@ -438,7 +438,7 @@ export default function QuizDashboardPage({
             <div className="grid gap-4 xl:grid-cols-3">
               <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-stone-900">Taux de reussite mission</p>
+                  <p className="text-sm font-semibold text-stone-900">Taux de réussite mission</p>
                   <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-stone-800">{missionSuccessPercent}%</span>
                 </div>
                 <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
@@ -448,7 +448,7 @@ export default function QuizDashboardPage({
 
               <article className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-stone-900">Progression avancee</p>
+                  <p className="text-sm font-semibold text-stone-900">Progression avancée</p>
                   <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-stone-800">{advancedMissionPercent}%</span>
                 </div>
                 <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
@@ -470,7 +470,7 @@ export default function QuizDashboardPage({
 
           <CollapsiblePanel
             eyebrow="Badges"
-            title="Dernieres recompenses"
+            title="Dernières récompenses"
             description={`XP actuelle : ${dashboard.profile.totalXp} · prochain palier : ${dashboard.profile.nextLevelXp ?? 'max'}`}
             defaultExpanded={false}
             bodyClassName="grid gap-5"
@@ -504,9 +504,9 @@ export default function QuizDashboardPage({
           </CollapsiblePanel>
 
           <CollapsiblePanel
-            eyebrow="Maitrise"
+            eyebrow="Maîtrise"
             title="Collection et progression"
-            description="Chaque pattern progresse via la demo, le quiz, les missions simples et les missions avancees."
+            description="Chaque pattern progresse via la démo, le quiz, les missions simples et les missions avancées."
             defaultExpanded={false}
             bodyClassName="grid gap-4 lg:grid-cols-2"
           >
@@ -531,10 +531,10 @@ export default function QuizDashboardPage({
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
-                    <span className={`rounded-full px-3 py-1 ${pattern.demoCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Demo</span>
+                    <span className={`rounded-full px-3 py-1 ${pattern.demoCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Démo</span>
                     <span className={`rounded-full px-3 py-1 ${pattern.quizPassed ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Quiz</span>
                     <span className={`rounded-full px-3 py-1 ${pattern.missionCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Mission</span>
-                    <span className={`rounded-full px-3 py-1 ${pattern.advancedMissionCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Mission avancee</span>
+                    <span className={`rounded-full px-3 py-1 ${pattern.advancedMissionCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-stone-500'}`}>Mission avancée</span>
                   </div>
                 </article>
               ))}
@@ -543,7 +543,7 @@ export default function QuizDashboardPage({
 
           <CollapsiblePanel
             eyebrow="Quiz"
-            title="Historique detaille par pattern"
+            title="Historique détaillé par pattern"
             description="Cette section liste les scores, tentatives et badges pattern par pattern."
             defaultExpanded={false}
             bodyClassName="grid gap-4 lg:grid-cols-2"

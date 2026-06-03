@@ -48,10 +48,10 @@ function lockPatternModeField(field, missionTitle) {
     defaultValue: withValue ?? field.defaultValue,
     allowedValueLabels: withValue
       ? {
-          [withValue]: `Pattern applique dans la mission ${missionTitle}`,
+          [withValue]: `Pattern appliqué dans la mission ${missionTitle}`,
         }
       : undefined,
-    description: 'Le mode est verrouille sur la version orientee pattern pour rester coherent avec le scenario mission.',
+    description: 'Le mode est verrouillé sur la version orientée pattern pour rester cohérent avec le scénario mission.',
   }
 }
 
@@ -192,19 +192,19 @@ function buildFallbackDescription({ mission, patternCode, field }) {
   const patternPrompt = mission?.patternPrompts?.[patternCode]
 
   if (field.name === 'mode') {
-    return `Scenario mission: ${shorten(patternPrompt || mission?.objective, 92)}`
+    return `Scénario mission : ${shorten(patternPrompt || mission?.objective, 92)}`
   }
 
   if (field.type === 'NUMBER') {
-    return `Regle ce parametre pour representer la charge du scenario ${shorten(mission?.title, 40)}.`
+    return `Règle ce paramètre pour représenter la charge du scénario ${shorten(mission?.title, 40)}.`
   }
 
   if (field.type === 'TEXT') {
-    return `Contexte mission: ${shorten(mission?.context, 92)}`
+    return `Contexte mission : ${shorten(mission?.context, 92)}`
   }
 
   if (field.type === 'SELECT' || field.type === 'LIST') {
-    return `Choix guide par l enonce: ${shorten(patternPrompt || mission?.objective, 92)}`
+    return `Choix guidé par l’énoncé : ${shorten(patternPrompt || mission?.objective, 92)}`
   }
 
   return ''
@@ -214,15 +214,15 @@ const missionFieldOverridesById = {
   'memory-overload': {
     flyweight: {
       assetType: {
-        label: 'Type d asset massivement duplique',
+        label: 'Type d’asset massivement dupliqué',
       },
       objectCount: {
-        label: 'Nombre d entites a afficher',
+        label: 'Nombre d’entités à afficher',
         defaultValue: '10000',
         missionCritical: true,
       },
       sharedVariantCount: {
-        label: 'Nombre de variantes partagees',
+        label: 'Nombre de variantes partagées',
         defaultValue: '5',
         missionCritical: true,
       },
@@ -231,16 +231,16 @@ const missionFieldOverridesById = {
   'global-logger': {
     singleton: {
       clients: {
-        label: 'Modules branches sur le logger',
+        label: 'Modules branchés sur le logger',
         defaultValue: 'UI Panel, Backend Job, Analytics Service, Alert Engine',
         missionCritical: true,
       },
       settingKey: {
-        label: 'Cle de config globale',
+        label: 'Clé de config globale',
         defaultValue: 'logLevel',
       },
       settingValue: {
-        label: 'Valeur partagee',
+        label: 'Valeur partagée',
         defaultValue: 'INFO',
       },
     },
@@ -260,16 +260,16 @@ const missionFieldOverridesById = {
   'notification-system': {
     observer: {
       subjectName: {
-        label: 'Nom du producteur d evenement',
+        label: 'Nom du producteur d’événement',
         defaultValue: 'Release Bus',
       },
       observers: {
-        label: 'Recepteurs abonnes',
+        label: 'Récepteurs abonnés',
         defaultValue: 'Mobile, Support, Back Office, Audit',
         missionCritical: true,
       },
       message: {
-        label: 'Message diffuse',
+        label: 'Message diffusé',
         defaultValue: 'Nouvelle release critique disponible',
       },
     },
@@ -277,11 +277,11 @@ const missionFieldOverridesById = {
   'power-up-system': {
     decorator: {
       characterName: {
-        label: 'Nom du personnage buffe',
+        label: 'Nom du personnage buffé',
         defaultValue: 'Arena Champion',
       },
       decorators: {
-        label: 'Bonus a empiler',
+        label: 'Bonus à empiler',
         defaultValue: 'FIRE, SHIELD, SPEED',
         missionCritical: true,
       },
@@ -298,7 +298,7 @@ const missionFieldOverridesById = {
         defaultValue: 'Operator Unit',
       },
       actions: {
-        label: 'Sequence d actions historisee',
+        label: 'Séquence d’actions historisée',
         defaultValue: 'ADD_BEACON, MOVE_RIGHT, MOVE_UP, UNDO, REDO',
         missionCritical: true,
       },
@@ -307,11 +307,11 @@ const missionFieldOverridesById = {
   'request-processing-pipeline': {
     chain: {
       requestName: {
-        label: 'Nom de la requete API',
-        defaultValue: 'Acces export securise',
+        label: 'Nom de la requête API',
+        defaultValue: 'Accès export sécurisé',
       },
       processingTarget: {
-        label: 'Operation cible',
+        label: 'Opération cible',
         defaultCandidates: ['PASSWORD_RESET', 'REPORT_EXPORT'],
         missionCritical: true,
       },
@@ -320,15 +320,15 @@ const missionFieldOverridesById = {
   'complex-combat-system': {
     strategy: {
       amount: {
-        label: 'Intensite de l attaque',
+        label: 'Intensité de l’attaque',
         defaultValue: '220',
       },
       strategy: {
         label: 'Style tactique actif',
         missionCritical: true,
         allowedValueLabels: {
-          CARD: 'Style precision',
-          PAYPAL: 'Style agilite',
+          CARD: 'Style précision',
+          PAYPAL: 'Style agilité',
           CRYPTO: 'Style puissance',
         },
         defaultCandidates: ['PAYPAL', 'CARD', 'CRYPTO'],
@@ -336,7 +336,7 @@ const missionFieldOverridesById = {
     },
     decorator: {
       characterName: {
-        label: 'Combattant de reference',
+        label: 'Combattant de référence',
         defaultValue: 'Vanguard Unit',
       },
       decorators: {
@@ -349,22 +349,22 @@ const missionFieldOverridesById = {
   'massive-multiplayer-world': {
     factory: {
       vehicleType: {
-        label: 'Archetype d entite creee',
+        label: 'Archétype d’entité créée',
         missionCritical: true,
         allowedValueLabels: {
-          CAR: 'Entite melee',
-          BIKE: 'Entite rapide',
+          CAR: 'Entité mêlée',
+          BIKE: 'Entité rapide',
         },
       },
     },
     flyweight: {
       objectCount: {
-        label: 'Population simulee',
+        label: 'Population simulée',
         defaultValue: '12000',
         missionCritical: true,
       },
       sharedVariantCount: {
-        label: 'Variants partagees',
+        label: 'Variantes partagées',
         defaultValue: '8',
         missionCritical: true,
       },
@@ -389,17 +389,17 @@ const missionFieldOverridesById = {
     },
     observer: {
       subjectName: {
-        label: 'Hub emetteur',
+        label: 'Hub émetteur',
         defaultValue: 'SmartAlertHub',
       },
       observers: {
-        label: 'Abonnes',
+        label: 'Abonnés',
         defaultValue: 'Mobile App, Support Desk, Back Office, Audit Log',
         missionCritical: true,
       },
       message: {
-        label: 'Alerte diffusee',
-        defaultValue: 'Alerte prioritaire: incident de paiement detecte',
+        label: 'Alerte diffusée',
+        defaultValue: 'Alerte prioritaire : incident de paiement détecté',
       },
     },
   },
@@ -414,7 +414,7 @@ const missionFieldOverridesById = {
         defaultValue: 'Runner Unit',
       },
       actions: {
-        label: 'Historique d actions',
+        label: 'Historique d’actions',
         defaultValue: 'ADD_BEACON, MOVE_RIGHT, MOVE_UP, MOVE_LEFT, UNDO, REDO',
         missionCritical: true,
       },
@@ -425,11 +425,11 @@ const missionFieldOverridesById = {
         defaultValue: 'Checkpoint Session',
       },
       presetCode: {
-        label: 'Preset de scene',
+        label: 'Preset de scène',
         defaultCandidates: ['CONTROL_ROOM', 'ARCADE_HUB', 'PIXEL_GARDEN'],
       },
       restoreTarget: {
-        label: 'Snapshot a restaurer',
+        label: 'Snapshot à restaurer',
         defaultCandidates: ['SNAPSHOT_BETA', 'SNAPSHOT_ALPHA'],
         missionCritical: true,
       },
@@ -447,7 +447,7 @@ const missionFieldOverridesById = {
         missionCritical: true,
       },
       operationLabel: {
-        label: 'Operation de rendu',
+        label: 'Opération de rendu',
         defaultValue: 'Render module tree',
       },
     },
@@ -457,7 +457,7 @@ const missionFieldOverridesById = {
         defaultValue: 'Widget Core',
       },
       decorators: {
-        label: 'Layers visuels a empiler',
+        label: 'Layers visuels à empiler',
         defaultValue: 'SHIELD, SPEED, FIRE',
         missionCritical: true,
         allowedValueLabels: {
@@ -472,37 +472,37 @@ const missionFieldOverridesById = {
   'secure-api-gateway': {
     chain: {
       requestName: {
-        label: 'Nom de la requete sensible',
+        label: 'Nom de la requête sensible',
         defaultValue: 'Gateway secure access',
       },
       tokenState: {
-        label: 'Etat du token auth',
+        label: 'État du token auth',
         defaultCandidates: ['VALID'],
         missionCritical: true,
       },
       payloadState: {
-        label: 'Etat du payload',
+        label: 'État du payload',
         defaultCandidates: ['VALID'],
         missionCritical: true,
       },
       processingTarget: {
-        label: 'Ressource demandee',
+        label: 'Ressource demandée',
         defaultCandidates: ['PASSWORD_RESET', 'REPORT_EXPORT'],
         missionCritical: true,
       },
     },
     proxy: {
       requestLabel: {
-        label: 'Libelle de la requete',
+        label: 'Libellé de la requête',
         defaultValue: 'Access secure endpoint',
       },
       requesterRole: {
-        label: 'Role appelant',
+        label: 'Rôle appelant',
         defaultCandidates: ['MEMBER', 'GUEST', 'ADMIN'],
         missionCritical: true,
       },
       resourceCode: {
-        label: 'Ressource protegee',
+        label: 'Ressource protégée',
         defaultCandidates: ['LIVE_DASHBOARD', 'REPORT_ARCHIVE', 'VAULT_VIDEO'],
         missionCritical: true,
       },
@@ -511,7 +511,7 @@ const missionFieldOverridesById = {
   'multi-device-control-system': {
     command: {
       boardName: {
-        label: 'Plan de controle devices',
+        label: 'Plan de contrôle devices',
         defaultValue: 'Device Control Board',
       },
       actorName: {
@@ -519,14 +519,14 @@ const missionFieldOverridesById = {
         defaultValue: 'Mobile Controller',
       },
       actions: {
-        label: 'Macros de controle',
+        label: 'Macros de contrôle',
         defaultValue: 'ADD_BEACON, MOVE_RIGHT, MOVE_UP, MOVE_LEFT, UNDO, REDO',
         missionCritical: true,
         allowedValueLabels: {
           ADD_BEACON: 'Activer TV',
           MOVE_RIGHT: 'Allumer lampe',
           MOVE_UP: 'Lancer musique',
-          MOVE_LEFT: 'Baisser lumiere',
+          MOVE_LEFT: 'Baisser lumière',
           DELETE_BEACON: 'Couper appareil',
           UNDO: 'Annuler macro',
           REDO: 'Rejouer macro',
@@ -539,24 +539,24 @@ const missionFieldOverridesById = {
         defaultValue: 'Living Room Hub',
       },
       participants: {
-        label: 'Devices relies',
+        label: 'Devices reliés',
         defaultValue: 'TV, Lamp, Music System',
         missionCritical: true,
       },
       senderName: {
-        label: 'Controleur principal',
+        label: 'Contrôleur principal',
         defaultValue: 'Mobile App',
       },
       message: {
-        label: 'Ordre diffuse',
-        defaultValue: 'Activer scene cinema synchronisee',
+        label: 'Ordre diffusé',
+        defaultValue: 'Activer scène cinéma synchronisée',
       },
     },
   },
   'dynamic-rendering-engine': {
     strategy: {
       amount: {
-        label: 'Intensite rendu',
+        label: 'Intensité rendu',
         defaultValue: '260',
       },
       strategy: {
@@ -572,7 +572,7 @@ const missionFieldOverridesById = {
     },
     bridge: {
       shapeCode: {
-        label: 'Famille d abstraction',
+        label: 'Famille d’abstraction',
         defaultCandidates: ['BANNER', 'CIRCLE', 'TRIANGLE'],
         missionCritical: true,
       },
@@ -582,7 +582,7 @@ const missionFieldOverridesById = {
         missionCritical: true,
       },
       objectName: {
-        label: 'Objet a rendre',
+        label: 'Objet à rendre',
         defaultValue: 'Runtime Render Node',
       },
     },
@@ -599,7 +599,7 @@ const missionFieldOverridesById = {
         missionCritical: true,
       },
       operationLabel: {
-        label: 'Operation appliquee',
+        label: 'Opération appliquée',
         defaultValue: 'Scan recursive tree',
       },
     },
@@ -609,12 +609,12 @@ const missionFieldOverridesById = {
         defaultCandidates: ['MEDIA_ARCHIVE', 'TEAM_WORKSPACE', 'ASSET_PACK'],
       },
       visitorType: {
-        label: 'Type d analyse',
+        label: 'Type d’analyse',
         defaultCandidates: ['VIRUS_SCAN', 'FIND_ELEMENT', 'COUNT_ELEMENTS'],
         missionCritical: true,
       },
       searchTerm: {
-        label: 'Terme de detection',
+        label: 'Terme de détection',
         defaultValue: 'malware',
       },
     },
@@ -630,13 +630,13 @@ const missionFieldOverridesById = {
         defaultCandidates: ['GAME_ASSETS', 'DOCS_SPACE', 'DESIGN_SYSTEM'],
       },
       operationLabel: {
-        label: 'Operation interpretee',
+        label: 'Opération interprétée',
         defaultValue: 'Interpret script tree',
       },
     },
     interpreter: {
       missionName: {
-        label: 'Nom du scenario script',
+        label: 'Nom du scénario script',
         defaultValue: 'Smart Mission Script',
       },
       objective: {

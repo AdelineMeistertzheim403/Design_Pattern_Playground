@@ -6,9 +6,9 @@ import com.designpatternplayground.backend.common.exception.InvalidPatternConfig
 
 public enum VisitorAnalysisType {
 
-	COUNT_ELEMENTS("COUNT_ELEMENTS", "Count Elements", "Compte tous les elements de la structure."),
+	COUNT_ELEMENTS("COUNT_ELEMENTS", "Count Elements", "Compte tous les éléments de la structure."),
 	CALCULATE_VALUE("CALCULATE_VALUE", "Calculate Value", "Additionne la taille totale des fichiers."),
-	FIND_ELEMENT("FIND_ELEMENT", "Find Element", "Recherche un element cible dans l arbre."),
+	FIND_ELEMENT("FIND_ELEMENT", "Find Element", "Recherche un élément cible dans l'arbre."),
 	VIRUS_SCAN("VIRUS_SCAN", "Virus Scan", "Detecte les fichiers marques comme infectes.");
 
 	private final String code;

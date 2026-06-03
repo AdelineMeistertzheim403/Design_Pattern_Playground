@@ -29,7 +29,7 @@ export const fallbackSchema = {
     },
     {
       name: 'triggerLabel',
-      label: 'Libelle du bouton',
+      label: 'Libellé du bouton',
       type: 'TEXT',
       required: true,
       allowedValues: null,
@@ -206,7 +206,7 @@ export const fallbackQuiz = {
       points: 0,
       explanation: 'Facade est un pattern structurel.',
       choices: [
-        { id: 'creational', label: 'Creation' },
+        { id: 'creational', label: 'Création' },
         { id: 'structural', label: 'Structurel' },
         { id: 'behavioral', label: 'Comportemental' },
       ],

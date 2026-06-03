@@ -54,7 +54,7 @@ function MatchingQuestionEditor({
       {(question.leftItems ?? []).map((leftItem) => (
         <div key={leftItem.id} className="grid gap-3 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4 md:grid-cols-[1fr_1fr] md:items-center">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Element de gauche</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Élément de gauche</p>
             <p className="mt-2 text-sm leading-7 text-stone-900">{leftItem.label}</p>
           </div>
 
@@ -158,7 +158,7 @@ function QuestionFeedback({
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.2em]">
-          {evaluation.isCorrect ? 'Bonne reponse' : 'A revoir'}
+          {evaluation.isCorrect ? 'Bonne réponse' : 'À revoir'}
         </p>
         <span className="rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
           {evaluation.earnedPoints} / {evaluation.availablePoints} pts
@@ -260,7 +260,7 @@ export default function QuizQuestionCard({
             type="button"
             onClick={onNext}
           >
-            {isLastQuestion ? 'Voir le resultat' : 'Question suivante'}
+            {isLastQuestion ? 'Voir le résultat' : 'Question suivante'}
           </button>
         )}
       </div>

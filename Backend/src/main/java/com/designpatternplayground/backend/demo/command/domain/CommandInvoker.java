@@ -48,7 +48,7 @@ public class CommandInvoker {
 			CommandAction.UNDO,
 			"UNDO",
 			true,
-			"Undo retire " + command.action().label().toLowerCase() + " de la pile active et restaure l etat precedent."
+			"Undo retire " + command.action().label().toLowerCase() + " de la pile active et restaure l'état precedent."
 		);
 	}
 
@@ -119,11 +119,11 @@ public class CommandInvoker {
 	private String executeDetail(CommandAction action) {
 		return switch (action) {
 			case ADD_BEACON -> board.actorName() + " depose une balise sur la grille.";
-			case MOVE_RIGHT -> board.actorName() + " avance d une case vers la droite.";
-			case MOVE_UP -> board.actorName() + " monte d une case.";
-			case MOVE_LEFT -> board.actorName() + " recule d une case vers la gauche.";
+			case MOVE_RIGHT -> board.actorName() + " avance d'une case vers la droite.";
+			case MOVE_UP -> board.actorName() + " monte d'une case.";
+			case MOVE_LEFT -> board.actorName() + " recule d'une case vers la gauche.";
 			case DELETE_BEACON -> board.actorName() + " retire une balise active.";
-			case UNDO, REDO -> "Action de controle.";
+			case UNDO, REDO -> "Action de contrôle.";
 		};
 	}
 }

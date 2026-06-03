@@ -55,11 +55,11 @@ public enum AddonOption {
 			case CHARACTER -> switch (this) {
 				case DEFENSE -> buildName + " recoit une couche defensive orientee tenue de ligne.";
 				case MOBILITY -> buildName + " obtient de nouveaux outils de deplacement et de rythme.";
-				case SUPPORT -> buildName + " est accompagne d un support qui elargit ses usages.";
+				case SUPPORT -> buildName + " est accompagne d'un support qui elargit ses usages.";
 			};
 			case HOUSE -> switch (this) {
 				case DEFENSE -> buildName + " ajoute une protection peripherique et un signal de solidite.";
-				case MOBILITY -> buildName + " facilite les circulations avec un acces ou une annexe mobile.";
+				case MOBILITY -> buildName + " facilite les circulations avec un accès ou une annexe mobile.";
 				case SUPPORT -> buildName + " etend ses usages avec un atelier ou une zone complementaire.";
 			};
 		};

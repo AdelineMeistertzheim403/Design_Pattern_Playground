@@ -129,19 +129,19 @@ function MissionMetricChip({ x, y, metric, tone, width = 146 }) {
 
 function getMissionHeroLine(missionId) {
   const labelsByMissionId = {
-    'complex-combat-system': 'Style + buffs: deux axes a coordonner pour un combat lisible.',
-    'massive-multiplayer-world': 'Creation massive + etat partage: garder la charge sous controle.',
-    'smart-notification-platform': 'Diffusion multi-abonnes + canal adaptable sans couplage fort.',
-    'game-save-system': 'Historique d actions + snapshots: revenir en arriere sans casser le flux.',
+    'complex-combat-system': 'Style + buffs : deux axes à coordonner pour un combat lisible.',
+    'massive-multiplayer-world': 'Création massive + état partagé : garder la charge sous contrôle.',
+    'smart-notification-platform': 'Diffusion multi-abonnés + canal adaptable sans couplage fort.',
+    'game-save-system': 'Historique d’actions + snapshots : revenir en arrière sans casser le flux.',
     'modular-ui-system': 'Arborescence UI + enrichissements visuels runtime.',
-    'secure-api-gateway': 'Pipeline de controles + acces protege a la ressource sensible.',
+    'secure-api-gateway': 'Pipeline de contrôles + accès protégé à la ressource sensible.',
     'multi-device-control-system': 'Commandes historisables + coordination multi-devices.',
-    'dynamic-rendering-engine': 'Deux axes de variation a faire evoluer sans explosion de classes.',
-    'intelligent-file-scanner': 'Parcours d arbre + analyses specialisees sur les memes noeuds.',
-    'smart-code-interpreter': 'Structure de script + execution pas a pas dans un contexte partage.',
+    'dynamic-rendering-engine': 'Deux axes de variation à faire évoluer sans explosion de classes.',
+    'intelligent-file-scanner': 'Parcours d’arbre + analyses spécialisées sur les mêmes nœuds.',
+    'smart-code-interpreter': 'Structure de script + exécution pas à pas dans un contexte partagé.',
   }
 
-  return labelsByMissionId[missionId] ?? 'Combiner plusieurs responsabilites tout en gardant une architecture nette.'
+  return labelsByMissionId[missionId] ?? 'Combiner plusieurs responsabilités tout en gardant une architecture nette.'
 }
 
 function getMissionScenePalette(missionId) {
@@ -536,7 +536,7 @@ function DualPatternMissionScene({
   const extraStepCount = Math.max(0, stageSteps.length - 2)
   const sceneWidth = Math.max(1240, viewBoxWidth)
   const activeTitle = activeStage?.title ?? 'Aucune phase active'
-  const activeSummary = activeStage?.summary ?? 'Lance la mission pour activer la progression scene par scene.'
+  const activeSummary = activeStage?.summary ?? 'Lance la mission pour activer la progression scène par scène.'
   const primaryMetrics = activeStage?.metrics?.slice(0, 3) ?? []
   const visualSpec = getDualMissionVisualSpec(mission.id)
   const palette = getMissionScenePalette(mission.id)
@@ -577,7 +577,7 @@ function DualPatternMissionScene({
       <text x={sceneWidth - 352} y="128" fontSize="14" fill="#57534e">
         {playback.currentFrame.currentStepIndex >= 0
           ? `Phase ${playback.currentFrame.currentStepIndex + 1} / ${stageSteps.length}`
-          : 'Etat initial'}
+          : 'État initial'}
       </text>
 
       <rect x="40" y="190" width={Math.max(1160, viewBoxWidth - 80)} height="220" rx="32" fill={`url(#${dualLaneId})`} stroke="#d6d3d1" strokeWidth="1.5" />
@@ -588,7 +588,7 @@ function DualPatternMissionScene({
       <text x="98" y="286" fontSize="22" fontWeight="700" fill="#1c1917">{firstStep?.title ?? 'Premier pattern'}</text>
       <foreignObject x="94" y="300" width="276" height="64">
         <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '13px', lineHeight: 1.4, color: '#44403c' }}>
-          {firstStep?.summary ?? 'Selectionne le premier pattern pour alimenter la mission.'}
+          {firstStep?.summary ?? 'Sélectionne le premier pattern pour alimenter la mission.'}
         </div>
       </foreignObject>
 
@@ -597,7 +597,7 @@ function DualPatternMissionScene({
       <text x={sceneWidth - 362} y="286" fontSize="22" fontWeight="700" fill="#1c1917">{secondStep?.title ?? 'Second pattern'}</text>
       <foreignObject x={sceneWidth - 366} y="300" width="276" height="64">
         <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '13px', lineHeight: 1.4, color: '#44403c' }}>
-          {secondStep?.summary ?? 'Selectionne le second pattern pour completer la solution.'}
+          {secondStep?.summary ?? 'Sélectionne le second pattern pour compléter la solution.'}
         </div>
       </foreignObject>
 
@@ -610,7 +610,7 @@ function DualPatternMissionScene({
         <g>
           <rect x={sceneWidth / 2 - 114} y="340" width="228" height="44" rx="20" fill="#ffffff" stroke="#d6d3d1" strokeWidth="1.5" />
           <text x={sceneWidth / 2} y="368" textAnchor="middle" fontSize="12" fontWeight="700" fill="#57534e">
-            +{extraStepCount} phase(s) complementaire(s)
+            +{extraStepCount} phase(s) complémentaire(s)
           </text>
         </g>
       ) : null}
@@ -679,7 +679,7 @@ function DefaultMissionScene({
       <rect x="40" y="38" width="320" height="118" rx="28" fill="#ffffff" stroke="#d6d3d1" strokeWidth="1.5" />
       <text x="62" y="72" fontSize="12" fontWeight="700" letterSpacing="0.18em" fill="#78716c">MISSION</text>
       <text x="62" y="104" fontSize="28" fontWeight="700" fill="#1c1917">{mission.title}</text>
-      <text x="62" y="132" fontSize="14" fill="#57534e">Score {result.score}/100 · {result.success ? 'Solution validee' : 'Solution fragile'}</text>
+      <text x="62" y="132" fontSize="14" fill="#57534e">Score {result.score}/100 · {result.success ? 'Solution validée' : 'Solution fragile'}</text>
 
       <rect className="mission-scene-pulse" x={viewBoxWidth - 360} y="38" width="320" height="118" rx="28" fill="#ffffff" stroke="#d6d3d1" strokeWidth="1.5" />
       <text x={viewBoxWidth - 338} y="72" fontSize="12" fontWeight="700" letterSpacing="0.18em" fill="#78716c">MISSION PULSE</text>
@@ -689,7 +689,7 @@ function DefaultMissionScene({
       <text x={viewBoxWidth - 338} y="132" fontSize="14" fill="#57534e">
         {playback.currentFrame.currentStepIndex >= 0
           ? `Phase ${playback.currentFrame.currentStepIndex + 1} / ${stageSteps.length}`
-          : 'Etat initial'}
+          : 'État initial'}
       </text>
 
       <line
@@ -797,14 +797,14 @@ export default function MissionExecutionScene({
     <section className="rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Mission Scene</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Scène mission</p>
           <h3 className="mt-2 text-2xl text-stone-950">
-            {hasDualPatternFlow ? 'Simulation SVG dual-pattern' : 'Simulation SVG dediee au scenario'}
+            {hasDualPatternFlow ? 'Simulation SVG dual-pattern' : 'Simulation SVG dédiée au scénario'}
           </h3>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-stone-700">
             {hasDualPatternFlow
-              ? 'Cette scene met visuellement en relation les deux patterns attendus par la mission pour coller a l enonce.'
-              : 'Cette scene est propre au mode mission. Elle orchestre les phases du scenario et ne reprend pas la scene SVG d une page pattern.'}
+              ? 'Cette scène met visuellement en relation les deux patterns attendus par la mission pour coller à l’énoncé.'
+              : 'Cette scène est propre au mode mission. Elle orchestre les phases du scénario et ne reprend pas la scène SVG d’une page pattern.'}
           </p>
         </div>
 
@@ -860,14 +860,14 @@ export default function MissionExecutionScene({
       <article className="mt-5 rounded-[24px] border border-black/10 bg-white p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Mission Step Replay</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Replay d’étape mission</p>
             <h4 className="mt-2 text-xl font-semibold text-stone-900">
               {activeStepIndex >= 0
-                ? `Etape ${activeStepIndex + 1} · ${activePatternName ?? 'Pattern actif'}`
-                : 'Etat initial de la mission'}
+                ? `Étape ${activeStepIndex + 1} · ${activePatternName ?? 'Pattern actif'}`
+                : 'État initial de la mission'}
             </h4>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-stone-700">
-              Cette vue reutilise la meme logique de scene que la page pattern, avec les donnees d execution de la mission.
+              Cette vue réutilise la même logique de scène que la page pattern, avec les données d’exécution de la mission.
             </p>
           </div>
           {activeStage?.summary ? (
@@ -890,26 +890,26 @@ export default function MissionExecutionScene({
                 <article className="rounded-[22px] border border-black/10 bg-[var(--panel)] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Delta etape</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Delta étape</p>
                       <p className="mt-1 text-sm text-stone-700">
-                        Etape {activeStepIndex + 1} comparee a l etape {activeStepIndex}.
+                        Étape {activeStepIndex + 1} comparée à l’étape {activeStepIndex}.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700">
-                        Noeuds modifies: {executionDelta.changedNodeIds.length}
+                        Nœuds modifiés : {executionDelta.changedNodeIds.length}
                       </span>
                       <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700">
-                        Edges ajoutees: {executionDelta.addedEdgeKeys.length}
+                        Edges ajoutées : {executionDelta.addedEdgeKeys.length}
                       </span>
                       <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700">
-                        Edges modifiees: {executionDelta.modifiedEdgeKeys.length}
+                        Edges modifiées : {executionDelta.modifiedEdgeKeys.length}
                       </span>
                       <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700">
-                        Edges supprimees: {executionDelta.removedEdgeKeys.length}
+                        Edges supprimées : {executionDelta.removedEdgeKeys.length}
                       </span>
                       <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700">
-                        Sorties modifiees: {executionDelta.changedOutputKeys.length}
+                        Sorties modifiées : {executionDelta.changedOutputKeys.length}
                       </span>
                     </div>
                   </div>
@@ -919,22 +919,22 @@ export default function MissionExecutionScene({
                       <div className="mt-3 flex flex-wrap gap-2">
                         {executionDelta.changedNodeIds.slice(0, 8).map((nodeId) => (
                           <span key={nodeId} className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
-                            Noeud: {nodeId}
+                            Nœud : {nodeId}
                           </span>
                         ))}
                         {executionDelta.addedEdgeKeys.slice(0, 8).map((edgeKey) => (
                           <span key={edgeKey} className="rounded-full border border-indigo-300 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-800">
-                            Edge ajoutee: {edgeKey.replaceAll('::', ' -> ')}
+                            Edge ajoutée : {edgeKey.replaceAll('::', ' -> ')}
                           </span>
                         ))}
                         {executionDelta.modifiedEdgeKeys.slice(0, 8).map((edgeKey) => (
                           <span key={edgeKey} className="rounded-full border border-sky-300 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800">
-                            Edge modifiee: {edgeKey.replaceAll('::', ' -> ')}
+                            Edge modifiée : {edgeKey.replaceAll('::', ' -> ')}
                           </span>
                         ))}
                         {executionDelta.removedEdgeKeys.slice(0, 8).map((edgeKey) => (
                           <span key={edgeKey} className="rounded-full border border-rose-300 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-800">
-                            Edge supprimee: {edgeKey.replaceAll('::', ' -> ')}
+                            Edge supprimée : {edgeKey.replaceAll('::', ' -> ')}
                           </span>
                         ))}
                         {executionDelta.changedOutputKeys.slice(0, 8).map((key) => (
@@ -957,14 +957,14 @@ export default function MissionExecutionScene({
                       </div>
                     </>
                   ) : (
-                    <p className="mt-3 text-sm text-stone-600">Aucune difference detectee entre les deux etapes.</p>
+                    <p className="mt-3 text-sm text-stone-600">Aucune différence détectée entre les deux étapes.</p>
                   )}
                 </article>
               ) : null}
             </div>
           ) : (
             <div className="rounded-[20px] border border-dashed border-black/15 bg-[var(--panel)] px-4 py-8 text-sm leading-7 text-stone-600">
-              Lance l animation ou avance d une etape pour afficher la scene specialisee du pattern courant.
+              Lance l’animation ou avance d’une étape pour afficher la scène spécialisée du pattern courant.
             </div>
           )}
         </div>

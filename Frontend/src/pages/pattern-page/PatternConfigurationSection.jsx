@@ -78,9 +78,9 @@ export default function PatternConfigurationSection({
   return (
     <CollapsiblePanel
       bodyClassName="grid gap-4"
-      description="Le formulaire est genere a partir du schema expose par le backend. La page du pattern reste donc stable meme quand la demo evolue."
+      description="Le formulaire est généré à partir du schéma exposé par le backend. La page du pattern reste donc stable même quand la démo évolue."
       eyebrow="Configuration"
-      title="Parametrer la demo"
+      title="Paramétrer la démo"
     >
       <form className="grid gap-4 xl:grid-cols-2" onSubmit={onSubmit}>
         {visibleFields.map((field) => (
@@ -126,7 +126,7 @@ export default function PatternConfigurationSection({
               disabled={isExecuting}
               type="submit"
             >
-              {isExecuting ? 'Execution API en cours...' : 'Lancer la demo (API)'}
+              {isExecuting ? 'Exécution API en cours...' : 'Lancer la démo (API)'}
             </button>
           </div>
 

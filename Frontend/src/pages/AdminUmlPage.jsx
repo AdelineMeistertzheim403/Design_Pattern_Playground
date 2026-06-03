@@ -667,16 +667,16 @@ export default function AdminUmlPage({
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
         <section className="rounded-[32px] border border-black/10 bg-white/85 p-8 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">Admin</p>
-          <h1 className="mt-3 text-4xl text-stone-950">Edition UML reservee</h1>
+          <h1 className="mt-3 text-4xl text-stone-950">Édition UML réservée</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-            Cette page necessite une session authentifiee avec un compte admin.
+            Cette page nécessite une session authentifiée avec un compte admin.
           </p>
           <button
             className="mt-6 rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white"
             type="button"
             onClick={onNavigateHome}
           >
-            Retour a l accueil
+            Retour à l'accueil
           </button>
         </section>
       </div>
@@ -691,8 +691,8 @@ export default function AdminUmlPage({
           <h1 className="mt-3 text-4xl text-stone-950">Mode Admin UML indisponible</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
             {isAdmin
-              ? 'Le backend doit etre actif pour charger et enregistrer les diagrammes UML.'
-              : 'Le compte courant n a pas le role ADMIN.'}
+              ? 'Le backend doit être actif pour charger et enregistrer les diagrammes UML.'
+              : "Le compte courant n'a pas le rôle ADMIN."}
           </p>
         </section>
       </div>
@@ -706,7 +706,7 @@ export default function AdminUmlPage({
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Admin</p>
           <h1 className="mt-3 text-4xl text-stone-950">Changement de mot de passe requis</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-            Le compte admin par defaut doit d abord changer son mot de passe initial depuis la fenetre Compte.
+            Le compte admin par défaut doit d'abord changer son mot de passe initial depuis la fenêtre Compte.
           </p>
         </section>
       </div>
@@ -746,7 +746,7 @@ export default function AdminUmlPage({
     const code = slugify(newDiagramCode)
     const name = newDiagramName.trim()
     if (!code || !name) {
-      setNotice('Renseigne un code et un nom pour creer un diagramme.')
+      setNotice('Renseigne un code et un nom pour créer un diagramme.')
       return
     }
 
@@ -755,7 +755,7 @@ export default function AdminUmlPage({
     setDraft(createEmptyDiagram())
     setSelectedClassId('')
     setSelectedRelationIndex(-1)
-    setNotice('Nouveau diagramme initialise. Tu peux maintenant l editer puis le sauvegarder.')
+    setNotice("Nouveau diagramme initialisé. Tu peux maintenant l'éditer puis le sauvegarder.")
   }
 
   const handleAddClass = () => {
@@ -784,7 +784,7 @@ export default function AdminUmlPage({
 
   const handleAddRelation = () => {
     if (draft.classes.length < 2) {
-      setNotice('Ajoute au moins deux boites avant de creer une relation.')
+      setNotice('Ajoute au moins deux boîtes avant de créer une relation.')
       return
     }
 
@@ -824,7 +824,7 @@ export default function AdminUmlPage({
 
   const handleSave = async () => {
     if (!selectedCode) {
-      setNotice('Choisis un diagramme ou cree un nouveau code avant de sauvegarder.')
+      setNotice('Choisis un diagramme ou crée un nouveau code avant de sauvegarder.')
       return
     }
 
@@ -846,7 +846,7 @@ export default function AdminUmlPage({
       setStoredDiagrams(freshIndex ?? [])
       setDraft(normalizeDiagram(saved.diagram))
       setDiagramName(saved.name)
-      setNotice(`Diagramme enregistre par ${saved.updatedBy}.`)
+      setNotice(`Diagramme enregistré par ${saved.updatedBy}.`)
     } catch (error) {
       setNotice(error.message)
     } finally {
@@ -860,9 +860,9 @@ export default function AdminUmlPage({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Admin UML</p>
         <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-4xl text-stone-950">Editeur de diagrammes UML SVG</h1>
+            <h1 className="text-4xl text-stone-950">Éditeur de diagrammes UML SVG</h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-700">
-              Cree des diagrammes, modifie les boites, deplace-les dans le canvas, redimensionne-les, regle les fleches et sauvegarde le JSON en base.
+              Crée des diagrammes, modifie les boîtes, déplace-les dans le canvas, redimensionne-les, règle les flèches et sauvegarde le JSON en base.
             </p>
           </div>
           <button
@@ -883,7 +883,7 @@ export default function AdminUmlPage({
           <section className="rounded-[30px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Source</p>
             <label className="mt-4 flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Diagramme a editer</span>
+              <span className="font-semibold text-stone-900">Diagramme à éditer</span>
               <select
                 className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none"
                 value={selectedCode}
@@ -941,13 +941,13 @@ export default function AdminUmlPage({
               type="button"
               onClick={handleCreateDiagram}
             >
-              Creer un brouillon
+              Créer un brouillon
             </button>
           </section>
 
           <section className="rounded-[30px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Boites</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Boîtes</p>
               <button
                 className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-700"
                 type="button"
@@ -1293,7 +1293,7 @@ export default function AdminUmlPage({
             <div className="rounded-[28px] border border-black/10 bg-white/85 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">Edition</p>
               <p className="mt-3 text-sm leading-7 text-stone-700">
-                Clique sur une boite ou une relation pour la selectionner. Glisse une boite dans le canvas, utilise le carre en bas a droite pour la redimensionner, puis attrape une extremite de relation pour la rattacher a un cote de boite.
+                Clique sur une boîte ou une relation pour la sélectionner. Glisse une boîte dans le canvas, utilise le carré en bas à droite pour la redimensionner, puis attrape une extrémité de relation pour la rattacher à un côté de boîte.
               </p>
             </div>
             <UmlDiagram
@@ -1364,13 +1364,13 @@ export default function AdminUmlPage({
                   type="button"
                   onClick={handleDeleteClass}
                 >
-                  Supprimer la boite
+                  Supprimer la boîte
                 </button>
               </div>
             ) : selectedRelation ? (
               <div className="mt-4 flex flex-col gap-4">
                 <label className="flex flex-col gap-2 text-sm text-stone-700">
-                  <span className="font-semibold text-stone-900">Etiquette</span>
+                  <span className="font-semibold text-stone-900">Étiquette</span>
                   <input
                     className="rounded-2xl border border-black/10 bg-white px-3 py-3 text-sm text-stone-900 outline-none"
                     value={selectedRelation.label}
@@ -1425,7 +1425,7 @@ export default function AdminUmlPage({
                       value={selectedRelation.marker}
                       onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, marker: event.target.value }))}
                     >
-                      <option value="arrow">Fleche</option>
+                      <option value="arrow">Flèche</option>
                       <option value="triangle">Triangle</option>
                       <option value="diamond">Diamond</option>
                     </select>
@@ -1459,10 +1459,10 @@ export default function AdminUmlPage({
                     type="checkbox"
                     onChange={(event) => updateSelectedRelation((relation) => ({ ...relation, dashed: event.target.checked }))}
                   />
-                  Trait pointille
+                  Trait pointillé
                 </label>
                 <TextAreaListField
-                  label="Points intermediaires"
+                  label="Points intermédiaires"
                   value={(selectedRelation.points ?? []).map((point) => `${point.x},${point.y}`)}
                   placeholder="640,320"
                   onChange={(lines) => updateSelectedRelation((relation) => ({
@@ -1485,7 +1485,7 @@ export default function AdminUmlPage({
               </div>
             ) : (
               <p className="mt-4 text-sm leading-7 text-stone-700">
-                Selectionne une boite ou une relation pour afficher ses proprietes.
+                Sélectionne une boîte ou une relation pour afficher ses propriétés.
               </p>
             )}
           </section>

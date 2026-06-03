@@ -38,6 +38,6 @@ public enum RequestPayloadState {
 			}
 		}
 
-		throw new InvalidPatternConfigurationException("Etat de payload inconnu : " + rawCode);
+		throw new InvalidPatternConfigurationException("État de payload inconnu : " + rawCode);
 	}
 }

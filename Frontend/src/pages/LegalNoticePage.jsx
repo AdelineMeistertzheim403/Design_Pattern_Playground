@@ -1,11 +1,11 @@
-const PLACEHOLDER = 'A completer avant mise en ligne'
+const PLACEHOLDER = 'À compléter avant mise en ligne'
 
 const editorDetails = [
   { label: 'Nom du projet', value: 'Design Pattern Playground' },
   { label: 'Statut', value: 'Site personnel edite a titre non professionnel' },
   {
     label: 'Publication de l identite',
-    value: 'Les informations personnelles de l editeur ne sont pas publiees sur cette page.',
+    value: "Les informations personnelles de l'éditeur ne sont pas publiées sur cette page.",
   },
 ]
 
@@ -22,16 +22,16 @@ const privacyHighlights = [
       'Votre mot de passe, conserve de maniere securisee et jamais affiche publiquement.',
       'Les informations necessaires pour vous garder connecte(e) au site.',
       'Votre progression dans les quiz : tentatives, scores et badges obtenus.',
-      'Une information de session conservee dans votre navigateur jusqu a la deconnexion.',
+      "Une information de session conservée dans votre navigateur jusqu'à la déconnexion.",
     ],
   },
   {
     title: 'Pourquoi ces donnees sont utilisees',
     items: [
-      'Creer et gerer votre compte utilisateur.',
+      'Créer et gérer votre compte utilisateur.',
       'Vous permettre de vous connecter en toute securite.',
-      'Enregistrer votre progression et vos resultats dans les quiz.',
-      'Vous eviter de devoir vous reconnecter a chaque visite.',
+      'Enregistrer votre progression et vos résultats dans les quiz.',
+      'Vous éviter de devoir vous reconnecter à chaque visite.',
     ],
   },
   {
@@ -50,7 +50,7 @@ const retentionRules = [
   },
   {
     title: 'Resume de session local',
-    description: 'La cle locale dpp_auth_user reste dans le navigateur jusqu a la deconnexion ou a l effacement manuel du stockage local.',
+    description: "La clé locale dpp_auth_user reste dans le navigateur jusqu'à la déconnexion ou à l'effacement manuel du stockage local.",
   },
   {
     title: 'Compte utilisateur et progression',
@@ -112,14 +112,14 @@ export default function LegalNoticePage({ onNavigateHome }) {
             type="button"
             onClick={onNavigateHome}
           >
-            Retour a l accueil
+            Retour à l'accueil
           </button>
         </div>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <DetailCard
-          eyebrow="Editeur"
+          eyebrow="Éditeur"
           title="Statut du site"
           items={editorDetails}
         />
@@ -135,9 +135,9 @@ export default function LegalNoticePage({ onNavigateHome }) {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Propriete intellectuelle</p>
         <h2 className="mt-3 text-2xl text-stone-950 sm:text-3xl">Contenus et reutilisation</h2>
         <p className="mt-4 text-sm leading-7 text-stone-700">
-          Les contenus, maquettes, textes, illustrations, schemas et elements de marque presentes sur ce site restent
-          proteges par le droit de la propriete intellectuelle. Toute reproduction, adaptation ou republication, totale
-          ou partielle, doit etre autorisee prealablement par l editeur, sauf usage prive ou exception legale.
+          Les contenus, maquettes, textes, illustrations, schémas et éléments de marque présentés sur ce site restent
+          protégés par le droit de la propriété intellectuelle. Toute reproduction, adaptation ou republication, totale
+          ou partielle, doit être autorisée préalablement par l'éditeur, sauf usage privé ou exception légale.
         </p>
       </section>
 
@@ -172,7 +172,7 @@ export default function LegalNoticePage({ onNavigateHome }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-[30px] border border-black/10 bg-white/82 p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] backdrop-blur-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Conservation</p>
-          <h2 className="mt-3 text-2xl text-stone-950">Durees de conservation</h2>
+          <h2 className="mt-3 text-2xl text-stone-950">Durées de conservation</h2>
           <div className="mt-6 grid gap-4">
             {retentionRules.map((rule) => (
               <article

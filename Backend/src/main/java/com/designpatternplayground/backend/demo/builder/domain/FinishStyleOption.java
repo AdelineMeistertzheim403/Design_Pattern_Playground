@@ -48,14 +48,14 @@ public enum FinishStyleOption {
 	public String detailFor(BuilderProductType productType, String buildName) {
 		return switch (productType) {
 			case CAR -> switch (this) {
-				case CLASSIC -> "La finition classique donne a " + buildName + " une lecture immediate et rassurante.";
+				case CLASSIC -> "La finition classique donne a " + buildName + " une lecture immédiate et rassurante.";
 				case NEON -> "La finition neon rend " + buildName + " spectaculaire et tres lisible en demo.";
 				case ECO -> "La finition eco met en avant la sobriete et les usages durables.";
 			};
 			case CHARACTER -> switch (this) {
-				case CLASSIC -> buildName + " termine son build sur un rendu heroique et lisible.";
+				case CLASSIC -> buildName + " termine son build sur un rendu héroïque et lisible.";
 				case NEON -> buildName + " se ferme sur une aura vive qui dramatise le profil.";
-				case ECO -> buildName + " obtient une identite plus organique et durable.";
+				case ECO -> buildName + " obtient une identité plus organique et durable.";
 			};
 			case HOUSE -> switch (this) {
 				case CLASSIC -> buildName + " affiche une facade lisible et intemporelle.";

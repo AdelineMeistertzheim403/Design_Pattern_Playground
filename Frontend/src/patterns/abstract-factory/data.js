@@ -5,9 +5,9 @@ export const patternDefinition = {
   name: 'Abstract Factory',
   type: 'CREATIONAL',
   description:
-    'Fabrique des familles d objets coherentes sans exposer les classes concretes ni melanger les themes au niveau du client.',
+    'Fabrique des familles d’objets cohérentes sans exposer les classes concrètes ni mélanger les thèmes au niveau du client.',
   useCase:
-    'Choisir un theme sci-fi ou medieval puis generer un hero, un transport et une relique parfaitement alignes.',
+    'Choisir un thème sci-fi ou médiéval puis générer un héros, un transport et une relique parfaitement alignés.',
   complexityLevel: 'INTERMEDIATE',
 }
 
@@ -23,7 +23,7 @@ export const fallbackSchema = {
     },
     {
       name: 'themeCode',
-      label: 'Theme',
+      label: 'Thème',
       type: 'SELECT',
       required: true,
       allowedValues: ['SCI_FI', 'MEDIEVAL'],
@@ -31,42 +31,42 @@ export const fallbackSchema = {
     },
     {
       name: 'generatorLabel',
-      label: 'Nom du generateur',
+      label: 'Nom du générateur',
       type: 'TEXT',
       required: true,
       allowedValues: null,
-      defaultValue: 'Theme Generator',
+      defaultValue: 'Générateur de thème',
     },
   ],
 }
 
 export const patternLearningContent = {
   strapline:
-    'Le client choisit une famille complete, pas trois classes concretes separees.',
+    'Le client choisit une famille complète, pas trois classes concrètes séparées.',
   intuition:
-    'Abstract Factory etend l idee de Factory Method a plusieurs produits qui doivent rester coherents ensemble. Ici, un theme genere un hero, un transport et une relique sans melange accidentel entre univers.',
+    "Abstract Factory étend l'idée de Factory Method à plusieurs produits qui doivent rester cohérents ensemble. Ici, un thème génère un héros, un transport et une relique sans mélange accidentel entre univers.",
   readingGuide:
-    'Regarde d abord le theme choisi, puis observe comment la famille complete se construit. La scene montre si la coherence passe par une vraie factory de famille ou par un assemblage manuel fragile.',
+    "Regarde d'abord le thème choisi, puis observe comment la famille complète se construit. La scène montre si la cohérence passe par une vraie factory de famille ou par un assemblage manuel fragile.",
   studentAngle:
-    'Le point cle est de comprendre que le pattern protege une relation entre produits. Il ne cree pas seulement plus vite : il evite les combinaisons incoherentes.',
+    "Le point clé est de comprendre que le pattern protège une relation entre produits. Il ne crée pas seulement plus vite : il évite les combinaisons incohérentes.",
   developerAngle:
-    'Ce pattern devient utile quand plusieurs objets concrets doivent changer ensemble : themes UI, kits de composants, drivers multiplateformes, environnements de jeu ou suites de services.',
+    'Ce pattern devient utile quand plusieurs objets concrets doivent changer ensemble : thèmes UI, kits de composants, drivers multiplateformes, environnements de jeu ou suites de services.',
   playfulPrompt:
-    'Bascule entre Sci-Fi et Medieval puis coupe la factory pour voir comment un seul objet hors theme casse tout le rendu final.',
+    'Bascule entre Sci-Fi et Médiéval puis coupe la factory pour voir comment un seul objet hors thème casse tout le rendu final.',
   steps: [
     'Le client choisit une famille abstraite.',
-    'La concrete factory correspondante est selectionnee.',
-    'Chaque produit concret est cree dans le meme univers.',
-    'Le client recupere une famille coherente sans connaitre les classes concretes.',
+    'La concrete factory correspondante est sélectionnée.',
+    'Chaque produit concret est créé dans le même univers.',
+    'Le client récupère une famille cohérente sans connaître les classes concrètes.',
   ],
   glossary: [
     {
       term: 'Abstract Factory',
-      definition: 'Contrat qui declare la creation de plusieurs produits relies.',
+      definition: 'Contrat qui déclare la création de plusieurs produits reliés.',
     },
     {
       term: 'Product Family',
-      definition: 'Ensemble d objets concrets qui doivent rester compatibles ou coherents ensemble.',
+      definition: 'Ensemble d’objets concrets qui doivent rester compatibles ou cohérents ensemble.',
     },
   ],
 }
@@ -165,20 +165,20 @@ export const patternUmlDiagram = {
 export const fallbackQuiz = {
   patternCode: 'abstract-factory',
   title: 'Quiz Abstract Factory',
-  description: 'Teste ta comprehension de la creation de familles d objets coherentes.',
+  description: 'Teste ta compréhension de la création de familles d’objets cohérentes.',
   passingPercent: 75,
-  badgeLabel: 'Badge valide',
+  badgeLabel: 'Badge validé',
   maxPoints: 0,
   questions: [
     {
       id: 'abstract-factory-q1',
-      label: 'Abstract Factory sert surtout a :',
+      label: 'Abstract Factory sert surtout à :',
       type: 'QCM_SINGLE',
       difficulty: 'EASY',
       points: 0,
-      explanation: 'Le pattern cree plusieurs produits coordonnes dans une meme famille.',
+      explanation: 'Le pattern crée plusieurs produits coordonnés dans une même famille.',
       choices: [
-        { id: 'family', label: 'Creer des familles d objets coherentes' },
+        { id: 'family', label: 'Créer des familles d’objets cohérentes' },
         { id: 'undo', label: 'Restaurer un snapshot' },
         { id: 'notify', label: 'Notifier plusieurs observers' },
       ],
@@ -191,11 +191,11 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q2',
-      label: 'Abstract Factory appartient aux patterns de creation.',
+      label: 'Abstract Factory appartient aux patterns de création.',
       type: 'TRUE_FALSE',
       difficulty: 'EASY',
       points: 0,
-      explanation: 'Oui : il organise la creation de plusieurs produits relies.',
+      explanation: 'Oui : il organise la création de plusieurs produits reliés.',
       choices: [{ id: 'true', label: 'Vrai' }, { id: 'false', label: 'Faux' }],
       correctChoiceIds: ['true'],
       leftItems: [],
@@ -206,13 +206,13 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q3',
-      label: 'Par rapport a Factory Method, Abstract Factory ajoute surtout :',
+      label: 'Par rapport à Factory Method, Abstract Factory ajoute surtout :',
       type: 'QCM_SINGLE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Il fabrique une famille complete plutot qu un seul produit.',
+      explanation: "Il fabrique une famille complète plutôt qu'un seul produit.",
       choices: [
-        { id: 'family', label: 'La creation de plusieurs produits relies' },
+        { id: 'family', label: 'La création de plusieurs produits reliés' },
         { id: 'singleton', label: 'Une seule instance globale' },
         { id: 'visitor', label: 'Un parcours sur une structure' },
       ],
@@ -225,15 +225,15 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q4',
-      label: 'Dans un Theme Generator, la factory abstraite garantit :',
+      label: 'Dans un générateur de thème, la factory abstraite garantit :',
       type: 'QCM_SINGLE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Tous les objets doivent rester dans le meme univers visuel.',
+      explanation: 'Tous les objets doivent rester dans le même univers visuel.',
       choices: [
-        { id: 'coherent', label: 'Une coherence entre hero, transport et relique' },
-        { id: 'faster', label: 'Une execution plus rapide' },
-        { id: 'cache', label: 'Un partage memoire' },
+        { id: 'coherent', label: 'Une cohérence entre héros, transport et relique' },
+        { id: 'faster', label: 'Une exécution plus rapide' },
+        { id: 'cache', label: 'Un partage mémoire' },
       ],
       correctChoiceIds: ['coherent'],
       leftItems: [],
@@ -244,11 +244,11 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q5',
-      label: 'Associe chaque element a son role dans Abstract Factory.',
+      label: 'Associe chaque élément à son rôle dans Abstract Factory.',
       type: 'MATCHING',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Le contrat declare, la factory concrete choisit le theme, et la famille fournit les objets.',
+      explanation: 'Le contrat déclare, la factory concrète choisit le thème, et la famille fournit les objets.',
       choices: [],
       correctChoiceIds: [],
       leftItems: [
@@ -257,9 +257,9 @@ export const fallbackQuiz = {
         { id: 'productFamily', label: 'Concrete Products' },
       ],
       rightItems: [
-        { id: 'contract', label: 'Declare createHero(), createTransport(), createRelic()' },
-        { id: 'theme', label: 'Choisit Sci-Fi ou Medieval' },
-        { id: 'objects', label: 'Fournit les objets concrets du theme' },
+        { id: 'contract', label: 'Déclare createHero(), createTransport(), createRelic()' },
+        { id: 'theme', label: 'Choisit Sci-Fi ou Médiéval' },
+        { id: 'objects', label: 'Fournit les objets concrets du thème' },
       ],
       correctPairs: [
         { leftId: 'abstractFactory', rightId: 'contract' },
@@ -271,15 +271,15 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q6',
-      label: 'Quel risque evitons-nous sans Abstract Factory ?',
+      label: 'Quel risque évitons-nous sans Abstract Factory ?',
       type: 'QCM_SINGLE',
       difficulty: 'EASY',
       points: 0,
-      explanation: 'Le client peut sinon composer une famille incoherente.',
+      explanation: 'Le client peut sinon composer une famille incohérente.',
       choices: [
-        { id: 'mix', label: 'Melanger des produits de themes differents' },
-        { id: 'network', label: 'Perdre la connexion reseau' },
-        { id: 'cursor', label: 'Perdre la position d un iterator' },
+        { id: 'mix', label: 'Mélanger des produits de thèmes différents' },
+        { id: 'network', label: 'Perdre la connexion réseau' },
+        { id: 'cursor', label: "Perdre la position d'un iterator" },
       ],
       correctChoiceIds: ['mix'],
       leftItems: [],
@@ -290,11 +290,11 @@ export const fallbackQuiz = {
     },
     {
       id: 'abstract-factory-q7',
-      label: 'Le client devrait connaitre directement les classes concretes de chaque produit.',
+      label: 'Le client devrait connaître directement les classes concrètes de chaque produit.',
       type: 'TRUE_FALSE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Faux : elles restent cachees derriere le contrat de factory.',
+      explanation: 'Faux : elles restent cachées derrière le contrat de factory.',
       choices: [{ id: 'true', label: 'Vrai' }, { id: 'false', label: 'Faux' }],
       correctChoiceIds: ['false'],
       leftItems: [],
@@ -309,9 +309,9 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Le generateur de theme est un bon exemple car plusieurs produits doivent rester alignes.',
+      explanation: 'Le générateur de thème est un bon exemple car plusieurs produits doivent rester alignés.',
       choices: [
-        { id: 'theme', label: 'Un generateur Sci-Fi / Medieval qui cree plusieurs objets assortis' },
+        { id: 'theme', label: 'Un générateur Sci-Fi / Médiéval qui crée plusieurs objets assortis' },
         { id: 'undo', label: 'Un historique de sauvegardes' },
         { id: 'pubsub', label: 'Un sujet qui pousse des notifications' },
       ],
@@ -328,11 +328,11 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'HARD',
       points: 0,
-      explanation: 'Le melange de familles concretes est le vrai probleme.',
+      explanation: 'Le mélange de familles concrètes est le vrai problème.',
       choices: [
-        { id: 'mismatch', label: 'Knight Champion + Hoverbike futuriste dans la meme famille medievale' },
-        { id: 'same', label: 'Nova Pilot + Hoverbike dans le meme theme sci-fi' },
-        { id: 'stable', label: 'Runic Banner + Warhorse dans le meme theme medieval' },
+        { id: 'mismatch', label: 'Knight Champion + Hoverbike futuriste dans la même famille médiévale' },
+        { id: 'same', label: 'Nova Pilot + Hoverbike dans le même thème sci-fi' },
+        { id: 'stable', label: 'Runic Banner + Warhorse dans le même thème médiéval' },
       ],
       correctChoiceIds: ['mismatch'],
       leftItems: [],
@@ -347,17 +347,17 @@ export const fallbackQuiz = {
       type: 'ORDERING',
       difficulty: 'HARD',
       points: 0,
-      explanation: 'Le client choisit un theme, la factory concrete est selectionnee, puis la famille est generee et livree.',
+      explanation: 'Le client choisit un thème, la factory concrète est sélectionnée, puis la famille est générée et livrée.',
       choices: [],
       correctChoiceIds: [],
       leftItems: [],
       rightItems: [],
       correctPairs: [],
       orderingItems: [
-        { id: 'choose', label: 'Le client choisit un theme' },
-        { id: 'factory', label: 'La factory concrete correspondante est selectionnee' },
-        { id: 'products', label: 'Les produits coherents sont crees' },
-        { id: 'result', label: 'La famille finale est livree au client' },
+        { id: 'choose', label: 'Le client choisit un thème' },
+        { id: 'factory', label: 'La factory concrète correspondante est sélectionnée' },
+        { id: 'products', label: 'Les produits cohérents sont créés' },
+        { id: 'result', label: 'La famille finale est livrée au client' },
       ],
       correctOrder: ['choose', 'factory', 'products', 'result'],
     },

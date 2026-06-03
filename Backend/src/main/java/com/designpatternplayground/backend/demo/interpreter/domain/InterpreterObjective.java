@@ -20,7 +20,7 @@ public record InterpreterObjective(
 		new InterpreterObjective(
 			"TARGET_DUMMY",
 			"Target Dummy",
-			"Atteindre le mannequin d entrainement puis declencher une attaque au bon endroit.",
+			"Atteindre le mannequin d entrainement puis déclencher une attaque au bon endroit.",
 			"Dummy",
 			4,
 			3,
@@ -40,7 +40,7 @@ public record InterpreterObjective(
 		new InterpreterObjective(
 			"GATE_SWITCH",
 			"Gate Switch",
-			"Declencher le levier final dans la partie basse de l arene.",
+			"Déclencher le levier final dans la partie basse de l arene.",
 			"Switch",
 			3,
 			5,

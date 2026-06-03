@@ -40,8 +40,8 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Template Method",
 			PatternType.BEHAVIORAL,
-			"Definit le squelette stable d un algorithme puis laisse certaines etapes varier dans les sous-classes.",
-			"Construire un workflow prepare -> execute -> finalise dans lequel seule l etape centrale change selon le scenario choisi.",
+			"Définit le squelette stable d'un algorithme puis laisse certaines étapes varier dans les sous-classes.",
+			"Construire un workflow prépare -> execute -> finalise dans lequel seule l'étape centrale change selon le scénario choisi.",
 			"INTERMEDIATE"
 		);
 	}
@@ -59,7 +59,7 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"workflowCode",
-				"Etape personnalisee",
+				"Étape personnalisee",
 				FieldType.SELECT,
 				true,
 				List.of("RELEASE_PIPELINE", "SECURITY_AUDIT", "DATA_SYNC"),
@@ -118,8 +118,8 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useTemplateMethod
-				? "Template Method conserve un squelette prepare -> execute -> finalise. Le workflow specialise ne redefinit que l etape centrale, sans dupliquer toute la recette."
-				: "Sans Template Method, chaque workflow recopie la sequence complete. La logique commune derive, la finalisation devient fragile et le code se repete.",
+				? "Template Method conserve un squelette prépare -> execute -> finalise. Le workflow spécialisé ne redéfinit que l étape centrale, sans dupliquer toute la recette."
+				: "Sans Template Method, chaque workflow recopie la sequence complete. La logique commune dérive, la finalisation devient fragile et le code se repete.",
 			logs,
 			output,
 			buildVisualization(useTemplateMethod, finalizationGuaranteed)
@@ -154,10 +154,10 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 		steps.add(new TemplateMethodStep(
 			1,
 			"CLIENT",
-			"Declenchement",
+			"Déclenchement",
 			"WorkflowClient",
 			"SENT",
-			"Le client lance " + workflowName + " puis delegue l orchestration a " + (useTemplateMethod ? "un squelette commun." : "un workflow copie-colle."),
+			"Le client lance " + workflowName + " puis délègue l orchestration a " + (useTemplateMethod ? "un squelette commun." : "un workflow copie-colle."),
 			false
 		));
 		steps.add(new TemplateMethodStep(
@@ -192,12 +192,12 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 		steps.add(new TemplateMethodStep(
 			5,
 			"RESULT",
-			"Etat final",
+			"État final",
 			useTemplateMethod ? "WorkflowTemplate" : "ManualWorkflow",
 			finalizationGuaranteed ? "STABLE" : "WARNING",
 			finalizationGuaranteed
-				? "Le workflow reste lisible : memes etapes communes, variation concentree sur execute()."
-				: "Le workflow aboutit, mais la fin de sequence n est plus garantie et la duplication augmente le risque de derive.",
+				? "Le workflow reste lisible : mêmes étapes communes, variation concentrée sur execute()."
+				: "Le workflow aboutit, mais la fin de sequence n'est plus garantie et la duplication augmente le risque de dérive.",
 			false
 		));
 		return steps;
@@ -210,11 +210,11 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 		boolean finalizationGuaranteed
 	) {
 		List<String> logs = new ArrayList<>();
-		logs.add("Le client lance " + workflowName + " sur le scenario " + profile.label() + ".");
+		logs.add("Le client lance " + workflowName + " sur le scénario " + profile.label() + ".");
 		logs.add(useTemplateMethod
-			? "Le squelette commun enchaine prepare() -> executeSpecificStep() -> finalize()."
-			: "Sans template method, le workflow re-implemente prepare, execute et finalize dans du code copie-colle.");
-		logs.add("Prepare -> " + profile.prepareDetail());
+			? "Le squelette commun enchaîne prépare() -> executeSpecificStep() -> finalize()."
+			: "Sans template method, le workflow re-implemente prépare, execute et finalize dans du code copie-colle.");
+		logs.add("Prépare -> " + profile.prepareDetail());
 		logs.add("Execute -> " + profile.executeDetail());
 		logs.add("Finalize -> " + (finalizationGuaranteed ? profile.finalizeDetail() : profile.manualDriftDetail()));
 		return logs;
@@ -241,7 +241,7 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 				"context",
 				Map.of("detail", useTemplateMethod ? "fixed skeleton" : "copy pasted flow", "active", useTemplateMethod)
 			),
-			new VisualizationNode("prepare", "Prepare", "component", Map.of("detail", "shared setup", "active", true)),
+			new VisualizationNode("prepare", "Prépare", "component", Map.of("detail", "shared setup", "active", true)),
 			new VisualizationNode("execute", "Execute", "component", Map.of("detail", "custom hook", "active", true)),
 			new VisualizationNode(
 				"finalize",
@@ -259,7 +259,7 @@ public class TemplateMethodPatternDemo implements DesignPatternDemo {
 
 		List<VisualizationEdge> edges = new ArrayList<>();
 		edges.add(new VisualizationEdge("client", "skeleton", "start"));
-		edges.add(new VisualizationEdge("skeleton", "prepare", "prepare"));
+		edges.add(new VisualizationEdge("skeleton", "prepare", "prépare"));
 		edges.add(new VisualizationEdge("prepare", "execute", "template step"));
 		edges.add(new VisualizationEdge("execute", "finalize", finalizationGuaranteed ? "finalize" : "manual finalize"));
 		edges.add(new VisualizationEdge("finalize", "result", finalizationGuaranteed ? "stable" : "warning"));

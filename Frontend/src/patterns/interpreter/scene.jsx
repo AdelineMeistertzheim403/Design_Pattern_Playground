@@ -211,7 +211,7 @@ export default function InterpreterScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Code your logic')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -243,14 +243,14 @@ export default function InterpreterScene({
                 setIsPlaying(false)
               }}
             >
-              Pas a pas
+              Pas à pas
             </button>
             <button
               className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
               type="button"
               onClick={handleReplay}
             >
-              Animer la scene
+              Animer la scène
             </button>
             <button
               className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
@@ -265,7 +265,7 @@ export default function InterpreterScene({
               type="button"
               onClick={handleNextStep}
             >
-              Etape suivante
+              Étape suivante
             </button>
           </div>
         </div>
@@ -539,7 +539,7 @@ export default function InterpreterScene({
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-75">
-                  Etape {step.index} · L{step.lineNumber} · {step.actionCode}
+                  Étape {step.index} · L{step.lineNumber} · {step.actionCode}
                 </span>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-75">
                   ({step.x},{step.y}) · {step.facing}

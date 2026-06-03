@@ -23,7 +23,15 @@ export default function MissionSolutionComposerSection({
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Composer la solution</p>
         <p className="mt-1 text-sm leading-7 text-stone-600">
-          Glisse les patterns candidats dans la zone solution. La page ne revele pas la bonne combinaison.
+          Lis le problème, choisis les patterns candidats qui correspondent au besoin, puis lance la simulation pour vérifier ton raisonnement.
+        </p>
+      </div>
+
+      <div className="mt-4 rounded-[20px] border border-black/10 bg-[var(--panel)] px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">Question de décision</p>
+        <p className="mt-1 text-sm leading-6 text-stone-700">{mission.objective}</p>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          Sélectionne {mission.expectedPatterns?.length > 1 ? 'les briques qui travaillent ensemble' : 'la brique qui couvre le cœur du problème'}, sans ajouter de pattern qui ne répond pas au besoin.
         </p>
       </div>
 
@@ -32,7 +40,6 @@ export default function MissionSolutionComposerSection({
           {mission.candidatePatterns.map((patternCode) => (
             <CandidatePatternCard
               key={patternCode}
-              missionPrompt={mission.patternPrompts?.[patternCode]}
               pattern={patternsByCode[patternCode]}
               onAdd={onAddPattern}
             />

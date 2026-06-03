@@ -500,7 +500,7 @@ export default function BuilderScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Build Your Object')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -529,7 +529,7 @@ export default function BuilderScene({
             type="button"
             onClick={() => setPlayMode('STEP')}
           >
-            Pas a pas
+            Pas à pas
           </button>
           {playMode === 'AUTO' ? (
             <select
@@ -559,13 +559,13 @@ export default function BuilderScene({
             </button>
           ) : null}
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20 disabled:opacity-40" disabled={currentFrameIndex === 0} type="button" onClick={handlePreviousStep}>
-            Etape precedente
+            Étape précédente
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20 disabled:opacity-40" disabled={currentFrameIndex >= playbackFrames.length - 1} type="button" onClick={handleNextStep}>
-            Etape suivante
+            Étape suivante
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20" type="button" onClick={handleResetToFinalState}>
-            Retour a la fin
+            Retour à la fin
           </button>
         </div>
       </div>
@@ -587,7 +587,7 @@ export default function BuilderScene({
             {model.buildName} · {model.productLabel}
           </text>
           <text x="1280" y="82" textAnchor="end" fontSize="24" fontWeight="700" fill="#241f18">
-            {visibleStageCount}/{model.stageCount} etape(s)
+            {visibleStageCount}/{model.stageCount} étape(s)
           </text>
           <text x="1280" y="108" textAnchor="end" fontSize="13" fill="#5f5548">
             {playMode === 'AUTO'
@@ -753,7 +753,7 @@ export default function BuilderScene({
                       style={{ borderColor: tone.stroke }}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
-                        Etape {stage.index}
+                        Étape {stage.index}
                       </p>
                       <p className="mt-2 text-[13px] font-semibold" style={{ color: tone.text }}>
                         {stage.stageLabel}

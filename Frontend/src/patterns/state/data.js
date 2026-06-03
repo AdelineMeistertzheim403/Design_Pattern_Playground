@@ -32,7 +32,7 @@ export const fallbackSchema = {
     },
     {
       "name": "initialState",
-      "label": "Etat initial",
+      "label": "État initial",
       "type": "SELECT",
       "required": true,
       "allowedValues": [
@@ -227,7 +227,7 @@ export const fallbackQuiz = {
         },
         {
           "id": "create",
-          "label": "Creer des objets"
+          "label": "Créer des objets"
         },
         {
           "id": "memory",
@@ -479,7 +479,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",

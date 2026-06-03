@@ -4,15 +4,15 @@ const themeProfiles = {
     label: 'Sci-Fi',
     factoryClassName: 'SciFiThemeFactory',
     familyLabel: 'Neon strike pack',
-    moodLabel: 'Neon, metal et interfaces holographiques.',
-    driftThemeLabel: 'Medieval',
+    moodLabel: 'Néon, métal et interfaces holographiques.',
+    driftThemeLabel: 'Médiéval',
     hero: {
       slotCode: 'HERO',
-      slotLabel: 'Hero',
+      slotLabel: 'Héros',
       className: 'SpacePilot',
       label: 'Nova Pilot',
       detail:
-        'Pilote tactique concu pour des environnements orbitaux et des missions a haute vitesse.',
+        'Pilote tactique conçu pour des environnements orbitaux et des missions à haute vitesse.',
     },
     transport: {
       slotCode: 'TRANSPORT',
@@ -20,15 +20,15 @@ const themeProfiles = {
       className: 'HoverBike',
       label: 'Pulse Hoverbike',
       detail:
-        'Vehicule leger a sustentation magnetique parfait pour garder une silhouette futuriste coherente.',
+        'Véhicule léger à sustentation magnétique parfait pour garder une silhouette futuriste cohérente.',
     },
     relic: {
       slotCode: 'RELIC',
-      slotLabel: 'Relic',
+      slotLabel: 'Relique',
       className: 'PlasmaRelic',
       label: 'Quantum Core',
       detail:
-        'Artefact lumineux qui alimente l univers visuel et le gameplay du theme.',
+        "Artefact lumineux qui alimente l'univers visuel et le gameplay du thème.",
     },
     driftArtifact: {
       slotCode: 'TRANSPORT',
@@ -36,23 +36,23 @@ const themeProfiles = {
       className: 'WarHorse',
       label: 'Iron Warhorse',
       detail:
-        'Monture lourde issue d un autre univers. Elle casse immediatement la coherence de famille.',
+        "Monture lourde issue d'un autre univers. Elle casse immédiatement la cohérence de famille.",
     },
   },
   MEDIEVAL: {
     code: 'MEDIEVAL',
-    label: 'Medieval',
+    label: 'Médiéval',
     factoryClassName: 'MedievalThemeFactory',
     familyLabel: 'Castle defense pack',
-    moodLabel: 'Pierre, cuir, bannieres et artisanat heroique.',
+    moodLabel: 'Pierre, cuir, bannières et artisanat héroïque.',
     driftThemeLabel: 'Sci-Fi',
     hero: {
       slotCode: 'HERO',
-      slotLabel: 'Hero',
+      slotLabel: 'Héros',
       className: 'KnightChampion',
       label: 'Knight Champion',
       detail:
-        'Champion de melee bati pour les remparts, les parades et le duel frontal.',
+        'Champion de mêlée bâti pour les remparts, les parades et le duel frontal.',
     },
     transport: {
       slotCode: 'TRANSPORT',
@@ -60,11 +60,11 @@ const themeProfiles = {
       className: 'WarHorse',
       label: 'Iron Warhorse',
       detail:
-        'Monture blindee qui garde la famille medievale lisible et homogene.',
+        'Monture blindée qui garde la famille médiévale lisible et homogène.',
     },
     relic: {
       slotCode: 'RELIC',
-      slotLabel: 'Relic',
+      slotLabel: 'Relique',
       className: 'RunicBanner',
       label: 'Runic Banner',
       detail:
@@ -76,7 +76,7 @@ const themeProfiles = {
       className: 'HoverBike',
       label: 'Pulse Hoverbike',
       detail:
-        'Vehicule a sustentation venu d un autre theme. Il cree une rupture immediate dans la famille.',
+        "Véhicule à sustentation venu d'un autre thème. Il crée une rupture immédiate dans la famille d'objets.",
     },
   },
 }
@@ -98,7 +98,7 @@ export default function executeAbstractFactoryPattern(parameters) {
   const useFactory = mode !== 'WITHOUT_ABSTRACT_FACTORY'
   const theme =
     themeProfiles[`${parameters.themeCode ?? 'SCI_FI'}`.trim().toUpperCase()] ?? themeProfiles.SCI_FI
-  const generatorLabel = `${parameters.generatorLabel ?? ''}`.trim() || 'Theme Generator'
+  const generatorLabel = `${parameters.generatorLabel ?? ''}`.trim() || 'Générateur de thème'
   const artifacts = useFactory
     ? [theme.hero, theme.transport, theme.relic]
     : [theme.hero, theme.driftArtifact, theme.relic]
@@ -108,7 +108,7 @@ export default function executeAbstractFactoryPattern(parameters) {
     toStep(
       1,
       'SELECT_THEME',
-      'Selection du theme',
+      'Sélection du thème',
       generatorLabel,
       `Le client choisit ${theme.label} comme famille cible.`,
       coherentFamily,
@@ -120,28 +120,28 @@ export default function executeAbstractFactoryPattern(parameters) {
       useFactory ? 'Choix de la factory' : 'Assemblage manuel',
       useFactory ? theme.factoryClassName : 'ThemePickerClient',
       useFactory
-        ? `${theme.factoryClassName} garantit que hero, transport et relique viennent du meme univers.`
-        : `Le client selectionne les objets un par un. Rien ne bloque un melange entre ${theme.label} et ${theme.driftThemeLabel}.`,
+        ? `${theme.factoryClassName} garantit que héros, transport et relique viennent du même univers.`
+        : `Le client sélectionne les objets un par un. Rien ne bloque un mélange entre ${theme.label} et ${theme.driftThemeLabel}.`,
       coherentFamily,
       useFactory,
     ),
     toStep(
       3,
       'GENERATE_FAMILY',
-      'Generation des objets',
+      'Génération des objets',
       useFactory ? theme.factoryClassName : 'ThemePickerClient',
-      `${artifacts[0].label}, ${artifacts[1].label} et ${artifacts[2].label} sont instancies.`,
+      `${artifacts[0].label}, ${artifacts[1].label} et ${artifacts[2].label} sont instanciés.`,
       coherentFamily,
       useFactory,
     ),
     toStep(
       4,
       'VERIFY',
-      'Verification de coherence',
-      'Theme Analyzer',
+      'Vérification de cohérence',
+      'Analyseur de thème',
       coherentFamily
-        ? 'Les trois objets partagent la meme direction artistique. Le theme reste lisible de bout en bout.'
-        : `${artifacts[1].label} vient du theme ${theme.driftThemeLabel} et casse la coherence de la famille.`,
+        ? 'Les trois objets partagent la même direction artistique. Le thème reste lisible de bout en bout.'
+        : `${artifacts[1].label} vient du thème ${theme.driftThemeLabel} et casse la cohérence de la famille.`,
       coherentFamily,
       useFactory,
     ),
@@ -150,19 +150,19 @@ export default function executeAbstractFactoryPattern(parameters) {
   return {
     patternCode: 'abstract-factory',
     summary: useFactory
-      ? "Abstract Factory cree toute une famille d objets coherente depuis un theme unique. Le client demande une ambiance, pas des classes concretes dispersees."
-      : "Sans Abstract Factory, le client assemble chaque produit a la main. Il suffit d un mauvais choix pour casser la coherence de la famille complete.",
+      ? "Abstract Factory crée toute une famille d’objets cohérente depuis un thème unique. Le client demande une ambiance, pas des classes concrètes dispersées."
+      : "Sans Abstract Factory, le client assemble chaque produit à la main. Il suffit d'un mauvais choix pour casser la cohérence de la famille complète.",
     logs: [
-      `${generatorLabel} recoit la demande pour le theme ${theme.label}.`,
+      `${generatorLabel} reçoit la demande pour le thème ${theme.label}.`,
       useFactory
-        ? `${theme.factoryClassName} prend en charge toute la famille d objets.`
-        : 'Le client selectionne manuellement chaque produit concret.',
-      `Hero -> ${artifacts[0].label}.`,
+        ? `${theme.factoryClassName} prend en charge toute la famille d’objets.`
+        : 'Le client sélectionne manuellement chaque produit concret.',
+      `Héros -> ${artifacts[0].label}.`,
       `Transport -> ${artifacts[1].label}.`,
-      `Relic -> ${artifacts[2].label}.`,
+      `Relique -> ${artifacts[2].label}.`,
       coherentFamily
-        ? 'La famille reste coherente et extensible.'
-        : 'La famille derive : un produit appartient a un autre univers visuel.',
+        ? 'La famille reste cohérente et extensible.'
+        : 'La famille dérive : un produit appartient à un autre univers visuel.',
     ],
     output: {
       mode,
@@ -174,7 +174,7 @@ export default function executeAbstractFactoryPattern(parameters) {
       familyLabel: theme.familyLabel,
       moodLabel: theme.moodLabel,
       coherentFamily,
-      resultLabel: coherentFamily ? 'Theme coherent' : 'Family drift',
+      resultLabel: coherentFamily ? 'Thème cohérent' : 'Dérive de famille',
       manualTouchCount: useFactory ? 1 : 3,
       familySize: 3,
       driftThemeLabel: coherentFamily ? '' : theme.driftThemeLabel,
@@ -189,26 +189,26 @@ export default function executeAbstractFactoryPattern(parameters) {
         { id: 'client', label: generatorLabel, type: 'client', data: { detail: theme.label } },
         {
           id: 'factory',
-          label: useFactory ? theme.factoryClassName : 'Manual assembly',
+          label: useFactory ? theme.factoryClassName : 'Assemblage manuel',
           type: useFactory ? 'factory' : 'cluster',
-          data: { detail: useFactory ? 'family creation' : 'concrete picks' },
+          data: { detail: useFactory ? 'création de famille' : 'sélections concrètes' },
         },
         { id: 'hero', label: artifacts[0].label, type: 'product', data: { detail: artifacts[0].className, active: true } },
         { id: 'transport', label: artifacts[1].label, type: 'product', data: { detail: artifacts[1].className, active: coherentFamily } },
         { id: 'relic', label: artifacts[2].label, type: 'product', data: { detail: artifacts[2].className, active: true } },
         {
           id: 'result',
-          label: coherentFamily ? 'Coherent family' : 'Family drift',
+          label: coherentFamily ? 'Famille cohérente' : 'Dérive de famille',
           type: 'output',
-          data: { message: coherentFamily ? theme.familyLabel : 'theme mismatch' },
+          data: { message: coherentFamily ? theme.familyLabel : 'mélange de thèmes' },
         },
       ],
       edges: [
-        { from: 'client', to: 'factory', label: useFactory ? 'request family' : 'pick each' },
-        { from: 'factory', to: 'hero', label: 'create hero' },
-        { from: 'factory', to: 'transport', label: useFactory ? 'create transport' : 'manual pick' },
-        { from: 'factory', to: 'relic', label: 'create relic' },
-        { from: 'factory', to: 'result', label: coherentFamily ? 'coherent' : 'mismatch' },
+        { from: 'client', to: 'factory', label: useFactory ? 'demande famille' : 'choisit chaque objet' },
+        { from: 'factory', to: 'hero', label: 'crée héros' },
+        { from: 'factory', to: 'transport', label: useFactory ? 'crée transport' : 'choix manuel' },
+        { from: 'factory', to: 'relic', label: 'crée relique' },
+        { from: 'factory', to: 'result', label: coherentFamily ? 'cohérent' : 'incohérent' },
       ],
     },
   }

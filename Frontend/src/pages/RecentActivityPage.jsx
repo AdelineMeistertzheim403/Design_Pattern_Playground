@@ -32,15 +32,15 @@ function getActivityLabel(type) {
     case 'BADGE_UNLOCKED':
       return 'Badge'
     case 'MISSION_SUCCESS':
-      return 'Mission reussie'
+      return 'Mission réussie'
     case 'MISSION_ATTEMPT':
-      return 'Mission a revoir'
+      return 'Mission à revoir'
     case 'PATTERN_MASTERED':
-      return 'Pattern maitrise'
+      return 'Pattern maîtrisé'
     case 'QUIZ_SUBMITTED':
       return 'Quiz'
     default:
-      return 'Activite'
+      return 'Activité'
   }
 }
 
@@ -67,10 +67,10 @@ function DashboardGate({
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activite recente</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activité récente</p>
         <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Journal de progression</h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-          Connecte-toi pour voir les derniers quiz termines, badges debloques, missions reussies et patterns maitrises.
+          Connecte-toi pour voir les derniers quiz terminés, badges débloqués, missions réussies et patterns maîtrisés.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button
@@ -85,7 +85,7 @@ function DashboardGate({
             type="button"
             onClick={onNavigateHome}
           >
-            Retour a l accueil
+            Retour à l’accueil
           </button>
         </div>
       </section>
@@ -125,10 +125,10 @@ export default function RecentActivityPage({
     return (
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <section className="rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activite indisponible</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activité indisponible</p>
           <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Journal de progression</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-            Cette page a besoin d une API connectee pour charger l activite recente persistante.
+            Cette page a besoin d’une API connectée pour charger l’activité récente persistante.
           </p>
         </section>
       </div>
@@ -146,34 +146,34 @@ export default function RecentActivityPage({
                 type="button"
                 onClick={onNavigateHome}
               >
-                Retour a l accueil
+                Retour à l’accueil
               </button>
               <button
                 className="rounded-full border border-black/10 bg-white/84 px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
                 type="button"
                 onClick={onNavigateProgress}
               >
-                Retour a la progression
+                Retour à la progression
               </button>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activite recente</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Activité récente</p>
               <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Journal de progression</h1>
             </div>
 
             <p className="max-w-3xl text-base leading-7 text-stone-700">
-              Cette page rassemble les derniers evenements persistants du playground : quiz, badges, missions et maitrise de pattern.
+              Cette page rassemble les derniers événements persistants du playground : quiz, badges, missions et maîtrise de pattern.
             </p>
           </div>
 
           <div className="grid gap-4 self-start md:grid-cols-3 xl:grid-cols-3">
             <article className="rounded-[24px] border border-black/10 bg-white/84 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Evenements</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Événements</p>
               <p className="mt-3 text-3xl text-stone-950">{activity.length}</p>
             </article>
             <article className="rounded-[24px] border border-black/10 bg-white/84 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Affiches</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Affichés</p>
               <p className="mt-3 text-3xl text-stone-950">{filteredActivity.length}</p>
             </article>
             <label className="grid gap-2">
@@ -186,9 +186,9 @@ export default function RecentActivityPage({
                 <option value="ALL">Tout afficher</option>
                 <option value="BADGE_UNLOCKED">Badges</option>
                 <option value="QUIZ_SUBMITTED">Quiz</option>
-                <option value="MISSION_SUCCESS">Missions reussies</option>
-                <option value="MISSION_ATTEMPT">Missions a revoir</option>
-                <option value="PATTERN_MASTERED">Patterns maitrises</option>
+                <option value="MISSION_SUCCESS">Missions réussies</option>
+                <option value="MISSION_ATTEMPT">Missions à revoir</option>
+                <option value="PATTERN_MASTERED">Patterns maîtrisés</option>
               </select>
             </label>
           </div>
@@ -197,7 +197,7 @@ export default function RecentActivityPage({
 
       {isActivityLoading ? (
         <div className="rounded-[26px] border border-black/10 bg-white/80 px-5 py-10 text-sm leading-7 text-stone-700 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
-          Chargement de l activite recente...
+          Chargement de l’activité récente...
         </div>
       ) : null}
 
@@ -239,7 +239,7 @@ export default function RecentActivityPage({
 
       {!isActivityLoading && !activityError && filteredActivity.length === 0 ? (
         <div className="rounded-[24px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
-          Aucun evenement ne correspond au filtre actuel.
+          Aucun événement ne correspond au filtre actuel.
         </div>
       ) : null}
     </div>

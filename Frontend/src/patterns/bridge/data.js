@@ -52,7 +52,7 @@ export const patternLearningContent = {
   intuition:
     'Bridge sert quand deux dimensions varient en meme temps. Ici, la forme varie d un cote et le moteur de rendu de l autre. Au lieu de creer une classe par combinaison, on les relie par delegation.',
   readingGuide:
-    'Regarde d abord la forme selectionnee, puis le moteur choisi. La scene montre ensuite si la liaison passe par un vrai pont runtime ou par une sous-classe concrete fusionnee.',
+    'Regarde d abord la forme sélectionnée, puis le moteur choisi. La scene montre ensuite si la liaison passe par un vrai pont runtime ou par une sous-classe concrete fusionnee.',
   studentAngle:
     'Le vrai declic est de voir que Bridge ne rend pas tout abstrait pour le plaisir. Il decoupe deux axes de variation qui evoluent independamment.',
   developerAngle:

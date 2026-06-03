@@ -4,7 +4,7 @@ export const patternDefinition = {
   code: 'template',
   name: 'Template Method',
   type: 'BEHAVIORAL',
-  description: 'Definit le squelette stable d un algorithme puis laisse certaines etapes varier dans les sous-classes.',
+  description: 'Definit le squelette stable d un algorithme puis laisse certaines étapes varier dans les sous-classes.',
   useCase: 'Construire un workflow prepare -> execute -> finalise dans lequel seule l etape centrale change selon le scenario choisi.',
   complexityLevel: 'INTERMEDIATE',
 }
@@ -21,7 +21,7 @@ export const fallbackSchema = {
     },
     {
       name: 'workflowCode',
-      label: 'Etape personnalisee',
+      label: 'Étape personnalisee',
       type: 'SELECT',
       required: true,
       allowedValues: ['RELEASE_PIPELINE', 'SECURITY_AUDIT', 'DATA_SYNC'],
@@ -63,7 +63,7 @@ export const patternLearningContent = {
     },
     {
       term: 'Hook specialise',
-      definition: 'Etape redefinie par une sous-classe pour injecter son comportement variable.',
+      definition: 'Étape redefinie par une sous-classe pour injecter son comportement variable.',
     },
   ],
 }
@@ -161,7 +161,7 @@ export const patternUmlDiagram = {
 export const fallbackQuiz = {
   patternCode: 'template',
   title: 'Quiz Template Method',
-  description: 'Teste ta comprehension d un algorithme stable dont certaines etapes varient.',
+  description: 'Teste ta comprehension d un algorithme stable dont certaines étapes varient.',
   passingPercent: 75,
   badgeLabel: 'Badge valide',
   maxPoints: 0,
@@ -172,9 +172,9 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'EASY',
       points: 0,
-      explanation: 'Il fixe le squelette d un algorithme tout en laissant quelques etapes varier.',
+      explanation: 'Il fixe le squelette d un algorithme tout en laissant quelques étapes varier.',
       choices: [
-        { id: 'skeleton', label: 'Fixer un squelette d algorithme avec quelques etapes variables' },
+        { id: 'skeleton', label: 'Fixer un squelette d algorithme avec quelques étapes variables' },
         { id: 'clone', label: 'Cloner un objet deja configure' },
         { id: 'cache', label: 'Partager un cache global' },
       ],
@@ -187,7 +187,7 @@ export const fallbackQuiz = {
     },
     {
       id: 'template-q2',
-      label: 'Dans Template Method, l ordre global des etapes est defini par la classe de base.',
+      label: 'Dans Template Method, l ordre global des étapes est defini par la classe de base.',
       type: 'TRUE_FALSE',
       difficulty: 'EASY',
       points: 0,
@@ -208,7 +208,7 @@ export const fallbackQuiz = {
       points: 0,
       explanation: 'Template Method est un pattern comportemental.',
       choices: [
-        { id: 'creational', label: 'Creation' },
+        { id: 'creational', label: 'Création' },
         { id: 'structural', label: 'Structurel' },
         { id: 'behavioral', label: 'Comportemental' },
       ],
@@ -225,7 +225,7 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Les sous-classes implementent surtout les etapes specialisees ou hooks.',
+      explanation: 'Les sous-classes implementent surtout les étapes specialisees ou hooks.',
       choices: [
         { id: 'hook', label: 'Une etape specialisee comme execute()' },
         { id: 'registry', label: 'Le registre global des patterns' },
@@ -271,7 +271,7 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'MEDIUM',
       points: 0,
-      explanation: 'Le pattern evite de recopier les memes etapes communes dans plusieurs workflows.',
+      explanation: 'Le pattern evite de recopier les memes étapes communes dans plusieurs workflows.',
       choices: [
         { id: 'duplication', label: 'La duplication du workflow commun' },
         { id: 'events', label: 'Les evenements pub/sub' },

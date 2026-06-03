@@ -29,7 +29,7 @@ export default function executeCommandPattern(parameters) {
   }
 
   if (useCommand) {
-    logs.push(`Creation du receiver ${boardName} pour ${actorName}.`)
+    logs.push(`Création du receiver ${boardName} pour ${actorName}.`)
     logs.push('Initialisation du CommandInvoker avec deux piles : undo et redo.')
 
     actions.forEach((actionCode, index) => {

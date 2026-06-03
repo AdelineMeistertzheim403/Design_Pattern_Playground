@@ -7,14 +7,14 @@ export default function NotFoundPage({ onNavigateHome }) {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Erreur de navigation</p>
         <h1 className="mt-4 text-4xl text-stone-950">Cette page n existe pas</h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-          Retourne a l accueil pour choisir un design pattern disponible et ouvrir sa page de demonstration.
+          Retourne à l'accueil pour choisir un design pattern disponible et ouvrir sa page de démonstration.
         </p>
         <SpaLink
           className="mt-6 rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
           href="/"
           onNavigate={onNavigateHome}
         >
-          Retour a l accueil
+          Retour à l'accueil
         </SpaLink>
       </section>
     </div>

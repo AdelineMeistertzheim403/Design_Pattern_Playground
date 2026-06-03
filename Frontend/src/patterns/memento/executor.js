@@ -153,7 +153,7 @@ export default function executeMementoPattern(parameters) {
     createStep(
       1,
       'INIT',
-      'Etat initial',
+      'État initial',
       'SceneEditor',
       'Le workspace charge la scene de base et expose l etat courant a l originator.',
       false,

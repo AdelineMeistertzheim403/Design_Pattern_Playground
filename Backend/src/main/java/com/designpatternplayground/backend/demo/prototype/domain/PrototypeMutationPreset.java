@@ -22,7 +22,7 @@ public record PrototypeMutationPreset(
 		new PrototypeMutationPreset(
 			"OVERCLOCK",
 			"Overclock Burst",
-			"Pousse le coeur clone dans un mode agressif. Ideal pour voir si l etat imbrique se propage.",
+			"Pousse le coeur clone dans un mode agressif. Ideal pour voir si l'état imbriqué se propage.",
 			"#cf5c3b",
 			"salve plasma",
 			"burst-red",

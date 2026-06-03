@@ -31,6 +31,6 @@ public enum ProxyCacheState {
 			}
 		}
 
-		throw new InvalidPatternConfigurationException("Etat de cache Proxy inconnu : " + code);
+		throw new InvalidPatternConfigurationException("État de cache Proxy inconnu : " + code);
 	}
 }

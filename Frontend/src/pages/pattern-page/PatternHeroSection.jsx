@@ -1,4 +1,4 @@
-import { typeLabels } from '../../app/playgroundConstants'
+import { complexityLabels, typeLabels } from '../../app/playgroundConstants'
 import { buildPatternPath } from '../../app/playgroundUtils'
 import SpaLink from '../../components/SpaLink'
 
@@ -23,7 +23,7 @@ export default function PatternHeroSection({
               href="/"
               onNavigate={onNavigateHome}
             >
-              Retour a l accueil
+              Retour à l’accueil
             </SpaLink>
             <div className={`inline-flex rounded-full px-3 py-2 text-xs font-semibold ring-1 ${status.tone}`}>
               {status.label}
@@ -36,13 +36,13 @@ export default function PatternHeroSection({
               type="button"
               onClick={onNavigateQuiz}
             >
-              {currentUser ? 'Ouvrir le quiz' : 'Connecte-toi pour debloquer le quiz'}
+              {currentUser ? 'Ouvrir le quiz' : 'Connecte-toi pour débloquer le quiz'}
             </button>
           </div>
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              {typeLabels[selectedPattern.type] ?? selectedPattern.type} · {selectedPattern.complexityLevel}
+              {typeLabels[selectedPattern.type] ?? selectedPattern.type} · {complexityLabels[selectedPattern.complexityLevel] ?? selectedPattern.complexityLevel}
             </p>
             <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{selectedPattern.name}</h1>
           </div>
@@ -62,7 +62,7 @@ export default function PatternHeroSection({
           </div>
 
           <p className="rounded-[24px] bg-[var(--accent-soft)]/62 px-5 py-4 text-sm leading-7 text-stone-700">
-            Cas d usage : {selectedPattern.useCase}
+            Cas d’usage : {selectedPattern.useCase}
           </p>
         </div>
 
@@ -71,20 +71,20 @@ export default function PatternHeroSection({
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Compte</p>
             {currentUser ? (
               <p className="mt-3 text-sm leading-7 text-stone-700">
-                Connecte en tant que <span className="font-semibold text-stone-950">@{currentUser.username}</span>.
-                Tu pourras plus tard sauvegarder tes scenarios et ton historique.
+                Connecté en tant que <span className="font-semibold text-stone-950">@{currentUser.username}</span>.
+                Tu pourras plus tard sauvegarder tes scénarios et ton historique.
               </p>
             ) : (
               <div className="mt-3 space-y-3">
                 <p className="text-sm leading-7 text-stone-700">
-                  Un compte n est pas obligatoire pour tester un pattern, mais il permettra ensuite de suivre la progression.
+                  Un compte n’est pas obligatoire pour tester un pattern, mais il permettra ensuite de suivre la progression.
                 </p>
                 <button
                   className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
                   type="button"
                   onClick={() => onOpenAuth('register')}
                 >
-                  Creer un compte
+                  Créer un compte
                 </button>
               </div>
             )}

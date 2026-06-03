@@ -20,7 +20,7 @@ public enum AdapterScenario {
 		"HDMI input",
 		"HDMI digital",
 		"%s :: HDMI 1080p bridge",
-		"Le SmartScreen attend une entree HDMI numerique. Un branchement direct VGA echoue.",
+		"Le SmartScreen attend une entrée HDMI numérique. Un branchement direct VGA échoue.",
 		"L adaptateur encapsule le signal analogique et expose une sortie HDMI exploitable."
 	),
 	SERIAL_TO_REST(
@@ -31,13 +31,13 @@ public enum AdapterScenario {
 		"Serial frames",
 		"FRAME[%s]|crc=42",
 		"SerialToRestAdapter",
-		"Traduit des trames serie vers un appel REST JSON attendu par le dashboard cloud.",
+		"Traduit des trames série vers un appel REST JSON attendu par le dashboard cloud.",
 		"CloudDashboard",
 		"HTTPS endpoint",
 		"REST JSON",
 		"{\"event\":\"%s\",\"transport\":\"https\"}",
-		"Le dashboard cloud attend une requete REST JSON. Une trame serie brute ne peut pas etre consommee telle quelle.",
-		"L adaptateur mappe la trame serie et publie un payload JSON sur l endpoint HTTP cible."
+		"Le dashboard cloud attend une requête REST JSON. Une trame série brute ne peut pas etre consommée telle quelle.",
+		"L adaptateur mappe la trame série et publie un payload JSON sur l endpoint HTTP cible."
 	),
 	XML_TO_JSON(
 		"XML_TO_JSON",
@@ -163,6 +163,6 @@ public enum AdapterScenario {
 		return Arrays.stream(values())
 			.filter(value -> value.code.equals(code == null ? "" : code.trim().toUpperCase(Locale.ROOT)))
 			.findFirst()
-			.orElseThrow(() -> new InvalidPatternConfigurationException("Scenario Adapter inconnu : " + code));
+			.orElseThrow(() -> new InvalidPatternConfigurationException("Scénario Adapter inconnu : " + code));
 	}
 }

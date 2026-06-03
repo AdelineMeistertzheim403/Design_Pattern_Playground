@@ -23,62 +23,62 @@ public record AbstractThemeProfile(
 		"Sci-Fi",
 		"SciFiThemeFactory",
 		"Neon strike pack",
-		"Neon, metal et interfaces holographiques.",
-		"Medieval",
+		"Néon, métal et interfaces holographiques.",
+		"Médiéval",
 		new ThemeArtifact(
 			"HERO",
-			"Hero",
+			"Héros",
 			"SpacePilot",
 			"Nova Pilot",
-			"Pilote tactique concu pour des environnements orbitaux et des missions a haute vitesse."
+			"Pilote tactique conçu pour des environnements orbitaux et des missions à haute vitesse."
 		),
 		new ThemeArtifact(
 			"TRANSPORT",
 			"Transport",
 			"HoverBike",
 			"Pulse Hoverbike",
-			"Vehicule leger a sustentation magnetique parfait pour garder une silhouette futuriste coherente."
+			"Véhicule léger à sustentation magnétique parfait pour garder une silhouette futuriste cohérente."
 		),
 		new ThemeArtifact(
 			"RELIC",
-			"Relic",
+			"Relique",
 			"PlasmaRelic",
 			"Quantum Core",
-			"Artefact lumineux qui alimente l univers visuel et le gameplay du theme."
+			"Artefact lumineux qui alimente l'univers visuel et le gameplay du thème."
 		),
 		new ThemeArtifact(
 			"TRANSPORT",
 			"Transport",
 			"WarHorse",
 			"Iron Warhorse",
-			"Monture lourde issue d un autre univers. Elle casse immediatement la coherence de famille."
+			"Monture lourde issue d'un autre univers. Elle casse immédiatement la cohérence de famille."
 		)
 	);
 
 	public static final AbstractThemeProfile MEDIEVAL = new AbstractThemeProfile(
 		"MEDIEVAL",
-		"Medieval",
+		"Médiéval",
 		"MedievalThemeFactory",
 		"Castle defense pack",
-		"Pierre, cuir, bannieres et artisanat heroique.",
+		"Pierre, cuir, bannières et artisanat héroïque.",
 		"Sci-Fi",
 		new ThemeArtifact(
 			"HERO",
-			"Hero",
+			"Héros",
 			"KnightChampion",
 			"Knight Champion",
-			"Champion de melee bati pour les remparts, les parades et le duel frontal."
+			"Champion de mêlée bâti pour les remparts, les parades et le duel frontal."
 		),
 		new ThemeArtifact(
 			"TRANSPORT",
 			"Transport",
 			"WarHorse",
 			"Iron Warhorse",
-			"Monture blindee qui garde la famille medievale lisible et homogene."
+			"Monture blindée qui garde la famille médiévale lisible et homogène."
 		),
 		new ThemeArtifact(
 			"RELIC",
-			"Relic",
+			"Relique",
 			"RunicBanner",
 			"Runic Banner",
 			"Relique de commandement qui porte les couleurs et la magie du royaume."
@@ -88,7 +88,7 @@ public record AbstractThemeProfile(
 			"Transport",
 			"HoverBike",
 			"Pulse Hoverbike",
-			"Vehicule a sustentation venu d un autre theme. Il cree une rupture immediate dans la famille d objets."
+			"Véhicule à sustentation venu d'un autre thème. Il crée une rupture immédiate dans la famille d'objets."
 		)
 	);
 
@@ -100,7 +100,7 @@ public record AbstractThemeProfile(
 		return switch (rawCode.trim().toUpperCase(Locale.ROOT)) {
 			case "SCI_FI" -> SCI_FI;
 			case "MEDIEVAL" -> MEDIEVAL;
-			default -> throw new InvalidPatternConfigurationException("Theme inconnu : " + rawCode);
+			default -> throw new InvalidPatternConfigurationException("Thème inconnu : " + rawCode);
 		};
 	}
 

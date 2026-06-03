@@ -49,7 +49,7 @@ public enum VisitorTreePreset {
 	TEAM_WORKSPACE(
 		"TEAM_WORKSPACE",
 		"Team Workspace",
-		"Espace d equipe avec docs, source et operations."
+		"Espace d equipe avec docs, source et opérations."
 	) {
 		@Override
 		public WorkspaceFolder buildRoot() {

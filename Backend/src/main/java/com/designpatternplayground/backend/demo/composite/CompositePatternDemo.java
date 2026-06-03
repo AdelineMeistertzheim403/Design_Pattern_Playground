@@ -41,8 +41,8 @@ public class CompositePatternDemo implements DesignPatternDemo {
 			"composite",
 			"Composite",
 			PatternType.STRUCTURAL,
-			"Compose des objets en arbre pour traiter uniformement un element simple et un groupe d elements.",
-			"Construire un explorateur de dossiers et fichiers ou une action appliquee au root descend naturellement sur toute la structure.",
+			"Composé des objets en arbre pour traiter uniformément un élément simple et un groupe d'éléments.",
+			"Construire un explorateur de dossiers et fichiers où une action appliquée au root descend naturellement sur toute la structure.",
 			"INTERMEDIATE"
 		);
 	}
@@ -61,7 +61,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 				"GAME_ASSETS"
 			),
 			new PatternField("extraLeafCount", "Feuilles supplementaires", FieldType.NUMBER, true, null, "3"),
-			new PatternField("operationLabel", "Operation", FieldType.TEXT, true, null, "Scan tree")
+			new PatternField("operationLabel", "Opération", FieldType.TEXT, true, null, "Scan tree")
 		));
 	}
 
@@ -94,7 +94,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		output.put("blueprintDescription", blueprint.description());
 		output.put("operationLabel", config.operationLabel());
 		output.put("uniformTraversal", useComposite);
-		output.put("operationResultLabel", missedCount == 0 ? "Arbre complet traite" : "Sous-arbre manque");
+		output.put("operationResultLabel", missedCount == 0 ? "Arbre complet traité" : "Sous-arbre manqué");
 		output.put("compositeBenefit", blueprint.compositeBenefit());
 		output.put("manualGapDetail", blueprint.manualGapDetail());
 		output.put("nodeCount", nodeCount);
@@ -113,7 +113,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useComposite
-				? "Composite permet de lancer la meme operation sur le root, un dossier ou un fichier sans changer le code client. La recursion descend naturellement dans tout l arbre."
+				? "Composite permet de lancer la même opération sur le root, un dossier ou un fichier sans changer le code client. La récursion descend naturellement dans tout l arbre."
 				: "Sans Composite, le client distingue dossiers et fichiers et oublie facilement les descendants plus profonds. Le parcours reste partiel et plus fragile.",
 			logs,
 			output,
@@ -135,7 +135,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		steps.add(new CompositeStep(
 			1,
 			"TRIGGER",
-			"Declenchement",
+			"Déclenchement",
 			"TreeBuilderClient",
 			"SENT",
 			"Le client lance " + operationLabel + " sur le root du blueprint " + blueprint.label() + "."
@@ -143,11 +143,11 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		steps.add(new CompositeStep(
 			2,
 			useComposite ? "COMPONENT_CALL" : "MANUAL_SPLIT",
-			useComposite ? "Appel uniforme" : "Gestion separee",
+			useComposite ? "Appel uniforme" : "Gestion séparee",
 			useComposite ? "WorkspaceComponent" : "TreeBuilderClient",
 			useComposite ? "UNIFIED" : "MANUAL",
 			useComposite
-				? "Le meme contrat est applique au root, aux dossiers et aux feuilles."
+				? "Le même contrat est applique au root, aux dossiers et aux feuilles."
 				: "Le client distingue dossier et fichier avec des branches manuelles."
 		));
 		steps.add(new CompositeStep(
@@ -203,14 +203,14 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		List<String> logs = new ArrayList<>();
 		logs.add("Le client lance " + operationLabel + " sur le root " + rootName + ".");
 		logs.add(useComposite
-			? "Le root, les dossiers et les fichiers partagent le meme contrat CompositeComponent."
-			: "Sans Composite, le client garde des branches separees pour les dossiers et les fichiers.");
+			? "Le root, les dossiers et les fichiers partagent le même contrat CompositeComponent."
+			: "Sans Composite, le client garde des branches séparees pour les dossiers et les fichiers.");
 		logs.add(useComposite
 			? blueprint.compositeBenefit()
 			: blueprint.manualGapDetail());
 		logs.add("Feuilles traitees : " + processedLeafCount + " / " + fileCount + ".");
 		logs.add(missedCount == 0
-			? "Aucun sous-arbre n est perdu pendant le parcours."
+			? "Aucun sous-arbre n'est perdu pendant le parcours."
 			: missedCount + " noeud(s) restent hors parcours a cause du traitement manuel.");
 		return logs;
 	}
@@ -277,7 +277,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 
 	private CompositeConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Composite sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Composite sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);
@@ -308,7 +308,7 @@ public class CompositePatternDemo implements DesignPatternDemo {
 		try {
 			return Integer.parseInt(rawValue.toString().trim());
 		} catch (NumberFormatException exception) {
-			throw new InvalidPatternConfigurationException(fieldName + " doit etre numerique.");
+			throw new InvalidPatternConfigurationException(fieldName + " doit etre numérique.");
 		}
 	}
 

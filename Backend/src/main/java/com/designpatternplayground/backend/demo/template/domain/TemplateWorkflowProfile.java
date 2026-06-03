@@ -9,7 +9,7 @@ public enum TemplateWorkflowProfile {
 	RELEASE_PIPELINE(
 		"RELEASE_PIPELINE",
 		"Release Pipeline",
-		"Publie une version avec preparation commune, deploiement specialise et cloture stable.",
+		"Publie une version avec preparation commune, deploiement spécialisé et cloture stable.",
 		"Preparation environnement",
 		"Verifie les pre-requis, givre la version et reserve la fenetre de livraison.",
 		"Deploiement progressif",
@@ -23,13 +23,13 @@ public enum TemplateWorkflowProfile {
 	SECURITY_AUDIT(
 		"SECURITY_AUDIT",
 		"Security Audit",
-		"Deroule un audit avec preparation commune, scan specialise et finalisation tracee.",
+		"Deroule un audit avec preparation commune, scan spécialisé et finalisation tracee.",
 		"Preparation audit",
 		"Charge les signatures, verrouille la fenetre de scan et rassemble la liste des endpoints critiques.",
-		"Scan de securite",
+		"Scan de sécurité",
 		"Analyse les surfaces critiques, compare les signatures et remonte les ecarts prioritaires.",
 		"Cloture audit",
-		"Archive les preuves, publie le rapport et notifie l equipe securite.",
+		"Archive les preuves, publie le rapport et notifie l equipe sécurité.",
 		"Sans template, le scan part bien mais la cloture varie selon l auteur : preuves partielles et notifications tardives.",
 		"Audit trace",
 		"security workflow"
@@ -37,13 +37,13 @@ public enum TemplateWorkflowProfile {
 	DATA_SYNC(
 		"DATA_SYNC",
 		"Data Sync",
-		"Synchronise des donnees avec un canevas stable et une etape centrale personnalisee.",
+		"Synchronise des données avec un canevas stable et une étape centrale personnalisee.",
 		"Preparation synchronisation",
 		"Ouvre les credentials, verifie le mapping et reserve le journal de reprise.",
 		"Synchronisation ciblee",
-		"Transfere les lots, applique les transformations et controle les ecarts de volume en continu.",
+		"Transfere les lots, applique les transformations et contrôle les ecarts de volume en continu.",
 		"Cloture synchronisation",
-		"Reindexe les donnees, ferme le journal de reprise et diffuse le recapitulatif d execution.",
+		"Reindexe les données, ferme le journal de reprise et diffuse le récapitulatif d exécution.",
 		"Sans template, la synchro est relancee depuis du code copie-colle et la phase de reindexation saute facilement.",
 		"Sync coherente",
 		"data workflow"

@@ -1,7 +1,7 @@
 export const difficultyLabels = {
   EASY: 'Facile',
-  MEDIUM: 'Intermediaire',
-  HARD: 'Avancee',
+  MEDIUM: 'Intermédiaire',
+  HARD: 'Avancée',
 }
 
 export function cloneAnswer(answer) {
@@ -18,16 +18,16 @@ export function cloneAnswer(answer) {
 
 export function getMasteryLabel(percent) {
   if (percent >= 90) {
-    return 'Maitrise forte'
+    return 'Maîtrise forte'
   }
 
   if (percent >= 75) {
-    return 'Quiz valide'
+    return 'Quiz validé'
   }
 
   if (percent >= 50) {
     return 'Base acquise'
   }
 
-  return 'A consolider'
+  return 'À consolider'
 }

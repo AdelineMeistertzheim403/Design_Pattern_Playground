@@ -236,7 +236,7 @@ export const fallbackQuiz = {
       points: 0,
       explanation: 'Composite est un pattern structurel.',
       choices: [
-        { id: 'creational', label: 'Creation' },
+        { id: 'creational', label: 'Création' },
         { id: 'structural', label: 'Structurel' },
         { id: 'behavioral', label: 'Comportemental' },
       ],
