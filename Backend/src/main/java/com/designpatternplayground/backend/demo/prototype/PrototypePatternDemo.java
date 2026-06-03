@@ -57,8 +57,8 @@ public class PrototypePatternDemo implements DesignPatternDemo {
 			"prototype",
 			"Prototype",
 			PatternType.CREATIONAL,
-			"Duplique un objet deja configure pour creer rapidement de nouvelles variantes sans repasser par toute la construction.",
-			"Cloner un robot, un drone ou un avatar puis observer la difference entre une copie superficielle et une copie profonde.",
+			"Duplique un objet déjà configuré pour créer rapidement de nouvelles variantes sans repasser par toute la construction.",
+			"Cloner un robot, un drone ou un avatar puis observer la différence entre une copie superficielle et une copie profonde.",
 			"INTERMEDIATE"
 		);
 	}
@@ -116,14 +116,14 @@ public class PrototypePatternDemo implements DesignPatternDemo {
 			.map(PrototypeUnit::id)
 			.toList();
 
-		logs.add("Le prototype source " + config.blueprintName() + " sort deja configure pour l archetype " + archetype.label() + ".");
+		logs.add("Le prototype source " + config.blueprintName() + " sort déjà configure pour l'archétype " + archetype.label() + ".");
 		logs.add(usePrototype
-			? "Chaque clone appelle clone() et duplique aussi le coeur imbrique. La reference profonde change a chaque copie."
-			: "Sans Prototype, le client recopie le chassis mais garde la meme reference de coeur imbrique entre tous les clones.");
+			? "Chaque clone appelle clone() et duplique aussi le coeur imbriqué. La reference profonde change à chaque copie."
+			: "Sans Prototype, le client recopie le châssis mais garde la même reference de coeur imbriqué entre tous les clones.");
 		logs.add(mutationTarget.label() + " recoit le preset " + mutationPreset.label() + " sur son coeur " + mutationTarget.companionState().label() + ".");
 		logs.add(affectedCloneIds.size() > 1
-			? "La mutation se propage a " + affectedCloneIds.size() + " clones car l etat imbrique est partage."
-			: "La mutation reste isolee sur " + mutationTarget.label() + " grace a une copie profonde du coeur.");
+			? "La mutation se propage a " + affectedCloneIds.size() + " clones car l'état imbriqué est partage."
+			: "La mutation reste isolée sur " + mutationTarget.label() + " grace à une copie profonde du coeur.");
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
 		output.put("mode", config.mode());
@@ -144,8 +144,8 @@ public class PrototypePatternDemo implements DesignPatternDemo {
 		output.put(
 			"propagationLabel",
 			affectedCloneIds.size() > 1
-				? affectedCloneIds.size() + " clones impactes par la meme reference de coeur"
-				: "1 clone impacte : l etat profond reste isole"
+				? affectedCloneIds.size() + " clones impactés par la même reference de coeur"
+				: "1 clone impacte : l'état profond reste isolé"
 		);
 		output.put("prototypeSeed", toCloneMap(prototypeSeed, false, false));
 		output.put("initialClones", initialClones.stream().map(clone -> toCloneMap(clone, false, false)).toList());
@@ -157,18 +157,18 @@ public class PrototypePatternDemo implements DesignPatternDemo {
 		);
 		output.put("steps", List.of(
 			toStepMap(1, "SEED", "Prototype source", "Le blueprint de base est pret avec sa coque et son coeur initial.", List.of(), 0),
-			toStepMap(2, "CLONE", "Duplication", "Les clones sortent du meme gabarit. Le vrai piege se joue dans l etat imbrique.", List.of(), config.cloneCount()),
+			toStepMap(2, "CLONE", "Duplication", "Les clones sortent du même gabarit. Le vrai piège se joue dans l'état imbriqué.", List.of(), config.cloneCount()),
 			toStepMap(3, "MUTATE", "Mutation ciblee", mutationTarget.label() + " recoit " + mutationPreset.label() + ".", List.of(mutationTarget.id()), config.cloneCount()),
 			toStepMap(4, "OBSERVE", "Propagation", affectedCloneIds.size() > 1
-				? "La mutation se diffuse a tous les clones relies au meme coeur."
+				? "La mutation se diffuse à tous les clones relies au même coeur."
 				: "La mutation reste limitee au clone cible.", affectedCloneIds, config.cloneCount())
 		));
 
 		return new PatternExecutionResult(
 			getCode(),
 			usePrototype
-				? "Prototype accelere la duplication d un objet deja configure. Avec une copie profonde, chaque clone garde ensuite son etat imbrique isole."
-				: "Sans Prototype, la duplication semble rapide mais laisse souvent un etat imbrique partage. Une mutation locale fuit alors vers les autres clones.",
+				? "Prototype accélère la duplication d'un objet déjà configure. Avec une copie profonde, chaque clone garde ensuite son état imbriqué isolé."
+				: "Sans Prototype, la duplication semble rapide mais laisse souvent un état imbriqué partage. Une mutation locale fuit alors vers les autres clones.",
 			logs,
 			output,
 			buildVisualization(usePrototype, prototypeSeed, finalClones, mutationTarget, affectedCloneIds)
@@ -302,7 +302,7 @@ public class PrototypePatternDemo implements DesignPatternDemo {
 
 	private PrototypeConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres Prototype sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres Prototype sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode").toUpperCase(Locale.ROOT);

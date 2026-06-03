@@ -40,7 +40,7 @@ export const fallbackSchema = {
     },
     {
       "name": "senderName",
-      "label": "Expediteur",
+      "label": "Expéditeur",
       "type": "TEXT",
       "required": true,
       "allowedValues": null,
@@ -63,9 +63,9 @@ export const patternLearningContent = {
   "readingGuide": "Observe d abord le trajet du message dans la scene, puis compare avec et sans mediator. L UML montre le hub central, la scene runtime montre la reduction du couplage.",
   "studentAngle": "Le declic pedagogique est simple : les joueurs discutent toujours entre eux, mais plus aucun ne porte la logique complete du reseau.",
   "developerAngle": "Le pattern devient utile pour des chats, des interfaces riches, des salles de jeu, des dashboards ou des workflows ou beaucoup d objets doivent se coordonner.",
-  "playfulPrompt": "Ajoute des participants, change l expediteur et compare la difference entre des messages directs et un hub de diffusion central.",
+  "playfulPrompt": "Ajoute des participants, change l expéditeur et compare la difference entre des messages directs et un hub de diffusion central.",
   "steps": [
-    "Le colleague expediteur envoie un message.",
+    "Le colleague expéditeur envoie un message.",
     "Le mediator central recoit cet evenement.",
     "Le mediator choisit les destinataires a notifier.",
     "Les autres colleagues recoivent le message sans connaitre toute la topologie du chat."
@@ -263,7 +263,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "create",
-          "label": "Creer des objets"
+          "label": "Créer des objets"
         },
         {
           "id": "centralize",
@@ -319,7 +319,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",

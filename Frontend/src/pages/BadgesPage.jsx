@@ -44,18 +44,18 @@ function formatDate(value) {
 
 function getBadgeUnlockCondition(badge) {
   const explicitRules = {
-    first_steps: 'Terminer une premiere demo.',
-    collector: 'Lancer au moins une demo pour chaque pattern du playground.',
-    quiz_passed: 'Valider un quiz avec au moins 75% de bonnes reponses.',
+    first_steps: 'Terminer une première démo.',
+    collector: 'Lancer au moins une démo pour chaque pattern du playground.',
+    quiz_passed: 'Valider un quiz avec au moins 75% de bonnes réponses.',
     perfect_quiz: 'Obtenir 100% sur un quiz.',
-    streak_3: 'Enchainer 3 reussites consecutives.',
-    mission_solver: 'Reussir 5 missions.',
-    architect_confirmed: 'Reussir 10 missions.',
-    fusion_success: 'Reussir une mission multi-pattern.',
-    fusion_master: 'Reussir 5 missions multi-pattern.',
-    untouchable: 'Reussir 3 missions difficiles sans echec.',
-    playground_archivist: 'Debloquer 20 badges.',
-    playground_master: 'Maitriser tous les patterns.',
+    streak_3: 'Enchaîner 3 réussites consécutives.',
+    mission_solver: 'Réussir 5 missions.',
+    architect_confirmed: 'Réussir 10 missions.',
+    fusion_success: 'Réussir une mission multi-pattern.',
+    fusion_master: 'Réussir 5 missions multi-pattern.',
+    untouchable: 'Réussir 3 missions difficiles sans échec.',
+    playground_archivist: 'Débloquer 20 badges.',
+    playground_master: 'Maîtriser tous les patterns.',
   }
 
   if (explicitRules[badge.code]) {
@@ -64,11 +64,11 @@ function getBadgeUnlockCondition(badge) {
 
   if (badge.category === 'MASTERY' && badge.code.startsWith('master_')) {
     const patternName = badge.code.replace('master_', '').replace(/_/g, ' ')
-    return `Atteindre 100% de maitrise sur ${patternName}.`
+    return `Atteindre 100% de maîtrise sur ${patternName}.`
   }
 
   if (badge.secret) {
-    return 'Condition tenue secrete tant que le badge n est pas debloque.'
+    return 'Condition tenue secrète tant que le badge n’est pas débloqué.'
   }
 
   return badge.description
@@ -105,7 +105,7 @@ function getBadgeProgress(badge, dashboard) {
     fusion_master: { current: missions.multiPatternMissionSuccesses, target: 5, unit: 'missions fusion' },
     untouchable: { current: missions.bestHardMissionSuccessStreak, target: 3, unit: 'missions difficiles' },
     playground_archivist: { current: profile.unlockedBadgeCount, target: 20, unit: 'badges' },
-    playground_master: { current: masteryCount, target: patterns.length || 23, unit: 'patterns maitrises' },
+    playground_master: { current: masteryCount, target: patterns.length || 23, unit: 'patterns maîtrisés' },
   }
 
   if (badge.category === 'MASTERY' && badge.code.startsWith('master_')) {
@@ -129,9 +129,9 @@ function DashboardGate({
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Badges</p>
-        <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de recompenses</h1>
+        <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de récompenses</h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-          Connecte-toi pour voir les badges deja debloques, ceux qui restent a viser et la rarete de chaque famille.
+          Connecte-toi pour voir les badges déjà débloqués, ceux qui restent à viser et la rareté de chaque famille.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button
@@ -146,7 +146,7 @@ function DashboardGate({
             type="button"
             onClick={onNavigateHome}
           >
-            Retour a l accueil
+            Retour à l’accueil
           </button>
         </div>
       </section>
@@ -191,12 +191,12 @@ function BadgeCard({ badge, progress }) {
           <h2 className="mt-2 text-xl text-stone-950">{badge.name}</h2>
         </div>
         <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${badge.unlocked ? 'bg-emerald-600 text-white' : 'bg-white text-stone-600'}`}>
-          {badge.unlocked ? 'Debloque' : badge.secret ? 'Secret' : 'Verrouille'}
+          {badge.unlocked ? 'Débloqué' : badge.secret ? 'Secret' : 'Verrouillé'}
         </span>
       </div>
 
       <p className="mt-4 text-sm leading-7 text-stone-700">
-        {badge.unlocked || !badge.secret ? badge.description : 'Les conditions de ce badge restent cachees tant qu il n est pas debloque.'}
+        {badge.unlocked || !badge.secret ? badge.description : 'Les conditions de ce badge restent cachées tant qu’il n’est pas débloqué.'}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -217,7 +217,7 @@ function BadgeDetailPanel({ badge, progress }) {
   if (!badge) {
     return (
       <article className="rounded-[24px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
-        Choisis un badge pour afficher sa fiche detaillee.
+        Choisis un badge pour afficher sa fiche détaillée.
       </article>
     )
   }
@@ -232,7 +232,7 @@ function BadgeDetailPanel({ badge, progress }) {
           <h2 className="mt-2 text-2xl text-stone-950">{badge.name}</h2>
         </div>
         <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${badge.unlocked ? 'bg-emerald-600 text-white' : 'bg-white text-stone-600'}`}>
-          {badge.unlocked ? 'Debloque' : badge.secret ? 'Secret' : 'Verrouille'}
+          {badge.unlocked ? 'Débloqué' : badge.secret ? 'Secret' : 'Verrouillé'}
         </span>
       </div>
 
@@ -240,19 +240,19 @@ function BadgeDetailPanel({ badge, progress }) {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Description</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">
-            {badge.unlocked || !badge.secret ? badge.description : 'Le contenu de ce badge reste cache tant qu il n est pas debloque.'}
+            {badge.unlocked || !badge.secret ? badge.description : 'Le contenu de ce badge reste caché tant qu’il n’est pas débloqué.'}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Condition de debloquage</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Condition de déblocage</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">
-            {badge.secret && !badge.unlocked ? 'Condition masquee pour conserver l effet secret.' : getBadgeUnlockCondition(badge)}
+            {badge.secret && !badge.unlocked ? 'Condition masquée pour conserver l’effet secret.' : getBadgeUnlockCondition(badge)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Etat</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">État</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">
             {badge.unlocked ? `Badge obtenu le ${formatDate(badge.unlockedAt)}.` : 'Badge pas encore obtenu.'}
           </p>
@@ -309,9 +309,9 @@ export default function BadgesPage({
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <section className="rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Badges indisponibles</p>
-          <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de recompenses</h1>
+          <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de récompenses</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-            Cette page a besoin d une API connectee pour charger les badges persistants.
+            Cette page a besoin d’une API connectée pour charger les badges persistants.
           </p>
         </section>
       </div>
@@ -392,30 +392,30 @@ export default function BadgesPage({
                 type="button"
                 onClick={onNavigateHome}
               >
-                Retour a l accueil
+                Retour à l’accueil
               </button>
               <button
                 className="rounded-full border border-black/10 bg-white/84 px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
                 type="button"
                 onClick={onNavigateProgress}
               >
-                Retour a la progression
+                Retour à la progression
               </button>
             </div>
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Badges</p>
-              <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de recompenses</h1>
+              <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">Collection de récompenses</h1>
             </div>
 
             <p className="max-w-3xl text-base leading-7 text-stone-700">
-              Filtre tes badges par categorie, rarete et statut pour voir ce qui est deja acquis et ce qu il reste a debloquer.
+              Filtre tes badges par catégorie, rareté et statut pour voir ce qui est déjà acquis et ce qu’il reste à débloquer.
             </p>
           </div>
 
           <div className="grid gap-4 self-start md:grid-cols-3 xl:grid-cols-3">
             <article className="rounded-[24px] border border-black/10 bg-white/84 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Debloques</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Débloqués</p>
               <p className="mt-3 text-3xl text-stone-950">{unlockedCount}</p>
             </article>
             <article className="rounded-[24px] border border-black/10 bg-white/84 p-5">
@@ -447,27 +447,27 @@ export default function BadgesPage({
           <CollapsiblePanel
             eyebrow="Filtres"
             title="Explorer la collection"
-            description="Trie par recence, rarete ou statut de debloquage, puis ouvre un badge pour afficher sa fiche detaillee."
+            description="Trie par récence, rareté ou statut de déblocage, puis ouvre un badge pour afficher sa fiche détaillée."
             bodyClassName="grid gap-4"
           >
             <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <BadgeFilter
-                label="Categorie"
+                label="Catégorie"
                 value={categoryFilter}
                 options={[
-                  { value: 'ALL', label: 'Toutes les categories' },
-                  { value: 'DISCOVERY', label: 'Decouverte' },
-                  { value: 'MASTERY', label: 'Maitrise' },
+                  { value: 'ALL', label: 'Toutes les catégories' },
+                  { value: 'DISCOVERY', label: 'Découverte' },
+                  { value: 'MASTERY', label: 'Maîtrise' },
                   { value: 'PERFORMANCE', label: 'Performance' },
-                  { value: 'LEGENDARY', label: 'Legendaire' },
+                  { value: 'LEGENDARY', label: 'Légendaire' },
                 ]}
                 onChange={setCategoryFilter}
               />
               <BadgeFilter
-                label="Rarete"
+                label="Rareté"
                 value={rarityFilter}
                 options={[
-                  { value: 'ALL', label: 'Toutes les raretes' },
+                  { value: 'ALL', label: 'Toutes les raretés' },
                   { value: 'COMMON', label: 'Common' },
                   { value: 'RARE', label: 'Rare' },
                   { value: 'EPIC', label: 'Epic' },
@@ -480,8 +480,8 @@ export default function BadgesPage({
                 value={statusFilter}
                 options={[
                   { value: 'ALL', label: 'Tous les statuts' },
-                  { value: 'UNLOCKED', label: 'Debloques' },
-                  { value: 'LOCKED', label: 'Verrouilles' },
+                  { value: 'UNLOCKED', label: 'Débloqués' },
+                  { value: 'LOCKED', label: 'Verrouillés' },
                 ]}
                 onChange={setStatusFilter}
               />
@@ -489,9 +489,9 @@ export default function BadgesPage({
                 label="Tri"
                 value={sortOrder}
                 options={[
-                  { value: 'RECENT', label: 'Plus recents' },
+                  { value: 'RECENT', label: 'Plus récents' },
                   { value: 'RARITY', label: 'Plus rares' },
-                  { value: 'UNLOCKED', label: 'Deja debloques' },
+                  { value: 'UNLOCKED', label: 'Déjà débloqués' },
                 ]}
                 onChange={setSortOrder}
               />

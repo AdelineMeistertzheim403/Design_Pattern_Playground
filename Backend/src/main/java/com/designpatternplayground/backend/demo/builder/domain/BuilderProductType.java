@@ -8,7 +8,7 @@ public enum BuilderProductType {
 	CAR(
 		"CAR",
 		"Voiture",
-		"Assemble un vehicule personnalisable couche par couche dans un atelier visuel."
+		"Assemble un véhicule personnalisable couche par couche dans un atelier visuel."
 	),
 	CHARACTER(
 		"CHARACTER",
@@ -18,7 +18,7 @@ public enum BuilderProductType {
 	HOUSE(
 		"HOUSE",
 		"Maison",
-		"Assemble une maison progressive en posant structure, energie, extension et facade."
+		"Assemble une maison progressive en posant structure, énergie, extension et facade."
 	);
 
 	private final String code;
@@ -45,7 +45,7 @@ public enum BuilderProductType {
 
 	public String silhouetteStageLabel() {
 		return switch (this) {
-			case CAR -> "Chassis";
+			case CAR -> "Châssis";
 			case CHARACTER -> "Silhouette";
 			case HOUSE -> "Structure";
 		};
@@ -62,7 +62,7 @@ public enum BuilderProductType {
 	public String addonStageLabel() {
 		return switch (this) {
 			case CAR -> "Module";
-			case CHARACTER -> "Accessoire";
+			case CHARACTER -> "Accèssoire";
 			case HOUSE -> "Extension";
 		};
 	}

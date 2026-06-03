@@ -3,31 +3,31 @@ export const emptyPatternSchema = {
 }
 
 export const defaultLearningContent = {
-  strapline: 'Observe le contrat commun, le role de chaque objet et ce qui change a l execution.',
+  strapline: "Observe le contrat commun, le rôle de chaque objet et ce qui change à l'exécution.",
   intuition:
-    "Le pattern deplace une responsabilite cle dans un point de variation stable. L enjeu n est pas de memoriser un nom, mais de comprendre ce qu on rend flexible.",
+    "Le pattern déplace une responsabilité clé dans un point de variation stable. L'enjeu n'est pas de mémoriser un nom, mais de comprendre ce qu'on rend flexible.",
   readingGuide:
-    "Lis la scene de gauche a droite, puis compare-la au diagramme UML. La scene raconte le comportement runtime, le diagramme UML montre la structure des classes.",
+    "Lis la scène de gauche à droite, puis compare-la au diagramme UML. La scène raconte le comportement runtime, le diagramme UML montre la structure des classes.",
   studentAngle:
-    "Concentre-toi sur les roles et sur le flux des messages entre objets avant de descendre dans le detail du code.",
+    "Concentre-toi sur les rôles et sur le flux des messages entre objets avant de descendre dans le détail du code.",
   developerAngle:
-    "Cherche surtout le point de couplage qui disparait et la dependance qui devient abstraite.",
+    "Cherche surtout le point de couplage qui disparaît et la dépendance qui devient abstraite.",
   playfulPrompt:
-    "Change les parametres, relance la demo et verifie quelle partie du systeme varie vraiment.",
+    "Change les paramètres, relance la démo et vérifie quelle partie du système varie vraiment.",
   steps: [
-    'Identifier les roles du pattern.',
-    "Observer ce qui est configurable dans l interface.",
-    "Comparer le comportement runtime avec l UML.",
-    "Faire le lien avec un cas d usage reel.",
+    'Identifier les rôles du pattern.',
+    "Observer ce qui est configurable dans l'interface.",
+    "Comparer le comportement runtime avec l'UML.",
+    "Faire le lien avec un cas d'usage réel.",
   ],
   glossary: [
     {
       term: 'Runtime',
-      definition: "Ce qui se passe pendant l execution de l application.",
+      definition: "Ce qui se passe pendant l'exécution de l'application.",
     },
     {
       term: 'Contrat',
-      definition: "L interface ou l abstraction sur laquelle le reste du code s appuie.",
+      definition: "L'interface ou l'abstraction sur laquelle le reste du code s'appuie.",
     },
   ],
 }

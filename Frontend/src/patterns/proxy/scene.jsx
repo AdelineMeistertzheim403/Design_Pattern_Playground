@@ -114,7 +114,7 @@ export default function ProxyScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Access Control')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -317,7 +317,7 @@ export default function ProxyScene({
             EXECUTION FEED
           </text>
           <text x={timelineX + 24} y={timelineY + 60} fontSize="24" fontWeight="700" fill="#241f18">
-            {model.steps.length} etape(s)
+            {model.steps.length} étape(s)
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
             controle, chargement et verdict se lisent ici dans l ordre runtime

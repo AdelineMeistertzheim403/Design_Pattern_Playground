@@ -15,7 +15,7 @@ public enum HeroArchetype {
 	MAGE(
 		"MAGE",
 		"Arcane Weaver",
-		"Profil technique avec beaucoup de controle, utile pour visualiser les effets elementaires.",
+		"Profil technique avec beaucoup de contrôle, utile pour visualiser les effets élémentaires.",
 		new CharacterStats(8, 4, 5, 9)
 	),
 	ROGUE(

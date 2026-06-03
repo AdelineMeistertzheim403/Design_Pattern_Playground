@@ -44,8 +44,8 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 			"flyweight",
 			"Flyweight",
 			PatternType.STRUCTURAL,
-			"Partage l etat intrinseque entre de nombreux objets afin de reduire le nombre d instances reelles en memoire.",
-			"Afficher des milliers d arbres, particules ou projectiles sans dupliquer les memes donnees lourdes pour chaque objet.",
+			"Partage l'état intrinsèque entre de nombreux objets afin de réduire le nombre d'instances réelles en mémoire.",
+			"Afficher des milliers d'arbres, particules ou projectiles sans dupliquer les mêmes données lourdes pour chaque objet.",
 			"ADVANCED"
 		);
 	}
@@ -63,7 +63,7 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"objectCount",
-				"Nombre d objets",
+				"Nombre d'objets",
 				FieldType.NUMBER,
 				true,
 				null,
@@ -124,12 +124,12 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 			currentMemoryKb = (long) factory.size() * profile.intrinsicStateKb()
 				+ (long) config.objectCount() * profile.extrinsicStateKb();
 			logs.add("Activation du cache Flyweight : " + factory.size() + " instance(s) partagee(s) seulement.");
-			logs.add("Chaque objet garde uniquement son etat extrinseque : position, echelle et variation.");
+			logs.add("Chaque objet garde uniquement son état extrinseque : position, echelle et variation.");
 		} else {
 			realInstances = config.objectCount();
 			currentMemoryKb = baselineMemoryKb;
-			logs.add("Mode sans Flyweight : chaque objet embarque son etat complet.");
-			logs.add("Le moteur recree donc " + realInstances + " instance(s) concretes en memoire.");
+			logs.add("Mode sans Flyweight : chaque objet embarque son état complet.");
+			logs.add("Le moteur recrée donc " + realInstances + " instance(s) concrètes en mémoire.");
 		}
 
 		long savedMemoryKb = Math.max(0L, baselineMemoryKb - currentMemoryKb);
@@ -139,11 +139,11 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		double simulatedFrameCostMs = roundToSingleDecimal(computeFrameCost(config.objectCount(), realInstances, config.useFlyweight()));
 		String performanceLabel = describePerformance(simulatedFrameCostMs, config.useFlyweight());
 
-		logs.add("Memoire theorique sans partage : " + baselineMemoryKb + " KB.");
-		logs.add("Memoire theorique dans le mode courant : " + currentMemoryKb + " KB.");
+		logs.add("Mémoire theorique sans partage : " + baselineMemoryKb + " KB.");
+		logs.add("Mémoire theorique dans le mode courant : " + currentMemoryKb + " KB.");
 		logs.add(config.useFlyweight()
-			? "Gain estime : " + savedMemoryKb + " KB economises (" + savingsPercent + "%)."
-			: "Aucun gain : le pattern n est pas active.");
+			? "Gain estime : " + savedMemoryKb + " KB économises (" + savingsPercent + "%)."
+			: "Aucun gain : le pattern n'est pas active.");
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
 		// Output stays numeric and explicit so the frontend can render both pedagogy and
@@ -168,8 +168,8 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			config.useFlyweight()
-				? "Flyweight mutualise les donnees lourdes pour alimenter une foule d objets legerement differencies."
-				: "Sans Flyweight, chaque objet garde son etat complet et la pression memoire grimpe lineairement.",
+				? "Flyweight mutualise les données lourdes pour alimenter une foule d'objets légerement differencies."
+				: "Sans Flyweight, chaque objet garde son état complet et la pression mémoire grimpe lineairement.",
 			logs,
 			output,
 			buildVisualization(profile, config, variantCount, realInstances, currentMemoryKb, baselineMemoryKb, performanceLabel)
@@ -194,7 +194,7 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 			"scene",
 			config.objectCount() + " " + profile.label().toLowerCase(Locale.ROOT),
 			"cluster",
-			Map.of("detail", config.useFlyweight() ? "etat extrinseque par objet" : "etat complet duplique")
+			Map.of("detail", config.useFlyweight() ? "état extrinseque par objet" : "état complet duplique")
 		));
 		nodes.add(new VisualizationNode(
 			"factory",
@@ -204,7 +204,7 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		));
 		nodes.add(new VisualizationNode(
 			"metrics",
-			"Memoire",
+			"Mémoire",
 			"output",
 			Map.of(
 				"message",
@@ -244,7 +244,7 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 
 	private FlyweightConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String assetType = requireText(parameters.get("assetType"), "assetType");
@@ -282,7 +282,7 @@ public class FlyweightPatternDemo implements DesignPatternDemo {
 		try {
 			parsed = (int) Math.round(Double.parseDouble(value.toString()));
 		} catch (NumberFormatException exception) {
-			throw new InvalidPatternConfigurationException(fieldName + " doit etre numerique.");
+			throw new InvalidPatternConfigurationException(fieldName + " doit etre numérique.");
 		}
 
 		if (parsed < min || parsed > max) {

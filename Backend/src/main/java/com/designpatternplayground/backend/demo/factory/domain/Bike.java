@@ -14,6 +14,6 @@ public class Bike implements Vehicle {
 
 	@Override
 	public String description() {
-		return "Vehicule agile cree pour des scenarios de livraison ou de mobilite rapide.";
+		return "Véhicule agile crée pour des scénarios de livraison ou de mobilité rapide.";
 	}
 }

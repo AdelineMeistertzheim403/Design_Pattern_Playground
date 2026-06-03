@@ -70,7 +70,7 @@ export default function UmlStudioHeaderActions({
       </label>
       {/* Buttons stay on one row on large screens; smaller screens can scroll horizontally instead of wrapping. */}
       <div className="flex flex-nowrap items-center gap-3 overflow-x-auto xl:overflow-visible">
-        <ActionButton icon="undo" label="Annuler la derniere action" onClick={onUndo} />
+        <ActionButton icon="undo" label="Annuler la dernière action" onClick={onUndo} />
         <ActionButton
           icon={savePending ? 'spinner' : 'save'}
           label={savePending ? 'Sauvegarde en cours' : 'Sauvegarder'}
@@ -78,7 +78,7 @@ export default function UmlStudioHeaderActions({
           variant="primary"
           disabled={savePending}
         />
-        <ActionButton icon="preview" label="Apercu" onClick={onPreviewOpen} />
+        <ActionButton icon="preview" label="Aperçu" onClick={onPreviewOpen} />
         <ActionButton icon="svg" label="Exporter en SVG" onClick={onExportSvg} />
         <ActionButton icon="png" label="Exporter en PNG" onClick={onExportPng} />
       </div>

@@ -41,8 +41,8 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 			"mediator",
 			"Mediator",
 			PatternType.BEHAVIORAL,
-			"Centralise des interactions entre plusieurs objets pour eviter qu ils se connaissent tous directement.",
-			"Construire un systeme de chat ou les joueurs passent par un hub central plutot que de se coupler chacun a tous les autres.",
+			"Centralise des interactions entre plusieurs objets pour éviter qu'ils se connaissent tous directement.",
+			"Construire un système de chat où les joueurs passent par un hub central plutôt que de se coupler chacun à tous les autres.",
 			"INTERMEDIATE"
 		);
 	}
@@ -53,7 +53,7 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_MEDIATOR, WITHOUT_MEDIATOR), WITH_MEDIATOR),
 			new PatternField("roomName", "Nom du salon", FieldType.TEXT, true, null, "Arena Chat"),
 			new PatternField("participants", "Participants", FieldType.LIST, true, null, "Luna, Kiro, Nova"),
-			new PatternField("senderName", "Expediteur", FieldType.TEXT, true, null, "Luna"),
+			new PatternField("senderName", "Expéditeur", FieldType.TEXT, true, null, "Luna"),
 			new PatternField("message", "Message", FieldType.TEXT, true, null, "Focus target center lane")
 		));
 	}
@@ -78,7 +78,7 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 
 		if (useMediator) {
 			ChatRoomMediator mediator = new ChatRoomMediator(config.roomName());
-			logs.add("Creation du ChatRoomMediator " + config.roomName() + ".");
+			logs.add("Création du ChatRoomMediator " + config.roomName() + ".");
 
 			for (ChatParticipant participant : participants) {
 				mediator.register(participant);
@@ -125,7 +125,7 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			useMediator
 				? "Mediator centralise les conversations dans un hub unique. Les participants ne dependent plus directement les uns des autres."
-				: "Sans Mediator, l expediteur connait chaque destinataire et multiplie les liens directs entre objets du chat.",
+				: "Sans Mediator, l expéditeur connait chaque destinataire et multiplie les liens directs entre objets du chat.",
 			logs,
 			output,
 			buildVisualization(useMediator, config.roomName(), config.senderName(), recipients, config.message())
@@ -140,7 +140,7 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 		String message
 	) {
 		List<VisualizationNode> nodes = new ArrayList<>();
-		nodes.add(new VisualizationNode("sender", senderName, "client", Map.of("detail", "expediteur")));
+		nodes.add(new VisualizationNode("sender", senderName, "client", Map.of("detail", "expéditeur")));
 		nodes.add(new VisualizationNode(
 			"mediator",
 			useMediator ? "ChatRoomMediator" : "Mediator bypassed",
@@ -188,7 +188,7 @@ public class MediatorPatternDemo implements DesignPatternDemo {
 
 	private MediatorConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode");

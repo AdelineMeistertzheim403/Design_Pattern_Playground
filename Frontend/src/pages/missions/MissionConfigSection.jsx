@@ -45,7 +45,7 @@ export default function MissionConfigSection({
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Configuration dynamique</p>
           <p className="mt-1 text-sm leading-7 text-stone-600">
-            Choisis une brique de la solution puis ajuste ses parametres contextualises sur l enonce mission avant la simulation.
+            Choisis une brique de la solution puis ajuste ses paramètres contextualisés sur l’énoncé mission avant la simulation.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -100,7 +100,7 @@ export default function MissionConfigSection({
         </>
       ) : (
         <p className="mt-4 text-sm leading-7 text-stone-600">
-          Selectionne un pattern de la solution pour charger sa configuration.
+          Sélectionne un pattern de la solution pour charger sa configuration.
         </p>
       )}
     </article>

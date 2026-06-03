@@ -41,8 +41,8 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Abstract Factory",
 			PatternType.CREATIONAL,
-			"Fabrique des familles d objets coherentes sans exposer les classes concretes ni melanger les themes au niveau du client.",
-			"Choisir un theme sci-fi ou medieval puis generer un hero, un transport et une relique parfaitement alignes.",
+			"Fabrique des familles d'objets cohérentes sans exposer les classes concrètes ni mélanger les thèmes au niveau du client.",
+			"Choisir un thème sci-fi ou médiéval puis générer un héros, un transport et une relique parfaitement alignés.",
 			"INTERMEDIATE"
 		);
 	}
@@ -51,8 +51,8 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_ABSTRACT_FACTORY, WITHOUT_ABSTRACT_FACTORY), WITH_ABSTRACT_FACTORY),
-			new PatternField("themeCode", "Theme", FieldType.SELECT, true, List.of("SCI_FI", "MEDIEVAL"), "SCI_FI"),
-			new PatternField("generatorLabel", "Nom du generateur", FieldType.TEXT, true, null, "Theme Generator")
+			new PatternField("themeCode", "Thème", FieldType.SELECT, true, List.of("SCI_FI", "MEDIEVAL"), "SCI_FI"),
+			new PatternField("generatorLabel", "Nom du générateur", FieldType.TEXT, true, null, "Générateur de thème")
 		));
 	}
 
@@ -65,7 +65,7 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 		boolean coherentFamily = useFactory;
 		int familySize = artifacts.size();
 		int manualTouchCount = useFactory ? 1 : familySize;
-		String resultLabel = coherentFamily ? "Theme coherent" : "Family drift";
+		String resultLabel = coherentFamily ? "Thème cohérent" : "Dérive de famille";
 
 		List<AbstractFactoryStep> steps = buildSteps(config.generatorLabel(), theme, artifacts, useFactory, coherentFamily);
 		List<String> logs = buildLogs(config.generatorLabel(), theme, artifacts, useFactory, coherentFamily);
@@ -93,8 +93,8 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useFactory
-				? "Abstract Factory cree toute une famille d objets coherente depuis un theme unique. Le client demande une ambiance, pas des classes concretes dispersees."
-				: "Sans Abstract Factory, le client assemble chaque produit a la main. Il suffit d un mauvais choix pour casser la coherence de la famille complete.",
+				? "Abstract Factory crée toute une famille d'objets cohérente depuis un thème unique. Le client demande une ambiance, pas des classes concrètes dispersées."
+				: "Sans Abstract Factory, le client assemble chaque produit à la main. Il suffit d'un mauvais choix pour casser la cohérence de la famille complète.",
 			logs,
 			output,
 			buildVisualization(config.generatorLabel(), theme, artifacts, useFactory, coherentFamily)
@@ -111,9 +111,9 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 			throw new InvalidPatternConfigurationException("mode doit valoir WITH_ABSTRACT_FACTORY ou WITHOUT_ABSTRACT_FACTORY.");
 		}
 
-		String generatorLabel = parameters.getOrDefault("generatorLabel", "Theme Generator").toString().trim();
+		String generatorLabel = parameters.getOrDefault("generatorLabel", "Générateur de thème").toString().trim();
 		if (generatorLabel.isBlank()) {
-			generatorLabel = "Theme Generator";
+			generatorLabel = "Générateur de thème";
 		}
 
 		return new AbstractFactoryConfig(
@@ -134,7 +134,7 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 		steps.add(new AbstractFactoryStep(
 			1,
 			"SELECT_THEME",
-			"Selection du theme",
+			"Sélection du thème",
 			generatorLabel,
 			"Le client choisit " + theme.label() + " comme famille cible.",
 			coherentFamily,
@@ -146,28 +146,28 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 			useFactory ? "Choix de la factory" : "Assemblage manuel",
 			useFactory ? theme.factoryClassName() : "ThemePickerClient",
 			useFactory
-				? theme.factoryClassName() + " garantit que hero, transport et relique viennent de la meme famille."
-				: "Le client choisit les produits un par un. Rien ne bloque un melange entre " + theme.label() + " et " + theme.driftThemeLabel() + ".",
+				? theme.factoryClassName() + " garantit que héros, transport et relique viennent de la même famille."
+				: "Le client choisit les produits un par un. Rien ne bloque un mélange entre " + theme.label() + " et " + theme.driftThemeLabel() + ".",
 			coherentFamily,
 			useFactory
 		));
 		steps.add(new AbstractFactoryStep(
 			3,
 			"GENERATE_FAMILY",
-			"Generation des objets",
+			"Génération des objets",
 			useFactory ? theme.factoryClassName() : "ThemePickerClient",
-			artifacts.get(0).label() + ", " + artifacts.get(1).label() + " et " + artifacts.get(2).label() + " sont instancies.",
+			artifacts.get(0).label() + ", " + artifacts.get(1).label() + " et " + artifacts.get(2).label() + " sont instanciés.",
 			coherentFamily,
 			useFactory
 		));
 		steps.add(new AbstractFactoryStep(
 			4,
 			"VERIFY",
-			"Verification de coherence",
-			"Theme Analyzer",
+			"Vérification de cohérence",
+			"Analyseur de thème",
 			coherentFamily
-				? "Les trois objets partagent la meme direction artistique. Le theme reste lisible de bout en bout."
-				: artifacts.get(1).label() + " vient du theme " + theme.driftThemeLabel() + " et casse la coherence de la famille.",
+				? "Les trois objets partagent la même direction artistique. Le thème reste lisible de bout en bout."
+				: artifacts.get(1).label() + " vient du thème " + theme.driftThemeLabel() + " et casse la cohérence de la famille.",
 			coherentFamily,
 			useFactory
 		));
@@ -182,16 +182,16 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 		boolean coherentFamily
 	) {
 		List<String> logs = new ArrayList<>();
-		logs.add(generatorLabel + " recoit la demande pour le theme " + theme.label() + ".");
+		logs.add(generatorLabel + " reçoit la demande pour le thème " + theme.label() + ".");
 		logs.add(useFactory
-			? theme.factoryClassName() + " prend en charge toute la famille d objets."
-			: "Le client selectionne manuellement chaque produit concret.");
-		logs.add("Hero -> " + artifacts.get(0).label() + ".");
+			? theme.factoryClassName() + " prend en charge toute la famille d'objets."
+			: "Le client sélectionne manuellement chaque produit concret.");
+		logs.add("Héros -> " + artifacts.get(0).label() + ".");
 		logs.add("Transport -> " + artifacts.get(1).label() + ".");
-		logs.add("Relic -> " + artifacts.get(2).label() + ".");
+		logs.add("Relique -> " + artifacts.get(2).label() + ".");
 		logs.add(coherentFamily
-			? "La famille reste coherent et extensible."
-			: "La famille derive : un produit appartient a un autre univers visuel.");
+			? "La famille reste cohérente et extensible."
+			: "La famille dérive : un produit appartient à un autre univers visuel.");
 		return logs;
 	}
 
@@ -206,26 +206,26 @@ public class AbstractFactoryPatternDemo implements DesignPatternDemo {
 		nodes.add(new VisualizationNode("client", generatorLabel, "client", Map.of("detail", theme.label())));
 		nodes.add(new VisualizationNode(
 			"factory",
-			useFactory ? theme.factoryClassName() : "Manual assembly",
+			useFactory ? theme.factoryClassName() : "Assemblage manuel",
 			useFactory ? "factory" : "cluster",
-			Map.of("detail", useFactory ? "family creation" : "concrete picks")
+			Map.of("detail", useFactory ? "création de famille" : "sélections concrètes")
 		));
 		nodes.add(new VisualizationNode("hero", artifacts.get(0).label(), "product", Map.of("detail", artifacts.get(0).className(), "active", true)));
 		nodes.add(new VisualizationNode("transport", artifacts.get(1).label(), "product", Map.of("detail", artifacts.get(1).className(), "active", coherentFamily)));
 		nodes.add(new VisualizationNode("relic", artifacts.get(2).label(), "product", Map.of("detail", artifacts.get(2).className(), "active", true)));
 		nodes.add(new VisualizationNode(
 			"result",
-			coherentFamily ? "Coherent family" : "Family drift",
+			coherentFamily ? "Famille cohérente" : "Dérive de famille",
 			"output",
-			Map.of("message", coherentFamily ? theme.familyLabel() : "theme mismatch")
+			Map.of("message", coherentFamily ? theme.familyLabel() : "mélange de thèmes")
 		));
 
 		List<VisualizationEdge> edges = new ArrayList<>();
-		edges.add(new VisualizationEdge("client", "factory", useFactory ? "request family" : "pick each"));
-		edges.add(new VisualizationEdge("factory", "hero", "create hero"));
-		edges.add(new VisualizationEdge("factory", "transport", useFactory ? "create transport" : "manual pick"));
-		edges.add(new VisualizationEdge("factory", "relic", "create relic"));
-		edges.add(new VisualizationEdge("factory", "result", coherentFamily ? "coherent" : "mismatch"));
+		edges.add(new VisualizationEdge("client", "factory", useFactory ? "demande famille" : "choisit chaque objet"));
+		edges.add(new VisualizationEdge("factory", "hero", "crée héros"));
+		edges.add(new VisualizationEdge("factory", "transport", useFactory ? "crée transport" : "choix manuel"));
+		edges.add(new VisualizationEdge("factory", "relic", "crée relique"));
+		edges.add(new VisualizationEdge("factory", "result", coherentFamily ? "cohérent" : "incohérent"));
 
 		return new VisualizationGraph(nodes, edges);
 	}

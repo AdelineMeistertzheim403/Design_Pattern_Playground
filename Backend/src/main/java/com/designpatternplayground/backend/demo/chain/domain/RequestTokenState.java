@@ -7,7 +7,7 @@ import com.designpatternplayground.backend.common.exception.InvalidPatternConfig
 public enum RequestTokenState {
 
 	VALID("VALID", "Token valide"),
-	EXPIRED("EXPIRED", "Token expire"),
+	EXPIRED("EXPIRED", "Token expiré"),
 	MISSING("MISSING", "Token manquant");
 
 	private final String code;
@@ -39,6 +39,6 @@ public enum RequestTokenState {
 			}
 		}
 
-		throw new InvalidPatternConfigurationException("Etat de token inconnu : " + rawCode);
+		throw new InvalidPatternConfigurationException("État de token inconnu : " + rawCode);
 	}
 }

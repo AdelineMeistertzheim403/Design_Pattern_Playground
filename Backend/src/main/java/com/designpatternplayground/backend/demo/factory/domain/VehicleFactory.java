@@ -10,7 +10,7 @@ public class VehicleFactory {
 		return switch (type.toUpperCase(Locale.ROOT)) {
 			case "CAR" -> new Car();
 			case "BIKE" -> new Bike();
-			default -> throw new InvalidPatternConfigurationException("Type de vehicule inconnu : " + type);
+			default -> throw new InvalidPatternConfigurationException("Type de véhicule inconnu : " + type);
 		};
 	}
 }

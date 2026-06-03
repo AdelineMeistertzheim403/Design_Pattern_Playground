@@ -42,8 +42,8 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 			"factory",
 			"Factory Method",
 			PatternType.CREATIONAL,
-			"Centralise la creation d objets derriere une fabrique dediee au lieu de disperser les constructeurs.",
-			"Choisir la bonne implementation de vehicule selon le scenario demande.",
+			"Centralise la création d'objets derrière une fabrique dédiée au lieu de disperser les constructeurs.",
+			"Choisir la bonne implémentation de véhicule selon le scénario demandé.",
 			"BEGINNER"
 		);
 	}
@@ -61,7 +61,7 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 			),
 			new PatternField(
 				"vehicleType",
-				"Type de vehicule",
+				"Type de véhicule",
 				FieldType.SELECT,
 				true,
 				List.of("CAR", "BIKE"),
@@ -84,8 +84,8 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 		nodes.add(new VisualizationNode("client", "Client", "client", Map.of()));
 
 		if (useFactory) {
-			logs.add("Creation du point d entree factory.");
-			logs.add("Demande de creation pour le type " + config.vehicleType() + ".");
+			logs.add("Création du point d entrée factory.");
+			logs.add("Demande de création pour le type " + config.vehicleType() + ".");
 
 			VehicleFactory factory = new VehicleFactory();
 			vehicle = factory.createVehicle(config.vehicleType());
@@ -93,7 +93,7 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 			logs.add("Instantiation du produit concret : " + vehicle.label() + ".");
 			logs.add("Retour du produit sans exposer le constructeur au client.");
 
-			nodes.add(new VisualizationNode("factory", "VehicleFactory", "factory", Map.of("detail", "creation centralisee")));
+			nodes.add(new VisualizationNode("factory", "VehicleFactory", "factory", Map.of("detail", "création centralisee")));
 			edges.add(new VisualizationEdge("client", "factory", "request"));
 			edges.add(new VisualizationEdge("factory", "product", "create"));
 		} else {
@@ -123,14 +123,14 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 		output.put("vehicleType", vehicle.type());
 		output.put("vehicleLabel", vehicle.label());
 		output.put("description", vehicle.description());
-		output.put("creationStyle", useFactory ? "Factory centralisee" : "Instantiation directe");
+		output.put("creationStyle", useFactory ? "Factory centralisée" : "Instantiation directe");
 		output.put("constructorExposed", !useFactory);
 
 		return new PatternExecutionResult(
 			getCode(),
 			useFactory
-				? "Factory Method centralise la creation du produit derriere une interface stable."
-				: "Sans Factory, le client instancie lui-meme le produit concret et se couple a son constructeur.",
+				? "Factory Method centralise la création du produit derriere une interface stable."
+				: "Sans Factory, le client instancie lui-même le produit concret et se couple a son constructeur.",
 			logs,
 			output,
 			new VisualizationGraph(nodes, edges)
@@ -154,7 +154,7 @@ public class FactoryPatternDemo implements DesignPatternDemo {
 		return switch (rawVehicleType.toUpperCase(Locale.ROOT)) {
 			case "CAR" -> new Car();
 			case "BIKE" -> new Bike();
-			default -> throw new InvalidPatternConfigurationException("Type de vehicule inconnu : " + rawVehicleType);
+			default -> throw new InvalidPatternConfigurationException("Type de véhicule inconnu : " + rawVehicleType);
 		};
 	}
 }

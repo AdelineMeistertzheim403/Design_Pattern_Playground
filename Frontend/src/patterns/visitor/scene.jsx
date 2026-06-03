@@ -96,7 +96,7 @@ function buildFrames(model) {
     },
     ...model.traversalSteps.map((step, index) => ({
       id: `step-${step.index}`,
-      title: `Etape ${step.index}`,
+      title: `Étape ${step.index}`,
       detail: step.detail,
       currentStep: step,
       currentNodeId: step.nodeId,
@@ -377,7 +377,7 @@ export default function VisitorScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Structure Analyzer')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -406,7 +406,7 @@ export default function VisitorScene({
             type="button"
             onClick={() => setPlayMode('STEP')}
           >
-            Pas a pas
+            Pas à pas
           </button>
         </div>
 
@@ -430,21 +430,21 @@ export default function VisitorScene({
             type="button"
             onClick={handleLaunchDemo}
           >
-            Animer la scene
+            Animer la scène
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
             type="button"
             onClick={handlePrevious}
           >
-            Etape precedente
+            Étape précédente
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
             type="button"
             onClick={handleNext}
           >
-            Etape suivante
+            Étape suivante
           </button>
           <button
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-black/20"
@@ -629,7 +629,7 @@ export default function VisitorScene({
             TRAVERSAL FEED
           </text>
           <text x={timelineX + 24} y={timelineY + 60} fontSize="24" fontWeight="700" fill="#241f18">
-            {model.traversalSteps.length} etape(s) dans l arbre
+            {model.traversalSteps.length} étape(s) dans l arbre
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
             suis le chemin pour voir comment le visitor explore la structure noeud par noeud
@@ -657,7 +657,7 @@ export default function VisitorScene({
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${isCurrent ? 'text-white/60' : 'text-stone-500'}`}>
-                          Etape {step.index}
+                          Étape {step.index}
                         </p>
                         <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${
                           isCurrent

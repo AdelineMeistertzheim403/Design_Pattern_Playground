@@ -9,7 +9,7 @@ function ExecutionResultContent({
   if (!execution) {
     return (
       <div className="rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
-        Aucun resultat pour le moment. Tu peux deja observer la scene SVG en apercu live, puis lancer la demonstration pour figer un resultat complet.
+        Aucun résultat pour le moment. Tu peux déjà observer la scène SVG en aperçu live, puis lancer la démonstration pour figer un résultat complet.
       </div>
     )
   }
@@ -18,8 +18,8 @@ function ExecutionResultContent({
     <div className="grid gap-4">
       {hasDraftChanges ? (
         <div className="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-900">
-          Le formulaire a change depuis la derniere execution. La scene SVG affiche un apercu live, mais
-          les logs et l output ci-dessous correspondent encore a la derniere execution.
+          Le formulaire a changé depuis la dernière exécution. La scène SVG affiche un aperçu live, mais
+          les logs et l’output ci-dessous correspondent encore à la dernière exécution.
         </div>
       ) : null}
 
@@ -68,9 +68,9 @@ export default function PatternExecutionResultSection({
 }) {
   return (
     <CollapsiblePanel
-      description="Tu retrouves ici le resume, l output et les logs pedagogiques renvoyes par la demo executee."
-      eyebrow="Resultat"
-      title="Retour d execution"
+      description="Tu retrouves ici le résumé, l’output et les logs pédagogiques renvoyés par la démo exécutée."
+      eyebrow="Résultat"
+      title="Retour d’exécution"
     >
       <ExecutionResultContent
         execution={execution}

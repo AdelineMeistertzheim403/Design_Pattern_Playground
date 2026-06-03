@@ -35,7 +35,7 @@ public class IdleState implements CharacterState {
 			case ATTACK -> new TransitionResult(
 				new AttackingState(),
 				true,
-				characterName + " declenche une attaque depuis Idle."
+				characterName + " déclenche une attaque depuis Idle."
 			);
 			default -> new TransitionResult(
 				this,

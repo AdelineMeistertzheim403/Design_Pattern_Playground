@@ -44,7 +44,7 @@ export const fallbackSchema = {
     },
     {
       "name": "silhouette",
-      "label": "Etape 1 · Structure",
+      "label": "Étape 1 · Structure",
       "type": "SELECT",
       "required": true,
       "allowedValues": [
@@ -56,7 +56,7 @@ export const fallbackSchema = {
     },
     {
       "name": "coreModule",
-      "label": "Etape 2 · Noyau",
+      "label": "Étape 2 · Noyau",
       "type": "SELECT",
       "required": true,
       "allowedValues": [
@@ -68,7 +68,7 @@ export const fallbackSchema = {
     },
     {
       "name": "addonModule",
-      "label": "Etape 3 · Module",
+      "label": "Étape 3 · Module",
       "type": "SELECT",
       "required": true,
       "allowedValues": [
@@ -80,7 +80,7 @@ export const fallbackSchema = {
     },
     {
       "name": "finishStyle",
-      "label": "Etape 4 · Finition",
+      "label": "Étape 4 · Finition",
       "type": "SELECT",
       "required": true,
       "allowedValues": [
@@ -96,10 +96,10 @@ export const fallbackSchema = {
 export const patternLearningContent = {
   "strapline": "Le produit se construit morceau par morceau au lieu de sortir d un constructeur geant opaque.",
   "intuition": "Builder separe le processus de construction du produit final. Le client exprime un besoin, le director orchestre l ordre, et le builder concret pose chaque brique clairement.",
-  "readingGuide": "Observe d abord la progression des etapes dans la scene, puis regarde l objet se completer. L UML montre le trio Client / Director / Builder, la scene runtime montre la construction progressive.",
-  "studentAngle": "Le declic pedagogique est de voir qu on ne cree pas un objet complexe en une seule ligne obscure : on le fabrique par etapes lisibles.",
+  "readingGuide": "Observe d abord la progression des étapes dans la scene, puis regarde l objet se completer. L UML montre le trio Client / Director / Builder, la scene runtime montre la construction progressive.",
+  "studentAngle": "Le declic pedagogique est de voir qu on ne cree pas un objet complexe en une seule ligne obscure : on le fabrique par étapes lisibles.",
   "developerAngle": "Builder devient utile des qu un constructeur accumule trop de parametres, que l ordre de creation compte, ou qu on veut produire plusieurs variantes d un meme objet.",
-  "playfulPrompt": "Change le type d objet, rejoue l assemblage puis compare avec et sans Builder pour voir quand le produit apparait et comment les etapes restent lisibles.",
+  "playfulPrompt": "Change le type d objet, rejoue l assemblage puis compare avec et sans Builder pour voir quand le produit apparait et comment les étapes restent lisibles.",
   "steps": [
     "Le client demande un type de build et des options.",
     "Le Director impose un ordre de construction stable.",
@@ -109,7 +109,7 @@ export const patternLearningContent = {
   "glossary": [
     {
       "term": "Director",
-      "definition": "Objet qui orchestre l ordre des etapes de construction sans contenir le produit final."
+      "definition": "Objet qui orchestre l ordre des étapes de construction sans contenir le produit final."
     },
     {
       "term": "Builder concret",
@@ -325,7 +325,7 @@ export const fallbackQuiz = {
       "choices": [
         {
           "id": "creational",
-          "label": "Creation"
+          "label": "Création"
         },
         {
           "id": "structural",
@@ -351,7 +351,7 @@ export const fallbackQuiz = {
       "type": "QCM_SINGLE",
       "difficulty": "MEDIUM",
       "points": 0,
-      "explanation": "Il orchestre l ordre des etapes sans contenir lui-meme le produit final.",
+      "explanation": "Il orchestre l ordre des étapes sans contenir lui-meme le produit final.",
       "choices": [
         {
           "id": "store",
@@ -491,7 +491,7 @@ export const fallbackQuiz = {
       "type": "QCM_SINGLE",
       "difficulty": "EASY",
       "points": 0,
-      "explanation": "Assembler une voiture, une maison ou un personnage par etapes est un bon terrain pour Builder.",
+      "explanation": "Assembler une voiture, une maison ou un personnage par étapes est un bon terrain pour Builder.",
       "choices": [
         {
           "id": "car",

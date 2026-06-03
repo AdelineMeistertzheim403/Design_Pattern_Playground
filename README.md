@@ -90,6 +90,8 @@ Le compose de dev expose les ports et monte le code source pour travailler local
 docker compose -f compose.dev.yml up --build
 ```
 
+Important : lance bien tout le compose de dev, ou au minimum `postgres` avec le backend. Le backend utilise l URL interne `jdbc:postgresql://postgres:5432/design_pattern_playground`; le nom `postgres` n existe que si le service PostgreSQL du compose est demarre dans le meme projet Docker.
+
 Acces utiles :
 
 - Frontend : `http://localhost:5173`
@@ -109,6 +111,40 @@ POSTGRES_HOST_PORT=5432 docker compose -f compose.dev.yml up --build
 ```
 
 Le frontend Vite passe par le proxy `/api`, ce qui permet d utiliser les cookies `HttpOnly` sans stocker de jetons dans le navigateur.
+
+### Erreur `UnknownHostException: postgres`
+
+Si le backend affiche :
+
+```text
+Caused by: java.net.UnknownHostException: postgres
+```
+
+cela signifie que le conteneur backend ne voit pas le service PostgreSQL du compose. Les causes les plus courantes sont :
+
+- le backend a ete lance seul, ou avec `--no-deps`
+- le service `postgres` n est pas demarre
+- les conteneurs viennent de deux projets compose differents
+
+Repars sur un lancement propre :
+
+```bash
+docker compose -f compose.dev.yml down
+docker compose -f compose.dev.yml up --build
+```
+
+Pour verifier seulement la base :
+
+```bash
+docker compose -f compose.dev.yml ps postgres
+```
+
+Si tu veux lancer le backend hors Docker, n utilise pas `postgres` comme hostname. Utilise le port expose localement :
+
+```bash
+cd Backend
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/design_pattern_playground ./mvnw spring-boot:run
+```
 
 ## Docker Prod
 

@@ -7,6 +7,7 @@ import {
   buildAdminSvgScenesPath,
   buildAdminUmlPath,
   buildBadgesPath,
+  buildHelpPath,
   buildLegalNoticePath,
   buildMissionPath,
   buildPatternPath,
@@ -22,6 +23,7 @@ const AuthDialog = lazy(() => import('./components/AuthDialog'))
 const BadgesPage = lazy(() => import('./pages/BadgesPage'))
 const ExecutionScene = lazy(() => import('./components/ExecutionScene'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const HelpPage = lazy(() => import('./pages/HelpPage'))
 const AdminSvgScenesPage = lazy(() => import('./pages/AdminSvgScenesPage'))
 const AdminUmlPage = lazy(() => import('./pages/AdminUmlPage'))
 const LegalNoticePage = lazy(() => import('./pages/LegalNoticePage'))
@@ -162,8 +164,10 @@ export default function App() {
         ? 'quiz'
         : route.name === 'missions'
           ? 'missions'
-        : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
-          ? 'progress'
+          : route.name === 'progress' || route.name === 'badges' || route.name === 'activity'
+            ? 'progress'
+            : route.name === 'help'
+              ? 'help'
           : route.name === 'adminUml' || route.name === 'adminSvgScenes' || route.name === 'umlStudio' || route.name === 'svgSceneStudio'
             ? 'admin'
           : route.name === 'legalNotice'
@@ -185,6 +189,7 @@ export default function App() {
         status={status}
         onNavigateHome={() => navigate('/')}
         onNavigateProgress={() => navigate(buildProgressPath())}
+        onNavigateHelp={() => navigate(buildHelpPath())}
         onOpenUmlStudio={() => setIsUmlStudioLaunchOpen(true)}
         onNavigateAdminUml={() => navigate(buildAdminUmlPath())}
         onNavigateMissions={() => navigate(buildMissionPath())}
@@ -208,6 +213,7 @@ export default function App() {
               status={status}
               onOpenAuth={openAuth}
               onOpenPattern={(code) => navigate(buildPatternPath(code))}
+              onOpenPatternHelp={(code) => navigate(buildHelpPath(code))}
               onCatalogFilterChange={handleCatalogFilterChange}
               onCatalogPageChange={handleCatalogPageChange}
             />
@@ -266,6 +272,26 @@ export default function App() {
               onOpenPattern={(code) => navigate(buildPatternPath(code))}
               onOpenQuiz={(code) => navigate(buildPatternQuizPath(code))}
             />
+          ) : route.name === 'help' ? (
+            <HelpPage
+              initialHelpSection={route.helpSection}
+              initialPatternCode={route.helpPatternCode}
+              patterns={patterns}
+              onNavigateMissions={() => navigate(buildMissionPath())}
+              onNavigatePattern={(code) => navigate(buildPatternPath(code))}
+              onNavigateSvgSceneStudio={() => {
+                const payload = { editorType: 'svg-scene', kind: 'blank', requestId: Date.now() }
+                savePendingUmlStudioLaunch(payload)
+                setUmlStudioLaunchRequest(payload)
+                navigate(buildSvgSceneStudioPath())
+              }}
+              onNavigateUmlStudio={() => {
+                const payload = { editorType: 'uml', diagramType: 'class', kind: 'blank', requestId: Date.now() }
+                savePendingUmlStudioLaunch(payload)
+                setUmlStudioLaunchRequest(payload)
+                navigate(buildUmlStudioPath())
+              }}
+            />
           ) : route.name === 'adminUml' ? (
             <AdminUmlPage
               backendStatus={backendStatus}
@@ -280,6 +306,7 @@ export default function App() {
               launchRequest={umlStudioLaunchRequest}
               patterns={patterns}
               onOpenAuth={openAuth}
+              onNavigateHelp={() => navigate(buildHelpPath('uml'))}
               onNavigateHome={() => navigate('/')}
             />
           ) : route.name === 'svgSceneStudio' ? (
@@ -289,6 +316,7 @@ export default function App() {
               launchRequest={umlStudioLaunchRequest}
               patterns={patterns}
               onOpenAuth={openAuth}
+              onNavigateHelp={() => navigate(buildHelpPath('uml'))}
               onNavigateHome={() => navigate('/')}
             />
           ) : route.name === 'activity' ? (
@@ -314,6 +342,7 @@ export default function App() {
               currentUser={currentUser}
               initialMissionId={route.missionId ?? null}
               patterns={patterns}
+              onNavigateHelp={() => navigate(buildHelpPath('missions'))}
               onNavigateMission={(missionId) => navigate(buildMissionPath(missionId))}
               onNavigatePattern={(code) => navigate(buildPatternPath(code))}
             />

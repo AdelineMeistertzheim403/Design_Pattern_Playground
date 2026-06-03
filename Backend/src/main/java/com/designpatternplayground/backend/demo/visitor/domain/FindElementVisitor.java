@@ -21,12 +21,12 @@ public final class FindElementVisitor implements StructureVisitor {
 
 	@Override
 	public String label() {
-		return "Find Element";
+		return "Find Élément";
 	}
 
 	@Override
 	public String description() {
-		return "Recherche un element cible dans l arbre et peut stopper le parcours des qu il est trouve.";
+		return "Recherche un élément cible dans l arbre et peut stopper le parcours dès qu'il est trouve.";
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public final class FindElementVisitor implements StructureVisitor {
 			foundId = file.id();
 			foundLabel = file.label();
 		}
-		return new VisitFeedback(matched, matched ? "Element recherche trouve." : "Fichier compare au terme de recherche.");
+		return new VisitFeedback(matched, matched ? "Élément recherche trouve." : "Fichier compare au terme de recherche.");
 	}
 
 	@Override
@@ -68,8 +68,8 @@ public final class FindElementVisitor implements StructureVisitor {
 		fields.put(
 			"resultDetail",
 			foundId == null
-				? "Aucun element ne correspond a \"" + searchTerm + "\"."
-				: "Element trouve : " + foundLabel + "."
+				? "Aucun élément ne correspond a \"" + searchTerm + "\"."
+				: "Élément trouve : " + foundLabel + "."
 		);
 		return fields;
 	}

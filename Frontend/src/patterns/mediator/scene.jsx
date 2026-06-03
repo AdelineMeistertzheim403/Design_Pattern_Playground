@@ -105,7 +105,7 @@ export default function MediatorScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Chat Hub Simulator')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -142,7 +142,7 @@ export default function MediatorScene({
             {model.deliveredCount} livraison(s)
           </text>
           <text x={metricsX + metricsWidth - 28} y={metricsY + 86} textAnchor="end" fontSize="13" fill="#5f5548">
-            couplage expediteur : {model.senderCouplingCount}
+            couplage expéditeur : {model.senderCouplingCount}
           </text>
 
           <rect x={graphX} y={graphY} width={graphWidth} height={graphHeight} rx="34" fill="rgba(255,250,242,0.96)" stroke="rgba(36,31,24,0.1)" strokeWidth="2" />

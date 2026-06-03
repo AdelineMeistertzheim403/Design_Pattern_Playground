@@ -322,7 +322,7 @@ export default function TemplateScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Workflow Builder')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -351,7 +351,7 @@ export default function TemplateScene({
             type="button"
             onClick={() => setPlayMode('STEP')}
           >
-            Pas a pas
+            Pas à pas
           </button>
         </div>
 
@@ -372,10 +372,10 @@ export default function TemplateScene({
           ) : null}
 
           <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>
-            Animer la scene
+            Animer la scène
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>
-            Precedent
+            Précédent
           </button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleNext} disabled={currentFrameIndex >= frames.length - 1}>
             Suivant
@@ -409,7 +409,7 @@ export default function TemplateScene({
             {model.workflowLabel}
           </text>
           <text x={metrics.x + 28} y={metrics.y + 92} fontSize="13" fill="#5f5548">
-            {model.modeLabel} · {model.ambianceLabel} · {visibleSteps.length}/{model.fixedStageCount} etapes jouees
+            {model.modeLabel} · {model.ambianceLabel} · {visibleSteps.length}/{model.fixedStageCount} étapes jouees
           </text>
           <text x={metrics.x + metrics.width - 28} y={metrics.y + 60} textAnchor="end" fontSize="24" fontWeight="700" fill={model.stableWorkflow ? '#153f38' : '#c25737'}>
             {currentResultLabel}
@@ -544,7 +544,7 @@ export default function TemplateScene({
             Timeline du workflow
           </text>
           <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">
-            {visibleSteps.length}/{model.steps.length} etapes · {model.templateUsed ? 'squelette stable' : 'workflow manuel fragile'}
+            {visibleSteps.length}/{model.steps.length} étapes · {model.templateUsed ? 'squelette stable' : 'workflow manuel fragile'}
           </text>
 
           {model.steps.map((step, index) => {

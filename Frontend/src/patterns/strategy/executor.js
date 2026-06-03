@@ -20,7 +20,7 @@ export default function executeStrategyPattern(parameters) {
       : "Sans Strategy, le service garde un bloc if/else pour chaque variante d algorithme.",
     logs: useStrategy
       ? [
-          'Creation du contexte de paiement.',
+          'Création du contexte de paiement.',
           `Selection de la strategie : ${label}.`,
           'Execution du workflow de paiement avec un algorithme interchangeable.',
           `Resultat : ${message}`,

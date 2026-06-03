@@ -46,8 +46,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 			"chain",
 			"Chain of Responsibility",
 			PatternType.BEHAVIORAL,
-			"Fait circuler une requete dans une chaine de maillons capables soit de la traiter, soit de la transmettre au suivant.",
-			"Visualiser un pipeline de validation ou de moderation ou chaque etape peut laisser passer, stopper ou traiter la requete.",
+			"Fait circuler une requête dans une chaîne de maillons capables soit de la traiter, soit de la transmettre au suivant.",
+			"Visualiser un pipeline de validation ou de modération où chaque étape peut laisser passer, stopper ou traiter la requête.",
 			"INTERMEDIATE"
 		);
 	}
@@ -56,9 +56,9 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 	public PatternSchema getSchema() {
 		return new PatternSchema(List.of(
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_CHAIN, WITHOUT_CHAIN), WITH_CHAIN),
-			new PatternField("requestName", "Nom de la requete", FieldType.TEXT, true, null, "Export mensuel"),
-			new PatternField("tokenState", "Etat du token", FieldType.SELECT, true, List.of("VALID", "EXPIRED", "MISSING"), "VALID"),
-			new PatternField("payloadState", "Etat du payload", FieldType.SELECT, true, List.of("VALID", "INVALID"), "VALID"),
+			new PatternField("requestName", "Nom de la requête", FieldType.TEXT, true, null, "Export mensuel"),
+			new PatternField("tokenState", "État du token", FieldType.SELECT, true, List.of("VALID", "EXPIRED", "MISSING"), "VALID"),
+			new PatternField("payloadState", "État du payload", FieldType.SELECT, true, List.of("VALID", "INVALID"), "VALID"),
 			new PatternField(
 				"processingTarget",
 				"Traitement cible",
@@ -92,8 +92,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 			RequestHandler processing = new ProcessingHandler();
 			auth.linkWith(validation).linkWith(processing);
 
-			logs.add("Construction de la chaine AuthenticationHandler -> ValidationHandler -> ProcessingHandler.");
-			logs.add("La requete " + pipelineRequest.requestName() + " entre dans le premier maillon.");
+			logs.add("Construction de la chaîne AuthenticationHandler -> ValidationHandler -> ProcessingHandler.");
+			logs.add("La requête " + pipelineRequest.requestName() + " entre dans le premier maillon.");
 
 			var execution = auth.handle(pipelineRequest);
 			steps = execution.steps();
@@ -101,8 +101,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 			handledBy = execution.handledBy();
 			stoppedAt = execution.stoppedAt();
 		} else {
-			logs.add("Mode sans Chain of Responsibility : un RequestController centralise tous les controles.");
-			logs.add("La requete " + pipelineRequest.requestName() + " traverse une suite de if / else dans une seule classe.");
+			logs.add("Mode sans Chain of Responsibility : un RequestController centralise tous les contrôles.");
+			logs.add("La requête " + pipelineRequest.requestName() + " traverse une suite de if / else dans une seule classe.");
 			steps = executeWithoutChain(pipelineRequest);
 			PipelineStep lastStep = steps.get(steps.size() - 1);
 			finalDecision = "HANDLED".equals(lastStep.status()) ? "ACCEPTED" : "REJECTED";
@@ -111,7 +111,7 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 		}
 
 		for (PipelineStep step : steps) {
-			logs.add("Etape " + step.index() + " - " + step.handlerLabel() + " : " + step.detail());
+			logs.add("Étape " + step.index() + " - " + step.handlerLabel() + " : " + step.detail());
 		}
 
 		List<String> visitedHandlers = steps.stream().map(PipelineStep::handlerCode).toList();
@@ -119,8 +119,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 		boolean accepted = "ACCEPTED".equals(finalDecision);
 		String modeLabel = useChain ? "Avec Chain of Responsibility" : "Sans Chain of Responsibility";
 		String decisionLabel = accepted
-			? "Requete acceptee et traitee par " + handledBy + "."
-			: "Requete stoppee par " + handledBy + ".";
+			? "Requête acceptee et traitee par " + handledBy + "."
+			: "Requête stoppee par " + handledBy + ".";
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
 		output.put("mode", config.mode());
@@ -145,8 +145,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useChain
-				? "Chaque maillon decide s il traite la requete, la rejette ou la transmet au suivant. La chaine reste modulaire et chaque controle est localise."
-				: "Sans chaine, les controles restent regroupes dans un seul controller procedural, ce qui centralise les conditions et rigidifie le flux.",
+				? "Chaque maillon decide s'il traite la requête, la rejette ou la transmet au suivant. La chaîne reste modulaire et chaque contrôle est localise."
+				: "Sans chaîne, les contrôles restent regroupes dans un seul controller procedural, ce qui centralise les conditions et rigidifie le flux.",
 			logs,
 			output,
 			buildVisualization(useChain, pipelineRequest, steps, accepted)
@@ -173,8 +173,8 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 				"REJECTED",
 				false,
 				request.tokenState() == RequestTokenState.EXPIRED
-					? "Le controller detecte un token expire et arrete la requete."
-					: "Le controller detecte l absence de token et bloque la requete."
+					? "Le controller detecte un token expiré et arrête la requête."
+					: "Le controller detecte l absence de token et bloque la requête."
 			));
 			return List.copyOf(steps);
 		}
@@ -195,7 +195,7 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 				"Inline validation check",
 				"REJECTED",
 				false,
-				"Le controller refuse le payload avant le traitement metier."
+				"Le controller refuse le payload avant le traitement métier."
 			));
 			return List.copyOf(steps);
 		}
@@ -262,7 +262,7 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 			),
 			new VisualizationNode(
 				"result",
-				accepted ? "Requete acceptee" : "Requete rejetee",
+				accepted ? "Requête acceptee" : "Requête rejetee",
 				"output",
 				Map.of("message", steps.get(steps.size() - 1).detail())
 			)
@@ -299,7 +299,7 @@ public class ChainOfResponsibilityPatternDemo implements DesignPatternDemo {
 
 	private ChainConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = requireText(parameters, "mode");

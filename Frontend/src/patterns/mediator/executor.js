@@ -26,7 +26,7 @@ export default function executeMediatorPattern(parameters) {
   }))
   const logs = useMediator
     ? [
-        `Creation du ChatRoomMediator ${roomName}.`,
+        `Création du ChatRoomMediator ${roomName}.`,
         `Enregistrement des participants dans le mediator : ${participants.join(', ')}.`,
         `${senderName} envoie son message au hub central.`,
         ...deliveries.map((delivery) => `${roomName} transmet le message a ${delivery.to}.`),
@@ -40,7 +40,7 @@ export default function executeMediatorPattern(parameters) {
     patternCode: 'mediator',
     summary: useMediator
       ? 'Mediator centralise les conversations dans un hub unique. Les participants ne dependent plus directement les uns des autres.'
-      : 'Sans Mediator, l expediteur connait chaque destinataire et multiplie les liens directs entre objets du chat.',
+      : 'Sans Mediator, l expéditeur connait chaque destinataire et multiplie les liens directs entre objets du chat.',
     logs,
     output: {
       mode,

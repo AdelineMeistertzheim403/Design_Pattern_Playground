@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { buildHelpPath } from '../app/playgroundUtils'
+import SpaLink from '../components/SpaLink'
 import VisualizationModal from '../components/VisualizationModal'
 import UmlStudioHeaderActions from '../components/umlStudio/UmlStudioHeaderActions'
 import SvgSceneStudioCanvas from '../components/svgSceneStudio/SvgSceneStudioCanvas'
@@ -33,7 +35,7 @@ import { consumePendingUmlStudioLaunch } from '../app/umlStudioStorage'
 import { getPatternSvgScene, getUserSvgScene, saveUserSvgScene } from '../lib/api'
 import { executeFallbackPattern, loadFallbackSchema, loadPatternSceneComponent } from '../patterns/loaders'
 
-export default function SvgSceneStudioPage({ backendStatus, currentUser, launchRequest, patterns, onOpenAuth }) {
+export default function SvgSceneStudioPage({ backendStatus, currentUser, launchRequest, patterns, onNavigateHelp, onOpenAuth }) {
   const [draft, setDraft] = useState(createDefaultDraft)
   const [selectedElementIds, setSelectedElementIds] = useState([])
   const [selectedArrowId, setSelectedArrowId] = useState('')
@@ -95,7 +97,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
           setSelectedElementIds([])
           setSelectedArrowId('')
           setUndoStack([])
-          setNotice('Scene SVG vide initialisee.')
+          setNotice('Scène SVG vide initialisee.')
         }
         return
       }
@@ -108,7 +110,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
           setSelectedElementIds([])
           setSelectedArrowId('')
           setUndoStack([])
-          setNotice('Template SVG charge.')
+          setNotice('Template SVG chargé.')
           setLoadPending(false)
         }
         return
@@ -123,11 +125,11 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
               setSelectedElementIds([])
               setSelectedArrowId('')
               setUndoStack([])
-              setNotice(`Scene "${savedScene.name}" chargee depuis la BDD.`)
+              setNotice(`Scène "${savedScene.name}" chargée depuis la BDD.`)
             }
           } catch {
             if (!ignore) {
-              setNotice('Impossible de charger cette scene depuis la BDD.')
+              setNotice('Impossible de charger cette scène depuis la BDD.')
             }
           }
           return
@@ -139,7 +141,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
           setSelectedElementIds([])
           setSelectedArrowId('')
           setUndoStack([])
-          setNotice(`Scene "${savedDocument.name}" chargee.`)
+          setNotice(`Scène "${savedDocument.name}" chargée.`)
         }
         return
       }
@@ -406,8 +408,8 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
       const element = {
         id: `element-${seed}`,
         type,
-        label: type === 'text' ? 'Texte' : type === 'ellipse' ? 'Noeud' : 'Element',
-        subtitle: type === 'text' ? '' : 'detail',
+        label: type === 'text' ? 'Texte' : type === 'ellipse' ? 'Nœud' : 'Élément',
+        subtitle: type === 'text' ? '' : 'détail',
         x: 150 + currentDraft.elements.length * 24,
         y: 120 + currentDraft.elements.length * 24,
         width: type === 'text' ? 180 : 230,
@@ -464,9 +466,9 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
     try {
       const importedDraft = await loadPatternDraft(importPatternCode, patterns.find((pattern) => pattern.code === importPatternCode)?.name || importPatternCode)
       setImportedPatternDraft(importedDraft)
-      setNotice(`Bibliotheque d elements chargee depuis le pattern "${importPatternCode}".`)
+      setNotice(`Bibliothèque d'éléments chargée depuis le pattern "${importPatternCode}".`)
     } catch (error) {
-      setNotice(error.message || 'Impossible d importer la scene du pattern.')
+      setNotice(error.message || "Impossible d'importer la scène du pattern.")
     } finally {
       setLoadPending(false)
     }
@@ -482,11 +484,11 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
         elements: [...currentDraft.elements, importedElement],
       }
     })
-    setNotice(`Element "${buildImportedElementLabel(templateElement, importIndex)}" ajoute a la scene.`)
+    setNotice(`Élément "${buildImportedElementLabel(templateElement, importIndex)}" ajouté à la scène.`)
   }
 
   async function handleSave() {
-    const name = draft.name.trim() || 'Scene SVG'
+    const name = draft.name.trim() || 'Scène SVG'
     const code = slugify(draft.code || name) || `scene-svg-${Date.now()}`
     const nextDraft = { ...draft, code, name }
     const svgMarkup = generateSvgMarkup(nextDraft)
@@ -498,10 +500,10 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
     if (backendStatus === 'connected' && currentUser) {
       try {
         const savedScene = await saveUserSvgScene(code, { code, name, svgMarkup })
-        setNotice(`Scene "${savedScene.name}" sauvegardee en BDD.`)
+        setNotice(`Scène "${savedScene.name}" sauvegardée en BDD.`)
         return
       } catch (error) {
-        setNotice(error.message || 'La sauvegarde BDD a echoue. Sauvegarde locale conservee.')
+        setNotice(error.message || 'La sauvegarde BDD a échoué. Sauvegarde locale conservée.')
       } finally {
         setSavePending(false)
       }
@@ -518,7 +520,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
     }
 
     saveSvgSceneStudioDocument(record)
-    setNotice(`Scene "${name}" sauvegardee dans le navigateur.`)
+    setNotice(`Scène "${name}" sauvegardée dans le navigateur.`)
     setSavePending(false)
   }
 
@@ -620,7 +622,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
     <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       {HiddenSceneComponent ? (
         <div ref={hiddenSceneRef} className="pointer-events-none fixed left-[-10000px] top-0 w-[1200px] opacity-0" aria-hidden="true">
-          <HiddenSceneComponent execution={renderedImportSource.execution} isExpanded panelClassName="p-0" svgClassName="h-auto w-full" TitleTag="h2" sourceLabel="Import scene" />
+          <HiddenSceneComponent execution={renderedImportSource.execution} isExpanded panelClassName="p-0" svgClassName="h-auto w-full" TitleTag="h2" sourceLabel="Import scène" />
         </div>
       ) : null}
 
@@ -628,11 +630,22 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Studio SVG</p>
-            <h1 className="mt-3 text-4xl text-stone-950">Editeur de scenes SVG</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl text-stone-950">Éditeur de scènes SVG</h1>
+              <SpaLink
+                aria-label="Ouvrir l’aide de l’éditeur de scène SVG"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-sm font-bold text-stone-800 shadow-[0_10px_20px_rgba(47,37,22,0.08)] transition hover:-translate-y-0.5 hover:border-black/20"
+                href={buildHelpPath('uml')}
+                title="Aide de l’éditeur de scène SVG"
+                onNavigate={onNavigateHelp}
+              >
+                ?
+              </SpaLink>
+            </div>
           </div>
           <UmlStudioHeaderActions
             diagramName={draft.name}
-            nameLabel="Nom de la scene"
+            nameLabel="Nom de la scène"
             onDiagramNameChange={(name) => setDraft((currentDraft) => ({ ...currentDraft, name }))}
             onExportPng={handleExportPng}
             onExportSvg={handleExportSvg}
@@ -692,7 +705,7 @@ export default function SvgSceneStudioPage({ backendStatus, currentUser, launchR
       </div>
 
       {isPreviewOpen && previewSvgMarkup ? (
-        <VisualizationModal title={`Apercu ${draft.name}`} onClose={() => setIsPreviewOpen(false)}>
+        <VisualizationModal title={`Aperçu ${draft.name}`} onClose={() => setIsPreviewOpen(false)}>
           <section className="rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.99),rgba(247,240,226,0.95))] p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
             <div className="overflow-auto rounded-[28px] border border-black/10 bg-[#fffaf2] p-4">
               <div className="mx-auto w-fit" dangerouslySetInnerHTML={{ __html: previewSvgMarkup }} />

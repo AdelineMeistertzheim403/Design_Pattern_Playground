@@ -197,7 +197,7 @@ export default function StateScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(
             TitleTag,
             { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' },
@@ -232,7 +232,7 @@ export default function StateScene({
             {model.characterName} · {currentStateLabel}
           </text>
           <text x="392" y="86" fontSize="13" fontWeight="600" fill="#5f5548">
-            Etat initial : {STATE_LABELS[model.initialState] ?? model.initialState}
+            État initial : {STATE_LABELS[model.initialState] ?? model.initialState}
           </text>
           <text x="392" y="112" fontSize="13" fontWeight="600" fill="#5f5548">
             Etat final : {currentStateLabel}

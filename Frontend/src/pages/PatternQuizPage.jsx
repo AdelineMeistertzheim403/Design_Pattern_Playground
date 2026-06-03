@@ -123,7 +123,7 @@ export default function PatternQuizPage({
         }
       } catch (error) {
         if (!ignore) {
-          setSubmissionError(error.message ?? "La progression n a pas pu etre enregistree.")
+          setSubmissionError(error.message ?? "La progression n’a pas pu être enregistrée.")
         }
       } finally {
         if (!ignore) {
@@ -228,7 +228,7 @@ export default function PatternQuizPage({
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Quiz indisponible</p>
           <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{selectedPattern.name}</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
-            Le quiz necessite une API connectee pour charger les questions protegees et enregistrer la progression utilisateur.
+            Le quiz nécessite une API connectée pour charger les questions protégées et enregistrer la progression utilisateur.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button
@@ -258,7 +258,7 @@ export default function PatternQuizPage({
                 type="button"
                 onClick={onNavigateHome}
               >
-                Retour a l accueil
+                Retour à l’accueil
               </button>
               <button
                 className="rounded-full border border-black/10 bg-white/84 px-4 py-2 text-sm font-semibold text-stone-800 transition hover:border-black/20"
@@ -280,7 +280,7 @@ export default function PatternQuizPage({
             </div>
 
             <p className="max-w-3xl text-base leading-7 text-stone-700">
-              {quiz?.description ?? "Un quiz pedagogique pour valider ce que tu as retenu du pattern apres la demo et l UML."}
+              {quiz?.description ?? "Un quiz pédagogique pour valider ce que tu as retenu du pattern après la démo et l’UML."}
             </p>
           </div>
 
@@ -288,18 +288,18 @@ export default function PatternQuizPage({
             <ProgressCard
               detail={displayedProgress
                 ? `Tentatives : ${displayedProgress.attemptsCount}. Cumul : ${displayedProgress.cumulativePoints} pts.`
-                : 'La progression personnelle sera visible des que le quiz sera charge.'}
+                : 'La progression personnelle sera visible dès que le quiz sera chargé.'}
               label="Meilleur score"
               value={displayedProgress ? `${displayedProgress.bestPoints} / ${displayedProgress.maxPoints} pts` : '—'}
             />
             <ProgressCard
-              detail={`Seuil de validation : ${quiz?.passingPercent ?? 75}% de bonnes reponses. Progression actuelle : ${Math.min(completedQuestions.length, totalQuestions)} / ${totalQuestions || '—'} questions.`}
+              detail={`Seuil de validation : ${quiz?.passingPercent ?? 75}% de bonnes réponses. Progression actuelle : ${Math.min(completedQuestions.length, totalQuestions)} / ${totalQuestions || '—'} questions.`}
               label="Badge"
               tone={displayedProgress?.badgeUnlocked || localSummary.badgeUnlocked ? 'success' : 'warning'}
-              value={displayedProgress?.badgeUnlocked || localSummary.badgeUnlocked ? (quiz?.badgeLabel ?? 'Badge valide') : 'A obtenir'}
+              value={displayedProgress?.badgeUnlocked || localSummary.badgeUnlocked ? (quiz?.badgeLabel ?? 'Badge validé') : 'À obtenir'}
             />
             <ProgressCard
-              detail="Chaque question rapporte un nombre de points qui depend du pattern et de sa difficulte."
+              detail="Chaque question rapporte un nombre de points qui dépend du pattern et de sa difficulté."
               label="Barème"
               value={quiz ? `${quiz.maxPoints} pts max` : '—'}
             />
@@ -333,7 +333,7 @@ export default function PatternQuizPage({
 
       {!isQuizLoading && !quiz && !quizError ? (
         <div className="rounded-[26px] border border-dashed border-black/15 bg-[var(--panel)] px-5 py-10 text-sm leading-7 text-stone-600">
-          Aucun quiz n est disponible pour ce pattern pour le moment.
+          Aucun quiz n’est disponible pour ce pattern pour le moment.
         </div>
       ) : null}
 
@@ -341,7 +341,7 @@ export default function PatternQuizPage({
         <Suspense
           fallback={(
             <DeferredQuizPlaceholder
-              description="Le renderer de question et ses editeurs specialises sont charges dans un chunk dedie."
+              description="Le renderer de question et ses éditeurs spécialisés sont chargés dans un chunk dédié."
               title="Chargement de la question"
             />
           )}
@@ -366,8 +366,8 @@ export default function PatternQuizPage({
         <Suspense
           fallback={(
             <DeferredQuizPlaceholder
-              description="Le recapitulatif final du quiz est charge separement du shell de la page."
-              title="Chargement du resultat du quiz"
+              description="Le récapitulatif final du quiz est chargé séparément du shell de la page."
+              title="Chargement du résultat du quiz"
             />
           )}
         >

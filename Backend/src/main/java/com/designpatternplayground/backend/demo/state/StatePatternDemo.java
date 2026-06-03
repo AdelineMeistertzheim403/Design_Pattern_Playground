@@ -49,8 +49,8 @@ public class StatePatternDemo implements DesignPatternDemo {
 			"state",
 			"State",
 			PatternType.BEHAVIORAL,
-			"Fait varier le comportement d un contexte selon son etat interne sans multiplier les conditions dans le code client.",
-			"Piloter une machine a etats de personnage, un workflow ou un cycle de vie UI avec des transitions explicites.",
+			"Fait varier le comportement d'un contexte selon son état interne sans multiplier les conditions dans le code client.",
+			"Piloter une machine à états de personnage, un workflow ou un cycle de vie UI avec des transitions explicites.",
 			"INTERMEDIATE"
 		);
 	}
@@ -60,7 +60,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 		return new PatternSchema(List.of(
 			new PatternField("mode", "Mode", FieldType.SELECT, true, List.of(WITH_STATE, WITHOUT_STATE), WITH_STATE),
 			new PatternField("characterName", "Nom du personnage", FieldType.TEXT, true, null, "Arena Bot"),
-			new PatternField("initialState", "Etat initial", FieldType.SELECT, true, STATE_CODES, "IDLE"),
+			new PatternField("initialState", "État initial", FieldType.SELECT, true, STATE_CODES, "IDLE"),
 			new PatternField(
 				"actions",
 				"Sequence d actions",
@@ -83,7 +83,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 
 		if (useState) {
 			CharacterContext context = new CharacterContext(config.characterName(), initialState);
-			logs.add("Creation du contexte pour " + config.characterName() + " avec l etat initial " + initialState.code() + ".");
+			logs.add("Création du contexte pour " + config.characterName() + " avec l'état initial " + initialState.code() + ".");
 
 			timeline = IntStream.range(0, config.actions().size())
 				.mapToObj(index -> {
@@ -99,7 +99,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 			finalState = context.currentState();
 		} else {
 			logs.add("Mode sans State : le contexte garde une logique de transition basee sur des conditions.");
-			logs.add("Creation du controleur conditionnel pour " + config.characterName() + " avec l etat initial " + initialState.code() + ".");
+			logs.add("Création du contrôleur conditionnel pour " + config.characterName() + " avec l'état initial " + initialState.code() + ".");
 
 			String currentStateCode = initialState.code();
 			List<StateTransitionStep> mutableTimeline = new ArrayList<>();
@@ -160,7 +160,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useState
-				? "State encapsule les transitions dans chaque etat concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer."
+				? "State encapsule les transitions dans chaque état concret, ce qui rend le contexte plus lisible et plus simple a faire evoluer."
 				: "Sans State, le contexte conserve les transitions dans une logique conditionnelle centrale plus difficile a maintenir.",
 			logs,
 			output,
@@ -179,7 +179,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 			"context",
 			useState ? "CharacterContext" : "SwitchController",
 			"context",
-			Map.of("detail", useState ? "etat courant" : "if / else centralise")
+			Map.of("detail", useState ? "état courant" : "if / else centralise")
 		));
 		nodes.add(new VisualizationNode("idle", "IdleState", "state", Map.of(
 			"active", "IDLE".equals(finalState.code()),
@@ -199,7 +199,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 		)));
 		nodes.add(new VisualizationNode(
 			"result",
-			"Etat final",
+			"État final",
 			"output",
 			Map.of("message", finalState.code() + " apres " + timeline.size() + " action(s)")
 		));
@@ -221,7 +221,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 
 	private StateConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = requireMode(parameters.get("mode"));
@@ -270,7 +270,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 					case ATTACK -> {
 						nextState = "ATTACKING";
 						accepted = true;
-						detail = characterName + " declenche une attaque depuis Idle.";
+						detail = characterName + " déclenche une attaque depuis Idle.";
 					}
 					default -> detail = action.label() + " ne produit rien tant que " + characterName + " est en Idle.";
 				}
@@ -280,7 +280,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 					case STOP -> {
 						nextState = "IDLE";
 						accepted = true;
-						detail = characterName + " s arrete et revient en Idle.";
+						detail = characterName + " s arrête et revient en Idle.";
 					}
 					case JUMP -> {
 						nextState = "JUMPING";
@@ -313,7 +313,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 					detail = action.label() + " est ignoree tant que " + characterName + " est en Attacking.";
 				}
 			}
-			default -> throw new InvalidPatternConfigurationException("Etat initial inconnu : " + currentStateCode);
+			default -> throw new InvalidPatternConfigurationException("État initial inconnu : " + currentStateCode);
 		}
 
 		return new StateTransitionStep(
@@ -335,7 +335,7 @@ public class StatePatternDemo implements DesignPatternDemo {
 			case "RUNNING" -> new RunningState();
 			case "JUMPING" -> new JumpingState();
 			case "ATTACKING" -> new AttackingState();
-			default -> throw new InvalidPatternConfigurationException("Etat initial inconnu : " + rawState);
+			default -> throw new InvalidPatternConfigurationException("État initial inconnu : " + rawState);
 		};
 	}
 

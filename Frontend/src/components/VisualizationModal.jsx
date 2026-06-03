@@ -35,7 +35,7 @@ export default function VisualizationModal({
         onClick={(event) => event.stopPropagation()}
       >
         <button
-          aria-label="Fermer la fenetre"
+          aria-label="Fermer la fenêtre"
           className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/92 text-lg font-semibold text-stone-800 shadow-[0_12px_30px_rgba(24,20,14,0.16)] transition hover:-translate-y-0.5 hover:border-black/20"
           type="button"
           onClick={onClose}

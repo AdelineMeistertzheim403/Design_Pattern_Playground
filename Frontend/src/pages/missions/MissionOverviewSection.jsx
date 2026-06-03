@@ -24,7 +24,7 @@ export default function MissionOverviewSection({ mission, onNavigateMission }) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Contexte</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">{mission.context}</p>
 
-          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Problemes</p>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Problèmes</p>
           <ul className="mt-2 grid gap-2 text-sm leading-7 text-stone-700">
             {mission.problems.map((problem) => (
               <li key={problem} className="rounded-2xl border border-black/10 bg-white px-3 py-2">
@@ -38,7 +38,7 @@ export default function MissionOverviewSection({ mission, onNavigateMission }) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Objectif</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">{mission.objective}</p>
 
-          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Critere de reussite</p>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">Critères de réussite</p>
           <ul className="mt-2 grid gap-2 text-sm leading-7 text-stone-700">
             {mission.successCriteria.map((criterion) => (
               <li key={criterion} className="rounded-2xl border border-black/10 bg-white px-3 py-2">

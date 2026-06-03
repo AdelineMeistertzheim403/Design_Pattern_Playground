@@ -34,15 +34,15 @@ export default function executeBuilderPattern(parameters) {
 
   if (useBuilder) {
     logs.push(`Le client demande un ${product.label.toLowerCase()} nomme ${buildName}.`)
-    logs.push('Le director orchestre la construction et garde l ordre des etapes stable.')
+    logs.push('Le director orchestre la construction et garde l ordre des étapes stable.')
     stages.forEach((stage) => {
-      logs.push(`Etape ${stage.index} - ${stage.stageLabel} : ${stage.optionLabel}. ${stage.detail}`)
+      logs.push(`Étape ${stage.index} - ${stage.stageLabel} : ${stage.optionLabel}. ${stage.detail}`)
     })
     logs.push('Le builder retourne un produit complet sans exposer le constructeur detaille au client.')
   } else {
     logs.push(`Mode sans Builder : le client instancie directement ${product.monolithicClassName} avec tous les parametres.`)
     logs.push(`Parametres passes d un bloc : ${silhouette.code}, ${coreModule.code}, ${addonModule.code}, ${finishStyle.code}.`)
-    logs.push('Le produit final apparait sans director ni etapes explicites dans le code appelant.')
+    logs.push('Le produit final apparait sans director ni étapes explicites dans le code appelant.')
   }
 
   const challengeMet = runningStats.utility >= 9 && runningStats.style >= 7

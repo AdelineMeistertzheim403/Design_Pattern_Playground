@@ -25,7 +25,7 @@ public class RunningState implements CharacterState {
 			case STOP -> new TransitionResult(
 				new IdleState(),
 				true,
-				characterName + " s arrete et revient en Idle."
+				characterName + " s arrête et revient en Idle."
 			);
 			case JUMP -> new TransitionResult(
 				new JumpingState(),

@@ -42,8 +42,8 @@ public class IteratorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Iterator",
 			PatternType.BEHAVIORAL,
-			"Expose un parcours sequentiel sur une collection sans reveler sa structure interne ni dupliquer la logique de navigation.",
-			"Parcourir une liste ou un arbre avec un curseur next / previous stable, meme quand la structure sous-jacente change.",
+			"Expose un parcours séquentiel sur une collection sans révéler sa structure interne ni dupliquer la logique de navigation.",
+			"Parcourir une liste ou un arbre avec un curseur next / previous stable, même quand la structure sous-jacente change.",
 			"INTERMEDIATE"
 		);
 	}
@@ -109,7 +109,7 @@ public class IteratorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			useIterator
 				? "Iterator encapsule next() et previous() dans un objet de parcours. Le client avance sur la collection sans connaitre la structure ni recalculer les positions."
-				: "Sans Iterator, le client gere lui-meme les index et le retour arriere. Le parcours fonctionne, mais la logique de navigation se repand vite dans le code appelant.",
+				: "Sans Iterator, le client gere lui-même les index et le retour arriere. Le parcours fonctionne, mais la logique de navigation se repand vite dans le code appelant.",
 			logs,
 			output,
 			buildVisualization(useIterator, preset, currentItem)

@@ -245,7 +245,7 @@ export default function MementoScene({
     <div className={panelClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-2 pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scene SVG</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Scène SVG</p>
           {createElement(TitleTag, { className: isExpanded ? 'mt-2 text-3xl text-stone-950 sm:text-[2.1rem]' : 'mt-2 text-2xl text-stone-950' }, 'Save & Restore')}
         </div>
         <SceneMetaBadges execution={execution} onOpenModal={onOpenModal} sourceLabel={sourceLabel} />
@@ -255,7 +255,7 @@ export default function MementoScene({
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Lecture</span>
           <button className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${playMode === 'AUTO' ? 'border-stone-950 bg-stone-950 text-white' : 'border-black/10 bg-white text-stone-700'}`} type="button" onClick={() => setPlayMode('AUTO')}>Auto</button>
-          <button className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${playMode === 'STEP' ? 'border-stone-950 bg-stone-950 text-white' : 'border-black/10 bg-white text-stone-700'}`} type="button" onClick={() => setPlayMode('STEP')}>Pas a pas</button>
+          <button className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${playMode === 'STEP' ? 'border-stone-950 bg-stone-950 text-white' : 'border-black/10 bg-white text-stone-700'}`} type="button" onClick={() => setPlayMode('STEP')}>Pas à pas</button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {playMode === 'AUTO' ? (
@@ -268,8 +268,8 @@ export default function MementoScene({
               </select>
             </label>
           ) : null}
-          <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>Animer la scene</button>
-          <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>Precedent</button>
+          <button className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5" type="button" onClick={handleLaunchDemo}>Animer la scène</button>
+          <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handlePrevious} disabled={currentFrameIndex === 0}>Précédent</button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleNext} disabled={currentFrameIndex >= frames.length - 1}>Suivant</button>
           <button className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-stone-700" type="button" onClick={handleReset}>Reset</button>
         </div>
@@ -358,7 +358,7 @@ export default function MementoScene({
           <rect x={timelineX} y={timelineY} width={timelineWidth} height={timelineHeight} rx="30" fill="rgba(255,249,239,0.98)" stroke="rgba(36,31,24,0.1)" strokeWidth="2" />
           <text x={timelineX + 24} y={timelineY + 30} fontSize="11" fontWeight="700" letterSpacing="0.18em" fill="#5f5548">PAS A PAS</text>
           <text x={timelineX + 24} y={timelineY + 60} fontSize="24" fontWeight="700" fill="#241f18">Timeline du rewind</text>
-          <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">{visibleSteps.length}/{model.steps.length} etapes · {model.restoreTargetLabel}</text>
+          <text x={timelineX + 24} y={timelineY + 86} fontSize="13" fill="#5f5548">{visibleSteps.length}/{model.steps.length} étapes · {model.restoreTargetLabel}</text>
 
           {model.steps.map((step, index) => {
             const column = index % timelineColumns

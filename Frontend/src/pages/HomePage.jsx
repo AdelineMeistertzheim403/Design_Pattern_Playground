@@ -1,6 +1,6 @@
 import { complexityLabels, typeLabels, useCaseCategoryLabels } from '../app/playgroundConstants'
 import SpaLink from '../components/SpaLink'
-import { buildPatternPath } from '../app/playgroundUtils'
+import { buildHelpPath, buildPatternPath } from '../app/playgroundUtils'
 import { getPatternPreviewTagline } from '../patterns/catalog'
 
 export default function HomePage({
@@ -15,6 +15,7 @@ export default function HomePage({
   onCatalogPageChange,
   onOpenAuth,
   onOpenPattern,
+  onOpenPatternHelp,
 }) {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -27,12 +28,12 @@ export default function HomePage({
                 Comprendre les design patterns en les voyant fonctionner
               </p>
               <h1 className="max-w-4xl text-4xl text-stone-950 sm:text-5xl">
-                Apprendre les design patterns avec des demos interactives
+                Apprendre les design patterns avec des démos interactives
               </h1>
               <p className="max-w-3xl text-base leading-7 text-stone-700 sm:text-lg">
-                Le but du site est simple : aider les etudiants, les developpeurs et les formateurs a relier
-                la theorie, le diagramme UML et le comportement runtime. Choisis un pattern, ouvre sa page et
-                manipule la demo.
+                Le but du site est simple : aider les étudiants, les développeurs et les formateurs à relier
+                la théorie, le diagramme UML et le comportement runtime. Choisis un pattern, ouvre sa page et
+                manipule la démo.
               </p>
             </div>
 
@@ -43,7 +44,7 @@ export default function HomePage({
                   type="button"
                   onClick={() => onOpenAuth('register')}
                 >
-                  Creer un compte
+                  Créer un compte
                 </button>
               ) : null}
             </div>
@@ -57,8 +58,8 @@ export default function HomePage({
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Catalogue</p>
             <h2 className="mt-3 text-3xl text-stone-950">Choisir un design pattern</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-700">
-              Depuis cette page, choisis un pattern et ouvre sa page detaillee pour acceder a sa configuration,
-              sa demo visuelle, ses logs, son UML et son contenu pedagogique.
+              Depuis cette page, choisis un pattern et ouvre sa page détaillée pour accéder à sa configuration,
+              sa démo visuelle, ses logs, son UML et son contenu pédagogique.
             </p>
           </div>
         </div>
@@ -95,7 +96,7 @@ export default function HomePage({
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Cas d usage</span>
+            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">Cas d’usage</span>
             <select
               className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-black/20"
               value={catalogFilters.useCase}
@@ -134,9 +135,20 @@ export default function HomePage({
                         </SpaLink>
                       </h3>
                     </div>
-                    <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-900">
-                      {complexityLabels[pattern.complexityLevel] ?? pattern.complexityLevel}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <SpaLink
+                        aria-label={`Ouvrir la fiche d'aide ${pattern.name}`}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-sm font-bold text-stone-800 transition hover:border-black/20 hover:bg-stone-950 hover:text-white"
+                        href={buildHelpPath(pattern.code)}
+                        title={`Aide ${pattern.name}`}
+                        onNavigate={() => onOpenPatternHelp(pattern.code)}
+                      >
+                        ?
+                      </SpaLink>
+                      <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-900">
+                        {complexityLabels[pattern.complexityLevel] ?? pattern.complexityLevel}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="mt-4 text-sm leading-7 text-stone-700">{pattern.description}</p>
@@ -144,7 +156,7 @@ export default function HomePage({
                     {previewTagline}
                   </p>
                   <p className="mt-4 text-sm leading-7 text-stone-700">
-                    Cas d usage : {pattern.useCase}
+                    Cas d’usage : {pattern.useCase}
                   </p>
 
                   <SpaLink
@@ -172,7 +184,7 @@ export default function HomePage({
               disabled={catalogPage === 1}
               onClick={() => onCatalogPageChange(catalogPage - 1)}
             >
-              Page precedente
+              Page précédente
             </button>
 
             {Array.from({ length: totalPatternPages }, (_, index) => index + 1).map((pageNumber) => (

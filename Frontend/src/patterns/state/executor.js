@@ -13,7 +13,7 @@ export default function executeStatePattern(parameters) {
   const actions = normalizeOrderedList(parameters.actions).map((action) => action.toUpperCase())
 
   if (!stateDefinitions[initialState]) {
-    throw new Error(`Etat initial inconnu : ${initialState}`)
+    throw new Error(`État initial inconnu : ${initialState}`)
   }
 
   if (actions.length === 0) {
@@ -23,7 +23,7 @@ export default function executeStatePattern(parameters) {
   let currentState = initialState
   const logs = [
     useState
-      ? `Creation du contexte pour ${characterName} avec l etat initial ${initialState}.`
+      ? `Création du contexte pour ${characterName} avec l etat initial ${initialState}.`
       : `Mode sans State : creation d un controleur conditionnel pour ${characterName} avec l etat initial ${initialState}.`,
   ]
 

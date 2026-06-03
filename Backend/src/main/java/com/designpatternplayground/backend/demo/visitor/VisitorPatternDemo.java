@@ -48,7 +48,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			"Visitor",
 			PatternType.BEHAVIORAL,
-			"Ajoute des operations sur une structure existante sans modifier les classes des elements parcourus.",
+			"Ajoute des opérations sur une structure existante sans modifier les classes des éléments parcourus.",
 			"Analyser un arbre de dossiers et de fichiers avec plusieurs visiteurs : compter, valoriser, rechercher ou scanner.",
 			"ADVANCED"
 		);
@@ -98,7 +98,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 			matchedIds = visitor.matchedIds();
 
 			logs.add("Le client choisit un visitor puis lance accept(visitor) sur le root.");
-			logs.add("Chaque element dispatch automatiquement vers visitFolder ou visitFile sans switch metier dans le client.");
+			logs.add("Chaque élément dispatch automatiquement vers visitFolder ou visitFile sans switch métier dans le client.");
 			logs.add("Le comportement change en remplaçant le visitor, pas en modifiant les classes de la structure.");
 		} else {
 			ManualAnalysisResult manualResult = analyzeWithoutVisitor(root, analysisType, config.searchTerm());
@@ -108,7 +108,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 
 			logs.add("Sans Visitor, le client centralise l analyse avec des instanceof et des branches par type.");
 			logs.add("Ajouter un nouveau calcul impose alors de retoucher le moteur de traversal manuel.");
-			logs.add("Le resultat peut etre juste, mais le couplage au modele grandit a chaque nouveau comportement.");
+			logs.add("Le resultat peut etre juste, mais le couplage au modele grandit à chaque nouveau comportement.");
 		}
 
 		Set<String> visitedIds = traversalSteps.stream()
@@ -143,7 +143,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 			getCode(),
 			useVisitor
 				? "Visitor ajoute de nouveaux comportements sur la structure sans modifier les classes des dossiers et fichiers. Le traversal reste stable, seule l analyse change."
-				: "Sans Visitor, chaque nouvelle analyse ajoute des branches de type dans un moteur central. La structure reste la meme, mais la logique grossit a chaque besoin.",
+				: "Sans Visitor, chaque nouvelle analyse ajoute des branches de type dans un moteur central. La structure reste la même, mais la logique grossit à chaque besoin.",
 			logs,
 			output,
 			buildVisualization(useVisitor, analysisType, matchedIds.size())
@@ -174,7 +174,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 			case COUNT_ELEMENTS -> {
 				resultFields.put("folderCount", state.folderCount);
 				resultFields.put("fileCount", state.fileCount);
-				resultFields.put("resultLabel", (state.folderCount + state.fileCount) + " elements");
+				resultFields.put("resultLabel", (state.folderCount + state.fileCount) + " éléments");
 				resultFields.put("resultDetail", state.folderCount + " dossiers analyses et " + state.fileCount + " fichiers comptes.");
 			}
 			case CALCULATE_VALUE -> {
@@ -190,8 +190,8 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 				resultFields.put(
 					"resultDetail",
 					state.foundLabel == null
-						? "Aucun element ne correspond a \"" + searchTerm + "\"."
-						: "Element trouve : " + state.foundLabel + "."
+						? "Aucun élément ne correspond a \"" + searchTerm + "\"."
+						: "Élément trouve : " + state.foundLabel + "."
 				);
 			}
 			case VIRUS_SCAN -> {
@@ -263,7 +263,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 			case CALCULATE_VALUE -> {
 				state.totalValueMb += file.sizeMb();
 				state.pricedFileCount++;
-				detail = file.sizeMb() + " MB ajoutes a la valeur manuelle.";
+				detail = file.sizeMb() + " MB ajoutes à la valeur manuelle.";
 			}
 			case FIND_ELEMENT -> {
 				matched = !searchTerm.isBlank() && file.label().toLowerCase(Locale.ROOT).contains(searchTerm);
@@ -271,7 +271,7 @@ public class VisitorPatternDemo implements DesignPatternDemo {
 					state.foundLabel = file.label();
 					state.matchedIds.add(file.id());
 				}
-				detail = matched ? "Element recherche trouve." : "Fichier compare au terme de recherche.";
+				detail = matched ? "Élément recherche trouve." : "Fichier compare au terme de recherche.";
 			}
 			case VIRUS_SCAN -> {
 				if (file.infected()) {

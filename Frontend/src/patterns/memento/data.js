@@ -5,7 +5,7 @@ export const patternDefinition = {
   name: 'Memento',
   type: 'BEHAVIORAL',
   description: 'Capture et restaure un etat interne sans exposer directement les details de cet etat au client.',
-  useCase: 'Sauvegarder une scene, appliquer des mutations risquees puis restaurer proprement un checkpoint comme dans un jeu ou un editeur.',
+  useCase: 'Sauvegarder une scene, appliquer des mutations risquees puis restaurer proprement un checkpoint comme dans un jeu ou un éditeur.',
   complexityLevel: 'INTERMEDIATE',
 }
 
@@ -55,7 +55,7 @@ export const patternLearningContent = {
   studentAngle:
     'Le declic pedagogique est de voir qu un historique ne devrait pas forcer le client a connaitre tous les champs internes d un objet.',
   developerAngle:
-    'Memento marche bien pour les editeurs, les jeux, les savepoints et certains historiques undo. Il devient plus delicat quand les snapshots sont lourds ou trop nombreux.',
+    'Memento marche bien pour les éditeurs, les jeux, les savepoints et certains historiques undo. Il devient plus delicat quand les snapshots sont lourds ou trop nombreux.',
   playfulPrompt:
     'Compare avec et sans Memento, puis regarde si l energie, les couches et les annotations reviennent vraiment au checkpoint choisi.',
   steps: [
@@ -185,7 +185,7 @@ export const fallbackQuiz = {
       points: 0,
       explanation: 'C est un pattern comportemental.',
       choices: [
-        { id: 'creational', label: 'Creation' },
+        { id: 'creational', label: 'Création' },
         { id: 'structural', label: 'Structurel' },
         { id: 'behavioral', label: 'Comportemental' },
       ],
@@ -282,7 +282,7 @@ export const fallbackQuiz = {
       type: 'QCM_SINGLE',
       difficulty: 'EASY',
       points: 0,
-      explanation: 'Un editeur ou un jeu avec savepoints est un excellent exemple.',
+      explanation: 'Un éditeur ou un jeu avec savepoints est un excellent exemple.',
       choices: [
         { id: 'savepoint', label: 'Un jeu avec savepoints ou rewind' },
         { id: 'factory', label: 'Une fabrique de vehicules' },

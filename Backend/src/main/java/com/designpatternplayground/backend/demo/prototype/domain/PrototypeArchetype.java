@@ -29,7 +29,7 @@ public record PrototypeArchetype(
 		new PrototypeArchetype(
 			"SCOUT_DRONE",
 			"Scout Drone",
-			"Un eclaireur leger clone rapidement pour couvrir le terrain avec un noyau de navigation partageable.",
+			"Un eclaireur léger clone rapidement pour couvrir le terrain avec un noyau de navigation partageable.",
 			"#d7b28d",
 			"coque sable",
 			8,
@@ -48,7 +48,7 @@ public record PrototypeArchetype(
 		new PrototypeArchetype(
 			"SIEGE_MECH",
 			"Siege Mech",
-			"Une plate-forme lourde dupliquee en plusieurs chassis pour preparer une vague de combat specialisee.",
+			"Une plate-forme lourde dupliquee en plusieurs châssis pour préparer une vague de combat spécialisée.",
 			"#8f6b54",
 			"armure bronze",
 			11,
@@ -67,7 +67,7 @@ public record PrototypeArchetype(
 		new PrototypeArchetype(
 			"ARCANE_SENTINEL",
 			"Arcane Sentinel",
-			"Un gardien mystique clone a la demande pour garder la meme silhouette tout en variant les charges internes.",
+			"Un gardien mystique clone à la demande pour garder la même silhouette tout en variant les charges internes.",
 			"#b996d0",
 			"plaque violette",
 			9,

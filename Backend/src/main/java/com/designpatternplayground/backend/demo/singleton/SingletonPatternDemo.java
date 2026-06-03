@@ -44,8 +44,8 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 			"singleton",
 			"Singleton",
 			PatternType.CREATIONAL,
-			"Garantit qu un service central ne possede qu une seule instance accessible depuis tous les clients.",
-			"Partager la meme configuration globale, le meme logger ou le meme gestionnaire audio dans toute l application.",
+			"Garantit qu'un service central ne possède qu'une seule instance accessible depuis tous les clients.",
+			"Partager la même configuration globale, le même logger ou le même gestionnaire audio dans toute l'application.",
 			"BEGINNER"
 		);
 	}
@@ -105,8 +105,8 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 		boolean coherent = clientViews.stream()
 			.allMatch(view -> config.settingValue().equals(view.visibleValue()));
 		String coherenceLabel = coherent
-			? "Tous les clients observent la meme configuration."
-			: "Chaque client voit un etat local different.";
+			? "Tous les clients observent la même configuration."
+			: "Chaque client voit un état local different.";
 
 		LinkedHashMap<String, Object> output = new LinkedHashMap<>();
 		output.put("mode", useSingleton ? WITH_SINGLETON : WITHOUT_SINGLETON);
@@ -131,8 +131,8 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 		return new PatternExecutionResult(
 			getCode(),
 			useSingleton
-				? "Singleton distribue une seule instance partagee, ce qui aligne tous les clients sur le meme etat global."
-				: "Sans Singleton, chaque client cree sa propre instance et les modifications se propagent mal.",
+				? "Singleton distribue une seule instance partagee, ce qui aligne tous les clients sur le même état global."
+				: "Sans Singleton, chaque client crée sa propre instance et les modifications se propagent mal.",
 			logs,
 			output,
 			buildVisualization(config, clientViews, uniqueInstanceIds, coherenceLabel, useSingleton)
@@ -165,12 +165,12 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 
 	private List<ClientPerspective> simulateWithoutSingleton(SingletonConfig config, List<String> logs, String writerClient) {
 		List<ClientPerspective> views = new ArrayList<>();
-		logs.add("Mode sans Singleton : chaque client cree sa propre instance.");
+		logs.add("Mode sans Singleton : chaque client crée sa propre instance.");
 
 		IntStream.range(0, config.clients().size()).forEach(index -> {
 			String client = config.clients().get(index);
 			GlobalSettingsManager manager = new GlobalSettingsManager("instance-" + (index + 1));
-			logs.add(client + " cree " + manager.instanceId() + ".");
+			logs.add(client + " crée " + manager.instanceId() + ".");
 
 			if (client.equals(writerClient)) {
 				manager.update(config.settingKey(), config.settingValue());
@@ -197,7 +197,7 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 
 		nodes.add(new VisualizationNode(
 			"summary",
-			"Etat global",
+			"État global",
 			"output",
 			Map.of("message", coherenceLabel)
 		));
@@ -231,7 +231,7 @@ public class SingletonPatternDemo implements DesignPatternDemo {
 
 	private SingletonConfig toConfig(Map<String, Object> parameters) {
 		if (parameters == null) {
-			throw new InvalidPatternConfigurationException("Les parametres sont obligatoires.");
+			throw new InvalidPatternConfigurationException("Les paramètres sont obligatoires.");
 		}
 
 		String mode = requireText(parameters.get("mode"), "mode").toUpperCase(Locale.ROOT);

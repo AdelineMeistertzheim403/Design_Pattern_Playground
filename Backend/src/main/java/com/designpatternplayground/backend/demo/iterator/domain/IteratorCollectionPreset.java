@@ -24,7 +24,7 @@ public enum IteratorCollectionPreset {
 	ASSET_TREE(
 		"ASSET_TREE",
 		"Asset Tree",
-		"Un arbre aplati en parcours depth-first pour montrer qu un iterator peut cacher la structure de stockage.",
+		"Un arbre aplati en parcours depth-first pour montrer qu'un iterator peut cacher la structure de stockage.",
 		"Depth-first traversal",
 		"Sans iterator, revenir en arriere oblige a recalculer la position dans l arbre a partir du root.",
 		List.of(
@@ -42,7 +42,7 @@ public enum IteratorCollectionPreset {
 		"Toolbelt",
 		"Une ceinture d outils a parcourir dans les deux sens avec un curseur visuel unique.",
 		"Bidirectional walk",
-		"Sans iterator, le client garde lui-meme la position et finit vite par dupliquer la logique de navigation.",
+		"Sans iterator, le client garde lui-même la position et finit vite par dupliquer la logique de navigation.",
 		List.of(
 			item("tool-map", "Map scanner", "TOOL", 0, 0),
 			item("tool-hook", "Grapple hook", "TOOL", 0, 1),

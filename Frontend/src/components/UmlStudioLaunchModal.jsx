@@ -85,18 +85,18 @@ export default function UmlStudioLaunchModal({
   }, [editorType, mode, umlDiagramType])
 
   return (
-    <VisualizationModal title="Ouvrir l editeur UML" onClose={onClose}>
+    <VisualizationModal title="Ouvrir l'éditeur UML" onClose={onClose}>
       <section className="rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.98),rgba(247,240,226,0.94))] p-6 shadow-[0_18px_45px_rgba(47,37,22,0.08)] sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Studio UML</p>
-        <h1 className="mt-3 text-4xl text-stone-950">Choisis un point de depart</h1>
+        <h1 className="mt-3 text-4xl text-stone-950">Choisis un point de départ</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-700">
-          Ouvre un canvas vide, charge un template base sur un design pattern, ou reprends un diagramme deja sauvegarde.
+          Ouvre un canvas vide, charge un template basé sur un design pattern, ou reprends un diagramme déjà sauvegardé.
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {[
             { id: 'uml', title: 'Diagramme de classe' },
-            { id: 'svg-scene', title: 'Scene SVG' },
+            { id: 'svg-scene', title: 'Scène SVG' },
           ].map((option) => (
             <button
               key={option.id}
@@ -125,7 +125,7 @@ export default function UmlStudioLaunchModal({
               onChange={(event) => setUmlDiagramType(event.target.value)}
             >
               <option value="class">Diagramme de classe</option>
-              <option value="activity">Diagramme d activite</option>
+              <option value="activity">Diagramme d'activité</option>
             </select>
           </label>
         ) : null}
@@ -135,21 +135,21 @@ export default function UmlStudioLaunchModal({
             {
               id: 'blank',
               title: 'Nouveau diagramme',
-              description: editorType === 'svg-scene' ? 'Demarrer avec une scene SVG vide.' : 'Demarrer avec un canvas UML vide.',
+              description: editorType === 'svg-scene' ? 'Démarrer avec une scène SVG vide.' : 'Démarrer avec un canvas UML vide.',
             },
             {
               id: 'template',
               title: 'Depuis un template',
               description: editorType === 'svg-scene'
-                ? 'Partir d une scene SVG de design pattern existante.'
+                ? "Partir d'une scène SVG de design pattern existante."
                 : umlDiagramType === 'activity'
                   ? 'Les templates UML concernent pour l instant les diagrammes de classe.'
-                  : 'Partir d un diagramme de design pattern existant.',
+                  : "Partir d'un diagramme de design pattern existant.",
             },
             {
               id: 'saved',
               title: 'Ouvrir un diagramme',
-              description: editorType === 'svg-scene' ? 'Reprendre une scene sauvegardee en base ou localement.' : 'Reprendre un diagramme sauvegarde en base ou localement.',
+              description: editorType === 'svg-scene' ? 'Reprendre une scène sauvegardée en base ou localement.' : 'Reprendre un diagramme sauvegardé en base ou localement.',
             },
           ].map((option) => {
             const isDisabled = option.id === 'template' && editorType === 'uml' && umlDiagramType === 'activity'
@@ -206,18 +206,18 @@ export default function UmlStudioLaunchModal({
 
         {editorType === 'uml' && umlDiagramType === 'activity' && mode === 'template' ? (
           <p className="mt-4 rounded-2xl border border-dashed border-black/12 bg-white/80 px-4 py-4 text-sm text-stone-600">
-            Les templates UML disponibles alimentent encore uniquement le diagramme de classe. Pour un diagramme d activite, ouvre un canvas vide ou un diagramme sauvegarde.
+            Les templates UML disponibles alimentent encore uniquement le diagramme de classe. Pour un diagramme d'activité, ouvre un canvas vide ou un diagramme sauvegardé.
           </p>
         ) : null}
 
         {mode === 'saved' ? (
           isRemoteSavedLoading ? (
             <p className="mt-6 rounded-2xl border border-dashed border-black/12 bg-white/80 px-4 py-4 text-sm text-stone-600">
-              Chargement des diagrammes sauvegardes...
+              Chargement des diagrammes sauvegardés...
             </p>
           ) : savedDocuments.length > 0 ? (
             <label className="mt-6 flex flex-col gap-2 text-sm text-stone-700">
-              <span className="font-semibold text-stone-900">Diagramme sauvegarde</span>
+              <span className="font-semibold text-stone-900">Diagramme sauvegardé</span>
               <select
                 className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-stone-900 outline-none"
                 value={selectedSavedId}
@@ -237,8 +237,8 @@ export default function UmlStudioLaunchModal({
           ) : (
             <p className="mt-6 rounded-2xl border border-dashed border-black/12 bg-white/80 px-4 py-4 text-sm text-stone-600">
               {canUseRemoteSavedDocuments
-                ? 'Aucun diagramme UML n est encore sauvegarde sur ton compte.'
-                : 'Aucun diagramme UML n est encore sauvegarde sur cet appareil.'}
+                ? "Aucun diagramme UML n'est encore sauvegardé sur ton compte."
+                : "Aucun diagramme UML n'est encore sauvegardé sur cet appareil."}
             </p>
           )
         ) : null}
@@ -272,7 +272,7 @@ export default function UmlStudioLaunchModal({
             }}
             disabled={(mode === 'template' && (!effectivePatternCode || (editorType === 'uml' && umlDiagramType === 'activity'))) || (mode === 'saved' && !selectedSavedId && savedDocuments.length > 0)}
           >
-            Ouvrir l editeur
+            Ouvrir l'éditeur
           </button>
         </div>
       </section>

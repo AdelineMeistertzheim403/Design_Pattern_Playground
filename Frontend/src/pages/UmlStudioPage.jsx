@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { buildHelpPath } from '../app/playgroundUtils'
 import { getUserUmlDiagram, saveUserUmlDiagram } from '../lib/api'
 import { loadPatternUmlDiagram } from '../patterns/loaders'
 import {
@@ -28,9 +29,10 @@ import {
 } from '../components/umlStudio/umlStudioDocument'
 import UmlStudioInspector from '../components/umlStudio/UmlStudioInspector'
 import UmlStudioPalette from '../components/umlStudio/UmlStudioPalette'
+import SpaLink from '../components/SpaLink'
 import VisualizationModal from '../components/VisualizationModal'
 
-export default function UmlStudioPage({ backendStatus, currentUser, launchRequest, patterns, onNavigateHome, onOpenAuth }) {
+export default function UmlStudioPage({ backendStatus, currentUser, launchRequest, patterns, onNavigateHelp, onNavigateHome, onOpenAuth }) {
   const [draft, setDraft] = useState(createEmptyDocument)
   const [selectedItem, setSelectedItem] = useState(null)
   const [undoStack, setUndoStack] = useState([])
@@ -60,7 +62,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           setDraft(createEmptyDocument(pendingLaunch.diagramType ?? 'class'))
           setSelectedItem(null)
           setUndoStack([])
-          setNotice(`Canvas UML ${pendingLaunch.diagramType === 'activity' ? 'd activite' : 'de classe'} vide initialise.`)
+          setNotice(`Canvas UML ${pendingLaunch.diagramType === 'activity' ? "d'activité" : 'de classe'} vide initialisé.`)
         }
         return
       }
@@ -71,7 +73,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           return
         }
         if (!template?.classes?.length) {
-          setNotice(`Aucun template UML n a ete trouve pour "${pendingLaunch.code}".`)
+          setNotice(`Aucun template UML n'a été trouvé pour "${pendingLaunch.code}".`)
           return
         }
         const pattern = patterns.find((item) => item.code === pendingLaunch.code)
@@ -84,7 +86,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
         }))
         setSelectedItem(null)
         setUndoStack([])
-        setNotice('Template charge. Tu peux maintenant adapter le diagramme a ton besoin.')
+        setNotice('Template chargé. Tu peux maintenant adapter le diagramme à ton besoin.')
         return
       }
 
@@ -100,7 +102,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
               }))
               setSelectedItem(null)
               setUndoStack([])
-              setNotice(`Diagramme "${savedDocument.name}" charge depuis la BDD.`)
+              setNotice(`Diagramme "${savedDocument.name}" chargé depuis la BDD.`)
             }
           } catch {
             if (!ignore) {
@@ -115,7 +117,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           setDraft(normalizeDocument(savedDocument.document))
           setSelectedItem(null)
           setUndoStack([])
-          setNotice(`Diagramme "${savedDocument.name}" charge.`)
+          setNotice(`Diagramme "${savedDocument.name}" chargé.`)
         }
         return
       }
@@ -381,7 +383,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
   function handleAddRelation() {
     if (diagramNodes.length < 2) {
-      setNotice(`Ajoute au moins deux ${draft.diagramType === 'activity' ? 'etapes' : 'boites'} avant de creer une relation.`)
+      setNotice(`Ajoute au moins deux ${draft.diagramType === 'activity' ? 'étapes' : 'boîtes'} avant de créer une relation.`)
       return
     }
 
@@ -412,14 +414,14 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
   function handleUndo() {
     const previousDraft = undoStack[undoStack.length - 1]
     if (!previousDraft) {
-      setNotice('Aucune action a annuler pour le moment.')
+      setNotice('Aucune action à annuler pour le moment.')
       return
     }
 
     setDraft(normalizeDocument(previousDraft))
     setUndoStack((currentStack) => currentStack.slice(0, -1))
     setSelectedItem(null)
-    setNotice('Derniere action annulee.')
+    setNotice('Dernière action annulée.')
   }
 
   function handleDeleteSelectedItem() {
@@ -456,7 +458,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
     setPlacingRelationPoint(null)
     setSelectedItem(null)
-    setNotice('Element supprime.')
+    setNotice('Élément supprimé.')
   }
 
   async function handleSave() {
@@ -482,10 +484,10 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
           id: savedDocument.code,
           name: savedDocument.name,
         }))
-        setNotice(`Diagramme "${savedDocument.name}" sauvegarde en BDD.`)
+        setNotice(`Diagramme "${savedDocument.name}" sauvegardé en BDD.`)
         return
       } catch (error) {
-        setNotice(error.message || 'La sauvegarde BDD a echoue. Sauvegarde locale conservee.')
+        setNotice(error.message || 'La sauvegarde BDD a échoué. Sauvegarde locale conservée.')
       } finally {
         setSavePending(false)
       }
@@ -495,7 +497,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
 
     saveUmlStudioDocument(record)
     setDraft(normalizeDocument(record.document))
-    setNotice(`Diagramme "${name}" sauvegarde dans le navigateur.`)
+    setNotice(`Diagramme "${name}" sauvegardé dans le navigateur.`)
   }
 
   function buildExportSvg() {
@@ -586,7 +588,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
       return
     }
     setPlacingRelationPoint(selectedRelation.id)
-    setNotice('Clique sur la fleche selectionnee pour placer un angle.')
+    setNotice('Clique sur la flèche sélectionnée pour placer un angle.')
   }
 
   function handleRelationPlacementClick(event, relation) {
@@ -605,7 +607,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
       )),
     }))
     setPlacingRelationPoint(null)
-    setNotice('Angle ajoute. Tu peux maintenant le deplacer directement sur la fleche.')
+    setNotice('Angle ajouté. Tu peux maintenant le déplacer directement sur la flèche.')
     setSelectedItem({ type: 'relation', id: relation.id })
   }
 
@@ -678,7 +680,18 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Studio UML</p>
-            <h1 className="mt-3 text-4xl text-stone-950">Editeur UML {draft.diagramType === 'activity' ? 'd activite' : ''}</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl text-stone-950">Éditeur UML {draft.diagramType === 'activity' ? "d'activité" : ''}</h1>
+              <SpaLink
+                aria-label="Ouvrir l’aide de l’éditeur UML"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-sm font-bold text-stone-800 shadow-[0_10px_20px_rgba(47,37,22,0.08)] transition hover:-translate-y-0.5 hover:border-black/20"
+                href={buildHelpPath('uml')}
+                title="Aide de l’éditeur UML"
+                onNavigate={onNavigateHelp}
+              >
+                ?
+              </SpaLink>
+            </div>
           </div>
           <UmlStudioHeaderActions
             diagramName={draft.name}
@@ -759,7 +772,7 @@ export default function UmlStudioPage({ backendStatus, currentUser, launchReques
       </div>
 
       {isPreviewOpen && previewSvgMarkup ? (
-        <VisualizationModal title={`Apercu ${draft.name}`} onClose={() => setIsPreviewOpen(false)}>
+        <VisualizationModal title={`Aperçu ${draft.name}`} onClose={() => setIsPreviewOpen(false)}>
           <section className="rounded-[34px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.99),rgba(247,240,226,0.95))] p-5 shadow-[0_18px_45px_rgba(47,37,22,0.08)]">
             <div className="overflow-auto rounded-[28px] border border-black/10 bg-[#fffaf2] p-4">
               <div

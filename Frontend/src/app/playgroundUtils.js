@@ -44,6 +44,11 @@ export function buildProgressPath() {
   return '/progression'
 }
 
+export function buildHelpPath(patternCode = '') {
+  const normalizedPatternCode = `${patternCode ?? ''}`.trim()
+  return normalizedPatternCode ? `/aide#${normalizedPatternCode}` : '/aide'
+}
+
 export function buildAdminUmlPath() {
   return '/admin/uml'
 }
@@ -78,7 +83,10 @@ export function buildLegalNoticePath() {
 }
 
 export function parseRoute(pathname) {
-  const normalized = pathname.replace(/\/+$/, '') || '/'
+  const [rawPath, rawHash = ''] = pathname.split('#')
+  const normalized = rawPath.replace(/\/+$/, '') || '/'
+  const hash = rawHash.trim()
+  const helpSections = new Set(['patterns', 'missions', 'uml'])
 
   if (normalized === '/') {
     return { name: 'home' }
@@ -86,6 +94,14 @@ export function parseRoute(pathname) {
 
   if (normalized === '/progression') {
     return { name: 'progress' }
+  }
+
+  if (normalized === '/aide') {
+    return {
+      name: 'help',
+      helpPatternCode: hash && !helpSections.has(hash) ? hash : null,
+      helpSection: helpSections.has(hash) ? hash : null,
+    }
   }
 
   if (normalized === '/admin/uml') {

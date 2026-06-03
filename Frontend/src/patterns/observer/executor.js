@@ -31,7 +31,7 @@ export default function executeObserverPattern(parameters) {
       : "Sans Observer, l emetteur appelle directement chaque cible concrete et augmente son couplage.",
     logs: useObserver
       ? [
-          `Creation du sujet : ${subjectName}.`,
+          `Création du sujet : ${subjectName}.`,
           ...observers.map((observer) => `Abonnement de ${observer}.`),
           `Emission de l evenement : ${message}.`,
           `Le sujet notifie ${deliveries.length} observer(s).`,

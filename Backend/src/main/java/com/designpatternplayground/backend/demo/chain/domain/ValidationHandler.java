@@ -15,7 +15,7 @@ public class ValidationHandler extends RequestHandler {
 		}
 
 		return HandlerEvaluation.reject(
-			"Payload invalide : la chaine stoppe avant le service metier.",
+			"Payload invalide : la chaîne stoppe avant le service métier.",
 			label(),
 			code()
 		);

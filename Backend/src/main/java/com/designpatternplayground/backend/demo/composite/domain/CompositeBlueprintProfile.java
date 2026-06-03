@@ -13,22 +13,22 @@ public enum CompositeBlueprintProfile {
 		"GAME_ASSETS",
 		"Game Assets",
 		"Arbre de production jeu avec dossiers sprites, audio et atlas UI.",
-		"Une seule operation peut balayer tout le pack d assets quand les dossiers et fichiers partagent le meme contrat.",
-		"Sans Composite, le client oublie les sprites imbriques dans player et ne traite que le premier niveau."
+		"Une seule opération peut balayer tout le pack d assets quand les dossiers et fichiers partagent le même contrat.",
+		"Sans Composite, le client oublie les sprites imbriqués dans player et ne traite que le premier niveau."
 	),
 	DESIGN_SYSTEM(
 		"DESIGN_SYSTEM",
 		"Design System",
 		"Bibliotheque UI avec composants, tokens et document Storybook.",
-		"Le root delegue la meme operation a des branches heterogenes sans if speciaux.",
+		"Le root délègue la même opération a des branches hétérogènes sans if spéciaux.",
 		"Sans Composite, les fichiers enfouis dans components et tokens restent hors du parcours manuel."
 	),
 	DOCS_SPACE(
 		"DOCS_SPACE",
 		"Docs Space",
 		"Espace documentaire avec guides, API et readme central.",
-		"Le meme appel de traversal couvre guides, API et documents feuilles.",
-		"Sans Composite, la documentation profonde n est pas consolidee quand le client reste au niveau racine."
+		"Le même appel de traversal couvre guides, API et documents feuilles.",
+		"Sans Composite, la documentation profonde n'est pas consolidee quand le client reste au niveau racine."
 	);
 
 	private final String code;

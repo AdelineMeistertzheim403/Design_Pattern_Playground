@@ -191,15 +191,15 @@ export const BUILDER_FINISH_PALETTES = {
 export const CHAIN_STAGE_META = {
   AUTH: {
     title: 'Authentication',
-    subtitle: 'controle du token',
+    subtitle: 'contrôle du token',
   },
   VALIDATION: {
     title: 'Validation',
-    subtitle: 'controle du payload',
+    subtitle: 'contrôle du payload',
   },
   PROCESSING: {
     title: 'Processing',
-    subtitle: 'traitement metier',
+    subtitle: 'traitement métier',
   },
 }
 
@@ -668,7 +668,7 @@ export function SceneMetaBadges({
 export function EmptyScenePlaceholder() {
   return (
     <div className="rounded-[26px] border border-dashed border-black/15 bg-white/70 px-5 py-12 text-sm leading-7 text-stone-600">
-      La scene visuelle apparaitra ici des qu une demo ou un apercu local sera disponible.
+      La scène visuelle apparaîtra ici dès qu'une démo ou un aperçu local sera disponible.
     </div>
   )
 }

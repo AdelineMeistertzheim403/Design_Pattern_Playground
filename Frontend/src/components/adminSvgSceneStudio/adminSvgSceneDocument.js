@@ -110,7 +110,7 @@ export function findAttachmentTarget(point, elements) {
   return bestTarget?.distance <= 120 ? bestTarget : null
 }
 
-export function createDefaultDraft(name = 'Scene SVG') {
+export function createDefaultDraft(name = 'Scène SVG') {
   return {
     viewBox: DEFAULT_VIEW_BOX,
     playbackMode: 'auto',
@@ -202,7 +202,7 @@ function parseLegacySvg(document, fallbackName) {
       return
     }
 
-    const label = shape.parentElement?.querySelector('text')?.textContent?.trim() || `Noeud ${index + 1}`
+    const label = shape.parentElement?.querySelector('text')?.textContent?.trim() || `Nœud ${index + 1}`
     draft.elements.push({
       id: `element-imported-ellipse-${index}`,
       type: 'ellipse',
