@@ -63,3 +63,53 @@ export function buildPatternPrerenderMarkup(pattern, learningContent) {
     </main>
   `
 }
+
+export function buildHelpPrerenderMarkup(patterns) {
+  const patternLinks = patterns
+    .map((pattern) => `
+      <li style="margin:0 0 8px;">
+        <a href="/patterns/${escapeHtml(pattern.code)}" style="color:#2f4f46; font-weight:700; text-decoration:none;">${escapeHtml(pattern.name)}</a>
+        <span style="color:#6b655e;"> - ${escapeHtml(pattern.description)}</span>
+      </li>
+    `)
+    .join('')
+
+  return `
+    <main style="max-width:1120px; margin:0 auto; padding:24px 16px 48px; color:#241f18; font-family:IBM Plex Sans, Segoe UI, sans-serif;">
+      <section style="padding:28px 0 12px;">
+        <p style="margin:0; font-size:12px; text-transform:uppercase; letter-spacing:0.18em; color:#6b655e;">Centre d'aide</p>
+        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Aide Design Pattern Playground</h1>
+        <p style="margin:18px 0 0; max-width:860px; font-size:18px; line-height:1.8; color:#4f463d;">Retrouve les fiches de configuration, le fonctionnement des missions et les reperes essentiels pour construire des diagrammes UML lisibles.</p>
+      </section>
+      <section style="margin-top:24px;">
+        <h2 style="margin:0; font-size:32px; line-height:1.2; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Configurer les design patterns</h2>
+        <p style="margin:14px 0 0; max-width:860px; line-height:1.8; color:#4f463d;">Chaque fiche explique le role du scenario et les champs a regler avant de lancer la demonstration interactive.</p>
+        <ul style="margin:18px 0 0; padding-left:22px; max-width:900px; line-height:1.7;">${patternLinks}</ul>
+      </section>
+      <section style="margin-top:24px;">
+        <h2 style="margin:0; font-size:32px; line-height:1.2; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Missions et editeurs visuels</h2>
+        <p style="margin:14px 0 0; max-width:860px; line-height:1.8; color:#4f463d;">Le mode mission transforme les patterns en exercices guides. Les editeurs UML et SVG servent a produire des supports visuels pour expliquer les responsabilites, relations et flux d'execution.</p>
+      </section>
+    </main>
+  `
+}
+
+export function buildLegalNoticePrerenderMarkup() {
+  return `
+    <main style="max-width:960px; margin:0 auto; padding:24px 16px 48px; color:#241f18; font-family:IBM Plex Sans, Segoe UI, sans-serif;">
+      <section style="padding:28px 0 12px;">
+        <p style="margin:0; font-size:12px; text-transform:uppercase; letter-spacing:0.18em; color:#6b655e;">Mentions legales et confidentialite</p>
+        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Informations legales et traitement des donnees</h1>
+        <p style="margin:18px 0 0; max-width:860px; font-size:18px; line-height:1.8; color:#4f463d;">Cette page presente les mentions legales applicables a ce site personnel non professionnel ainsi que les informations essentielles relatives aux donnees personnelles traitees dans l'application.</p>
+      </section>
+      <section style="margin-top:24px;">
+        <h2 style="margin:0; font-size:32px; line-height:1.2; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Editeur et hebergement</h2>
+        <p style="margin:14px 0 0; max-width:860px; line-height:1.8; color:#4f463d;">Design Pattern Playground est un site personnel edite a titre non professionnel. Le site est heberge par OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.</p>
+      </section>
+      <section style="margin-top:24px;">
+        <h2 style="margin:0; font-size:32px; line-height:1.2; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Donnees personnelles</h2>
+        <p style="margin:14px 0 0; max-width:860px; line-height:1.8; color:#4f463d;">Les donnees de compte, de session et de progression sont utilisees uniquement pour faire fonctionner l'authentification, les quiz et le suivi pedagogique. Aucun cookie publicitaire ni traceur marketing tiers n'est utilise.</p>
+      </section>
+    </main>
+  `
+}

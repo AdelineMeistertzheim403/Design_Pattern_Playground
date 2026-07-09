@@ -4,7 +4,12 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { fallbackPatterns } from '../src/patterns/catalog.js'
 import { defaultLearningContent } from '../src/patterns/defaults.js'
 import { buildPageSeoPayload, buildStructuredData, normalizeOrigin } from '../src/seo/pageSeo.js'
-import { buildHomePrerenderMarkup, buildPatternPrerenderMarkup } from '../src/seo/prerenderTemplates.js'
+import {
+  buildHelpPrerenderMarkup,
+  buildHomePrerenderMarkup,
+  buildLegalNoticePrerenderMarkup,
+  buildPatternPrerenderMarkup,
+} from '../src/seo/prerenderTemplates.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -142,6 +147,30 @@ async function main() {
 
   await writeRouteHtml('index.html', homeHtml)
 
+  const helpPayload = buildPageSeoPayload({
+    pageKind: 'help',
+    pathname: '/aide',
+    siteOrigin,
+  })
+  const helpHtml = injectRootMarkup(
+    injectHead(baseHtml, helpPayload, []),
+    buildHelpPrerenderMarkup(fallbackPatterns),
+  )
+
+  await writeRouteHtml(path.join('aide', 'index.html'), helpHtml)
+
+  const legalNoticePayload = buildPageSeoPayload({
+    pageKind: 'legalNotice',
+    pathname: '/mentions-legales',
+    siteOrigin,
+  })
+  const legalNoticeHtml = injectRootMarkup(
+    injectHead(baseHtml, legalNoticePayload, []),
+    buildLegalNoticePrerenderMarkup(),
+  )
+
+  await writeRouteHtml(path.join('mentions-legales', 'index.html'), legalNoticeHtml)
+
   for (const pattern of fallbackPatterns) {
     const learningContent = await loadPatternLearningContent(pattern.code)
     const pathname = `/patterns/${pattern.code}`
@@ -167,7 +196,7 @@ async function main() {
     await writeRouteHtml(path.join('patterns', pattern.code, 'index.html'), patternHtml)
   }
 
-  console.log(`[prerender] Generated static HTML snapshots for home and ${fallbackPatterns.length} pattern pages.`)
+  console.log(`[prerender] Generated static HTML snapshots for home, help, legal notice and ${fallbackPatterns.length} pattern pages.`)
 }
 
 main().catch((error) => {
