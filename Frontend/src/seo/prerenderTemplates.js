@@ -1,3 +1,5 @@
+import { buildPatternSeoFields } from './pageSeo.js'
+
 function escapeHtml(value) {
   return `${value ?? ''}`
     .replace(/&/g, '&amp;')
@@ -23,7 +25,7 @@ export function buildHomePrerenderMarkup(patterns) {
     <main style="max-width:1120px; margin:0 auto; padding:24px 16px 48px; color:#241f18; font-family:IBM Plex Sans, Segoe UI, sans-serif;">
       <section style="padding:28px 0 12px;">
         <p style="margin:0; font-size:12px; text-transform:uppercase; letter-spacing:0.18em; color:#6b655e;">Comprendre les design patterns en les voyant fonctionner</p>
-        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Apprendre les design patterns avec des demos interactives</h1>
+        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">Apprendre les design patterns  avec des exemples interactifs</h1>
         <p style="margin:18px 0 0; max-width:840px; font-size:18px; line-height:1.8; color:#4f463d;">Design Pattern Playground aide a relier la theorie, le diagramme UML et le comportement a l execution. Chaque pattern dispose d une page dediee avec explication, demonstration visuelle et quiz.</p>
       <p style="margin:12px 0 0; max-width:840px; font-size:16px; line-height:1.8; color:#6b655e;">Les implementations sont en Java avec Spring Boot. L interface interactive est construite avec React. Explore les patterns GoF : Creational, Structural et Behavioral.</p>
       </section>
@@ -36,6 +38,7 @@ export function buildHomePrerenderMarkup(patterns) {
 }
 
 export function buildPatternPrerenderMarkup(pattern, learningContent) {
+  const patternSeo = buildPatternSeoFields(pattern, learningContent)
   const stepsMarkup = (learningContent?.steps ?? [])
     .map((step) => `<li style="margin:0 0 10px;">${escapeHtml(step)}</li>`)
     .join('')
@@ -44,7 +47,7 @@ export function buildPatternPrerenderMarkup(pattern, learningContent) {
     <main style="max-width:1120px; margin:0 auto; padding:24px 16px 48px; color:#241f18; font-family:IBM Plex Sans, Segoe UI, sans-serif;">
       <article style="padding:28px 0 12px;">
         <p style="margin:0; font-size:12px; text-transform:uppercase; letter-spacing:0.18em; color:#6b655e;">${escapeHtml(pattern.type)} - ${escapeHtml(pattern.complexityLevel)}</p>
-        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">${escapeHtml(pattern.name)}</h1>
+        <h1 style="margin:16px 0 0; font-size:48px; line-height:1.1; font-family:Space Grotesk, Trebuchet MS, sans-serif;">${escapeHtml(patternSeo.h1)}</h1>
         <p style="margin:18px 0 0; max-width:860px; font-size:18px; line-height:1.8; color:#4f463d;">${escapeHtml(pattern.description)}</p>
         <p style="margin:14px 0 0; max-width:860px; font-size:17px; line-height:1.8; color:#4f463d;"><strong>Cas d usage :</strong> ${escapeHtml(pattern.useCase)}</p>
       </article>

@@ -16,6 +16,21 @@ function joinDescriptionParts(parts, maxLength = 175) {
   return `${combined.slice(0, maxLength - 3).trimEnd()}...`
 }
 
+export function buildPatternSeoFields(pattern, learningContent) {
+  const patternName = `${pattern?.name ?? 'Design pattern'}`.trim()
+  const patternKeyword = `${patternName} Pattern `
+
+  return {
+    description: joinDescriptionParts([
+      `Decouvrez le ${patternKeyword} avec un exemple concret, un diagramme UML, une demo interactive et un quiz.`,
+      learningContent?.strapline,
+    ], 165),
+    h1: `Comprendre le design pattern ${patternName}`,
+    headline: `${patternKeyword} : exemple, UML et demonstration interactive`,
+    title: `${patternKeyword} : exemple, UML et demo interactive | ${SITE_NAME}`,
+  }
+}
+
 export function normalizeOrigin(rawValue) {
   return `${rawValue ?? ''}`.trim().replace(/\/$/, '')
 }
@@ -31,18 +46,16 @@ export function buildPageSeoPayload({
   const imageUrl = `${siteOrigin}${DEFAULT_IMAGE_PATH}`
 
   if (pageKind === 'pattern' && selectedPattern) {
+    const patternSeo = buildPatternSeoFields(selectedPattern, learningContent)
+
     return {
       canonicalUrl,
-      description: joinDescriptionParts([
-        `${selectedPattern.name} : ${selectedPattern.description}`,
-        `Cas d usage : ${selectedPattern.useCase}.`,
-        learningContent?.strapline,
-      ]),
+      description: patternSeo.description,
       imageUrl,
       imageWidth: '1020',
       imageHeight: '235',
       robots: 'index,follow',
-      title: `${selectedPattern.name} design pattern Java : explication, UML et demo interactive | ${SITE_NAME}`,
+      title: patternSeo.title,
       type: 'article',
     }
   }
@@ -108,12 +121,12 @@ export function buildPageSeoPayload({
 
   return {
     canonicalUrl,
-    description: 'Apprends les design patterns GoF en Java et Spring Boot avec des demos interactives, des schemas UML et des quiz. Exemples concrets en React.',
+    description: 'Apprends les design patterns avec des exemples concrets, des diagrammes UML, des demos interactives et des quiz.',
     imageUrl,
     imageWidth: '1020',
     imageHeight: '235',
     robots: 'index,follow',
-    title: `${SITE_NAME} | Apprendre les design patterns Java avec demos interactives et UML`,
+    title: `${SITE_NAME} | Apprendre les design patterns avec exemples UML interactifs`,
     type: 'website',
   }
 }
@@ -132,7 +145,7 @@ export function buildStructuredData({
     const article = {
       '@context': 'https://schema.org',
       '@type': 'TechArticle',
-      headline: `${selectedPattern.name} design pattern`,
+      headline: buildPatternSeoFields(selectedPattern, learningContent).headline,
       description: buildPageSeoPayload({
         learningContent,
         pageKind,

@@ -1,6 +1,7 @@
 import { complexityLabels, typeLabels } from '../../app/playgroundConstants'
 import { buildPatternPath } from '../../app/playgroundUtils'
 import SpaLink from '../../components/SpaLink'
+import { buildPatternSeoFields } from '../../seo/pageSeo'
 
 export default function PatternHeroSection({
   selectedPattern,
@@ -13,6 +14,8 @@ export default function PatternHeroSection({
   onNavigateQuiz,
   onOpenAuth,
 }) {
+  const patternSeo = buildPatternSeoFields(selectedPattern, learningContent)
+
   return (
     <section className="reveal rounded-[34px] border border-black/10 bg-[var(--panel)] px-6 py-8 shadow-[0_26px_70px_rgba(47,37,22,0.12)] sm:px-10 sm:py-10">
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -44,7 +47,7 @@ export default function PatternHeroSection({
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
               {typeLabels[selectedPattern.type] ?? selectedPattern.type} · {complexityLabels[selectedPattern.complexityLevel] ?? selectedPattern.complexityLevel}
             </p>
-            <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{selectedPattern.name}</h1>
+            <h1 className="mt-3 text-4xl text-stone-950 sm:text-5xl">{patternSeo.h1}</h1>
           </div>
 
           <p className="max-w-3xl text-base leading-7 text-stone-700">{selectedPattern.description}</p>

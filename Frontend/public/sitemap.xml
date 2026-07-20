@@ -2,157 +2,157 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/aide</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/mentions-legales</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/abstract-factory</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/bridge</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/memento</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/iterator</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/template</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/interpreter</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/visitor</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/prototype</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/mediator</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/chain</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/command</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/adapter</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/proxy</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/facade</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/composite</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/builder</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/singleton</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/state</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/flyweight</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/decorator</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/factory</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/observer</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://design-pattern-playground.adelinemeistertzheim.fr/patterns/strategy</loc>
-    <lastmod>2026-07-09</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
